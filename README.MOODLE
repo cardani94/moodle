@@ -5,7 +5,7 @@ This is a modified version of phpMyAdmin integrated with Moodle.
 2/ open shell and cd to 'yourmoodleinstallation/local' directory
 3/ execute "git clone git@github.com:moodlehq/moodle-local_phpmyadmin.git phpmyadmin"
 
-Alternatively you may download snapshot from https://github.com/moodlehq/moodle-local_phpmyadmin/archives/MOODLE_20_STABLE
+Alternatively you may download snapshot from https://github.com/moodlehq/moodle-local_phpmyadmin
 
 
 ==Maintainer==
