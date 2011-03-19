@@ -18,19 +18,19 @@ if (!empty($CFG->passwordsaltmain)) {
 
 /* Servers configuration */
 $i = 1;
-        
+
 $cfg['Servers'][$i]['auth_type'] = 'cookie';
 $cfg['Servers'][$i]['extension'] = 'mysqli';
 $cfg['Servers'][$i]['compress']  = false;
 
 if ($CFG->dbhost === 'localhost') {
-    $cfg['Servers'][$i]['connect_type'] = 'socket';    
+    $cfg['Servers'][$i]['connect_type'] = 'socket';
     $cfg['Servers'][$i]['socket']       = '';
     if (!empty($CFG->dboptions['dbsocket']) and (strpos($CFG->dboptions['dbsocket'], '/') !== false or strpos($CFG->dboptions['dbsocket'], '\\') !== false)) {
         $cfg['Servers'][$i]['socket']   = $CFG->dboptions['dbsocket'];
-    }    
+    }
 } else {
-    $cfg['Servers'][$i]['connect_type'] = 'tcp';    
+    $cfg['Servers'][$i]['connect_type'] = 'tcp';
     $cfg['Servers'][$i]['port']         = '';
     if (!empty($CFG->dboptions['dbport'])) {
         $cfg['Servers'][$i]['port']     = $CFG->dboptions['dbport'];
@@ -73,7 +73,7 @@ foreach ($dirs as $dir) {
         if (!empty($CFG->directorypermissions)) {
             $directorypermissions = $CFG->directorypermissions;
         }
-        
+
         umask(0000); // just in case some evil code changed it
         mkdir($dir, $directorypermissions, true);
     }
