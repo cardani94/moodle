@@ -366,7 +366,7 @@ function PMA_auth_check()
         }
     }
 
-    if (! empty($_REQUEST['pma_username'])) {
+    if (! empty($_REQUEST['pma_username']) and $GLOBALS['cfg']['moodledbuser'] === $_REQUEST['pma_username']) { //moodle extra security - only our db user allowed
         // The user just logged in
         $GLOBALS['PHP_AUTH_USER'] = $_REQUEST['pma_username'];
         $GLOBALS['PHP_AUTH_PW']   = empty($_REQUEST['pma_password']) ? '' : $_REQUEST['pma_password'];
