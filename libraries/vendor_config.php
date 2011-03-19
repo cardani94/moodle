@@ -41,6 +41,13 @@ define('SETUP_DIR_WRITABLE', true);
 define('CONFIG_DIR', './');
 
 /**
+ * Whether to skip mtime check on config file and load it on every request.
+ * This has slight performance drawback, but it is the only way to handle
+ * inclusions of other php scripts from config.
+ */
+define('SKIP_MTIME_CONFIG_CHECK', true);
+
+/**
  * Filename of a configuration file.
  */
 define('CONFIG_FILE', CONFIG_DIR . 'config.inc.php');
@@ -58,7 +65,7 @@ define('CUSTOM_FOOTER_FILE', CONFIG_DIR . 'config.footer.inc.php');
 /**
  * Default value for check for version upgrades.
  */
-define('VERSION_CHECK_DEFAULT', true);
+define('VERSION_CHECK_DEFAULT', false);
 
 /**
  * Path to gettext.inc file. Useful when you want php-gettext somewhere else,
