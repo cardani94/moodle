@@ -10,6 +10,10 @@ $CFG = null;
 define('ABORT_AFTER_CONFIG', true);
 require('../../config.php'); // this stops immediately at the beginning of lib/setup.php
 
+if ($CFG->dbtype !== 'mysql' and $CFG->dbtype !== 'mysqli') {
+    die();
+}
+
 if (!empty($CFG->passwordsaltmain)) {
     $cfg['blowfish_secret'] = sha1($CFG->passwordsaltmain);
 } else {
