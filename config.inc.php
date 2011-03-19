@@ -18,7 +18,7 @@ if (!empty($CFG->passwordsaltmain)) {
 
 /* Servers configuration */
 $i = 1;
-
+        
 $cfg['Servers'][$i]['auth_type'] = 'cookie';
 $cfg['Servers'][$i]['extension'] = 'mysqli';
 $cfg['Servers'][$i]['compress']  = false;
@@ -39,26 +39,42 @@ if ($CFG->dbhost === 'localhost') {
 $cfg['Servers'][$i]['host']    = $CFG->dbhost;
 $cfg['Servers'][$i]['only_db'] = $CFG->dbname;
 
+$cfg['PmaAbsoluteUri']         = "$CFG->wwwroot/local/phpmyadmin/";
+$cfg['AllowThirdPartyFraming'] = false;
+$cfg['MemoryLimit']            = '64M';
+$cfg['Confirm']                = true;
+$cfg['ShowCreateDb']           = false;
+$cfg['CheckConfigurationPermissions'] = false;
 $cfg['AllowAnywhereRecoding']  = false;
 $cfg['DefaultCharset']         = 'utf-8';
 $cfg['RecodingEngine']         = 'auto';
 $cfg['IconvExtraParams']       = '//TRANSLIT';
-$cfg['UploadDir']              = "$CFG->dataroot/mysql";
-$cfg['SaveDir']                = "$CFG->dataroot/mysql";
-$cfg['docSQLDir']              = "$CFG->dataroot/mysql";
-$cfg['TempDir']                = "$CFG->dataroot/mysql";
+$cfg['UploadDir']              = "$CFG->dataroot/local_phpmyadmin/upload";
+$cfg['SaveDir']                = "$CFG->dataroot/local_phpmyadmin/save";
+$cfg['docSQLDir']              = "$CFG->dataroot/local_phpmyadmin/docs";
+$cfg['TempDir']                = "$CFG->dataroot/local_phpmyadmin/temp";
+$cfg['SessionSavePath']        = "$CFG->dataroot/local_phpmyadmin/session"; // not yet implemented in 3.3.10
+$cfg['AllowUserDropDatabase']  = false;
+
+// special moodle hacks
+$cfg['moodledbuser']           = $CFG->dbuser;
 
 // make sure the dir actually exists
 if (!file_exists($CFG->dataroot) or !is_writable($CFG->dataroot)) {
     die();
 }
 
-if (!file_exists("$CFG->dataroot/mysql")) {
-    $directorypermissions = 02777;
-    if (!empty($CFG->directorypermissions)) {
-        $directorypermissions = $CFG->directorypermissions;
+$dirs = array('upload', 'save', 'docs', 'temp', 'session');
+
+foreach ($dirs as $dir) {
+    $dir = "$CFG->dataroot/local_phpmyadmin/$dir";
+    if (!file_exists($dir)) {
+        $directorypermissions = 02777;
+        if (!empty($CFG->directorypermissions)) {
+            $directorypermissions = $CFG->directorypermissions;
+        }
+        
+        umask(0000); // just in case some evil code changed it
+        mkdir($dir, $directorypermissions, true);
     }
-    
-    umask(0000); // just in case some evil code changed it
-    mkdir($dir, $directorypermissions, false);
 }
