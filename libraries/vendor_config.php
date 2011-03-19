@@ -39,6 +39,6 @@ define('SETUP_DIR_WRITABLE', true);
  * This has slight performance drawback, but it is the only way to handle
  * inclusions of other php scripts from config.
  */
-define('SKIP_MTIME_CONFIG_CHECK', false);
+define('SKIP_MTIME_CONFIG_CHECK', true);
 
 ?>
