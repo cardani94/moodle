@@ -7119,6 +7119,7 @@ function get_core_subsystems() {
             'userkey'     => NULL,
             'webservice'  => 'webservice',
             'xmldb'       => NULL,
+            'generator'   => 'admin'
         );
     }
 

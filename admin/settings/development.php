@@ -81,6 +81,8 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
      // Web service test clients DO NOT COMMIT : THE EXTERNAL WEB PAGE IS NOT AN ADMIN PAGE !!!!!
     $ADMIN->add('development', new admin_externalpage('testclient', get_string('testclient', 'webservice'), "$CFG->wwwroot/$CFG->admin/webservice/testclient.php"));
 
+    // Data generator for moodle plugins.
+    $ADMIN->add('development', new admin_externalpage('generator', get_string('generatorname', 'generator'), "$CFG->wwwroot/$CFG->admin/generator/"));
 
     if ($CFG->mnet_dispatcher_mode !== 'off') {
         $ADMIN->add('development', new admin_externalpage('mnettestclient', get_string('testclient', 'mnet'), "$CFG->wwwroot/$CFG->admin/mnet/testclient.php"));
