@@ -166,7 +166,7 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group{
                     }
                 }
                 if (!is_array($value)) {
-                    $currentdate = usergetdate($value);
+                    $currentdate = usergetdate($value, $this->_options['timezone']);
                     // Round minutes to the previous multiple of step.
                     $currentdate['minutes'] -= $currentdate['minutes'] % $this->_options['step'];
                     $value = array(
