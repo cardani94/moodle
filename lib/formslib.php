@@ -924,13 +924,18 @@ abstract class moodleform {
      * @param int $i the index of this element.
      * @param HTML_QuickForm_element $elementclone
      * @param array $namecloned array of names
+     * @param string $groupname name of the element group
      */
-    function repeat_elements_fix_clone($i, $elementclone, &$namecloned) {
+    function repeat_elements_fix_clone($i, $elementclone, &$namecloned, $groupname = null) {
         $name = $elementclone->getName();
-        $namecloned[] = $name;
 
         if (!empty($name)) {
-            $elementclone->setName($name."[$i]");
+            if (is_null($groupname)) {
+                $elementclone->setName($name."[$i]");
+                $namecloned[] = $name;
+            } else {
+                $namecloned[$groupname."[$i][$name]"] = $groupname."[$name]";
+            }
         }
 
         if (is_a($elementclone, 'HTML_QuickForm_header')) {
@@ -941,6 +946,24 @@ abstract class moodleform {
             $value=$elementclone->getLabel();
             $elementclone->setLabel(str_replace('{no}', ($i+1), $value));
         }
+    }
+
+    /**
+     * Adds index to element created by repeat_elements.
+     *
+     * @param string $elementname name of the element
+     * @param int $index index which needs to be appeneded
+     */
+    function add_index_to_field_name($elementname, $index) {
+        $realelementname = null;
+        $pos = strpos($elementname, '[');
+        if ($pos !== FALSE) {
+            $realelementname = substr($elementname, 0, $pos)."[$index]";
+            $realelementname .= substr($elementname, $pos);
+        } else {
+            $realelementname = $elementname."[$index]";
+        }
+        return $realelementname;
     }
 
     /**
@@ -986,9 +1009,9 @@ abstract class moodleform {
                 $elementclone = fullclone($elementobj);
                 $this->repeat_elements_fix_clone($i, $elementclone, $namecloned);
 
-                if ($elementclone instanceof HTML_QuickForm_group && !$elementclone->_appendName) {
+                if ($elementclone instanceof HTML_QuickForm_group) {
                     foreach ($elementclone->getElements() as $el) {
-                        $this->repeat_elements_fix_clone($i, $el, $namecloned);
+                        $this->repeat_elements_fix_clone($i, $el, $namecloned, $elementobj->getName());
                     }
                     $elementclone->setLabel(str_replace('{no}', $i + 1, $elementclone->getLabel()));
                 }
@@ -997,17 +1020,10 @@ abstract class moodleform {
             }
         }
         for ($i=0; $i<$repeats; $i++) {
-            foreach ($options as $elementname => $elementoptions){
-                $pos=strpos($elementname, '[');
-                if ($pos!==FALSE){
-                    $realelementname = substr($elementname, 0, $pos+1)."[$i]";
-                    $realelementname .= substr($elementname, $pos+1);
-                }else {
-                    $realelementname = $elementname."[$i]";
-                }
+            foreach ($options as $elementname => $elementoptions) {
+                $realelementname = $this->add_index_to_field_name($elementname, $i);
                 foreach ($elementoptions as  $option => $params){
-
-                    switch ($option){
+                    switch ($option) {
                         case 'default' :
                             $mform->setDefault($realelementname, str_replace('{no}', $i + 1, $params));
                             break;
@@ -1018,7 +1034,7 @@ abstract class moodleform {
                         case 'disabledif' :
                             foreach ($namecloned as $num => $name){
                                 if ($params[0] == $name){
-                                    $params[0] = $params[0]."[$i]";
+                                    $params[0] = $this->add_index_to_field_name($params[0], $i);
                                     break;
                                 }
                             }
@@ -1026,11 +1042,31 @@ abstract class moodleform {
                             call_user_func_array(array(&$mform, 'disabledIf'), $params);
                             break;
                         case 'rule' :
-                            if (is_string($params)){
-                                $params = array(null, $params, null, 'client');
+                            $pos = strpos($elementname, '[');
+                            // If element belongs to group
+                            if ($pos !== FALSE) {
+                                foreach ($namecloned as $groupelement => $name) {
+                                    if ($elementname == $name) {
+                                        $orignalelementname = substr($name, $pos+1, strlen($name)-$pos-2);
+                                        $rules = array();
+                                        if (!empty($orignalelementname) && !empty($groupelement)) {
+                                            if (is_string($params)) {
+                                                $rules[$orignalelementname][] = array(null, $params, null, 'client');
+                                            } else {
+                                                $rules[$orignalelementname][] = $params;
+                                            }
+                                            $groupelement = substr($groupelement, 0, strpos($groupelement, "]")+1);
+                                            $mform->addGroupRule($groupelement, $rules);
+                                        }
+                                    }
+                                }
+                            } else {
+                                if (is_string($params)){
+                                    $params = array(null, $params, null, 'client');
+                                }
+                                $params = array_merge(array($realelementname), $params);
+                                call_user_func_array(array(&$mform, 'addRule'), $params);
                             }
-                            $params = array_merge(array($realelementname), $params);
-                            call_user_func_array(array(&$mform, 'addRule'), $params);
                             break;
                         case 'type' :
                             //Type should be set only once

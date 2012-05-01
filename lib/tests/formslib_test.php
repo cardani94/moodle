@@ -190,6 +190,31 @@ class formslib_testcase extends basic_testcase {
         $this->assertTag(array('tag'=>'input', 'id'=>'id_repeatradio_2_2',
             'attributes'=>array('type'=>'radio', 'name'=>'repeatradio[2]', 'value'=>'2')), $html);
     }
+
+    public function test_add_index_to_field_name() {
+        $form = new formslib_test_form();
+        $testvalues = array(
+            array(
+                'elementname' => 'element',
+                'index' => '1',
+                'expectedvalue' => 'element[1]'
+            ),
+            array(
+                'elementname' => 'element[a]',
+                'index' => '1',
+                'expectedvalue' => 'element[1][a]'
+            ),
+            array(
+                'elementname' => 'element[a][b]',
+                'index' => '1',
+                'expectedvalue' => 'element[1][a][b]'
+            )
+        );
+        foreach ($testvalues as $vals) {
+            $actualoutput = $form->add_index_to_field_name($vals['elementname'], $vals['index']);
+            $this->assertEquals($vals['expectedvalue'], $actualoutput);
+        }
+    }
 }
 
 
