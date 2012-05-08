@@ -504,7 +504,7 @@ function forum_cron() {
             @set_time_limit(120); // terminate if processing of any account takes longer than 2 minutes
 
             // set this so that the capabilities are cached, and environment matches receiving user
-            cron_setup_user($userto);
+            cron_setup_user(clone $userto);
 
             mtrace('Processing user '.$userto->id);
 
@@ -802,7 +802,7 @@ function forum_cron() {
 
                 // Override the language and timezone of the "current" user, so that
                 // mail is customised for the receiver.
-                cron_setup_user($userto);
+                cron_setup_user(clone $userto);
 
                 // init caches
                 $userto->viewfullnames = array();
