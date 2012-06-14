@@ -1743,6 +1743,19 @@ M.core_filepicker.init = function(Y, options) {
                         if (obj.repo_id == scope.active_repo.id && obj.form) {
                             // if we did not jump to another repository meanwhile
                             searchform.setContent(obj.form);
+                            // Highlight search text when user click for search.
+                            var searchnode = searchform.one('input[name="s"]');
+                            if (searchnode) {
+                                searchnode.on('focus', function(e) {
+                                    e.preventDefault();
+                                    // Hacky way to select text, as this.select() doesn't
+                                    // work well with IE, Chrome and opera.
+                                    var self = this;
+                                    setTimeout(function() {
+                                        self.select();
+                                    }, 0);
+                                });
+                            }
                         }
                     }
                 }, false);
