@@ -3018,7 +3018,10 @@ function assignment_grade_item_update($assignment, $grades=NULL) {
         $assignment->courseid = $assignment->course;
     }
 
-    $params = array('itemname'=>$assignment->name, 'idnumber'=>$assignment->cmidnumber);
+    $params = array(
+        'itemname' => $assignment->name,
+        'idnumber' => $assignment->cmidnumber,
+        'scalegrade' => $assignment->scalegrade);
 
     if ($assignment->grade > 0) {
         $params['gradetype'] = GRADE_TYPE_VALUE;
@@ -3898,10 +3901,10 @@ function assignment_supports($feature) {
         case FEATURE_COMPLETION_TRACKS_VIEWS: return true;
         case FEATURE_GRADE_HAS_GRADE:         return true;
         case FEATURE_GRADE_OUTCOMES:          return true;
-        case FEATURE_GRADE_HAS_GRADE:         return true;
         case FEATURE_BACKUP_MOODLE2:          return true;
         case FEATURE_SHOW_DESCRIPTION:        return true;
         case FEATURE_ADVANCED_GRADING:        return true;
+        case FEATURE_SCALE_GRADE_IN_RANGE:    return true;
 
         default: return null;
     }

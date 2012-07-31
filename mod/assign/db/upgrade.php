@@ -49,7 +49,15 @@ function xmldb_assign_upgrade($oldversion) {
 
     // Moodle v2.3.0 release upgrade line
     // Put any upgrade step following this
+    if ($oldversion < 2012073000) {
+        $table = new xmldb_table('assign');
 
+        // Add scalegrade flag to assign table
+        $field = new xmldb_field('scalegrade', XMLDB_TYPE_INTEGER, 1, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'grade');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+    }
 
     return true;
 }

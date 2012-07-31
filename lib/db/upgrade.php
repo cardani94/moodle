@@ -1069,5 +1069,18 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2012072401.00);
     }
 
+    if ($oldversion < 2012073000.00) {
+        $table = new xmldb_table('grade_items');
+
+        // Add scalegrade flag to grade_items table
+        $field = new xmldb_field('scalegrade', XMLDB_TYPE_INTEGER, 1, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 1, 'needsupdate');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Set default value for all old scalegrades to 0.
+        $DB->set_field('grade_items', 'scalegrade', 0, array('itemtype' => 'mod', 'itemmodule' => 'assignment'));
+        $DB->set_field('grade_items', 'scalegrade', 0, array('itemtype' => 'mod', 'itemmodule' => 'assign'));
+    }
+
     return true;
 }

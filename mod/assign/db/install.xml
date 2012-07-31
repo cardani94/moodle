@@ -19,8 +19,9 @@
         <FIELD NAME="sendlatenotifications" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Allows separate enabling of notifications for late assignment submissions." PREVIOUS="sendnotifications" NEXT="duedate"/>
         <FIELD NAME="duedate" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The due date for the assignment. Displayed to students." PREVIOUS="sendlatenotifications" NEXT="allowsubmissionsfromdate"/>
         <FIELD NAME="allowsubmissionsfromdate" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If set, submissions will only be accepted after this date." PREVIOUS="duedate" NEXT="grade"/>
-        <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The maximum grade for this assignment. Can be negative to indicate the use of a scale." PREVIOUS="allowsubmissionsfromdate" NEXT="timemodified"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The time the settings for this assign module instance were last modified." PREVIOUS="grade"/>
+        <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The maximum grade for this assignment. Can be negative to indicate the use of a scale." PREVIOUS="allowsubmissionsfromdate" NEXT="scalegrade"/>
+        <FIELD NAME="scalegrade" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If true, submission grades will be scaled depending on previous grade and new grade" PREVIOUS="grade" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The time the settings for this assign module instance were last modified." PREVIOUS="scalegrade"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="The unique id for this assignment instance."/>

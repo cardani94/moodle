@@ -1764,8 +1764,9 @@
         <FIELD NAME="hidden" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 is hidden, &amp;gt; 1 is a date to hide until (prevents viewing)" PREVIOUS="decimals" NEXT="locked"/>
         <FIELD NAME="locked" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 is locked, &amp;gt; 1 is a date to lock until (prevents update)" PREVIOUS="hidden" NEXT="locktime"/>
         <FIELD NAME="locktime" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="lock all final grades after this date" PREVIOUS="locked" NEXT="needsupdate"/>
-        <FIELD NAME="needsupdate" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If this flag is set, then the whole column will be recalculated" PREVIOUS="locktime" NEXT="timecreated"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The first time this grade_item was created" PREVIOUS="needsupdate" NEXT="timemodified"/>
+        <FIELD NAME="needsupdate" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If this flag is set, then the whole column will be recalculated" PREVIOUS="locktime" NEXT="scalegrade"/>
+        <FIELD NAME="scalegrade" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="If true, grades will be scaled depnding on old maxgrade and new maxgrade" PREVIOUS="needsupdate" NEXT="timecreated"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The first time this grade_item was created" PREVIOUS="scalegrade" NEXT="timemodified"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The last time this grade_item was modified" PREVIOUS="timecreated"/>
       </FIELDS>
       <KEYS>

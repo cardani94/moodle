@@ -50,7 +50,7 @@ class grade_item extends grade_object {
     public $required_fields = array('id', 'courseid', 'categoryid', 'itemname', 'itemtype', 'itemmodule', 'iteminstance',
                                  'itemnumber', 'iteminfo', 'idnumber', 'calculation', 'gradetype', 'grademax', 'grademin',
                                  'scaleid', 'outcomeid', 'gradepass', 'multfactor', 'plusfactor', 'aggregationcoef',
-                                 'sortorder', 'display', 'decimals', 'hidden', 'locked', 'locktime', 'needsupdate', 'timecreated',
+                                 'sortorder', 'display', 'decimals', 'hidden', 'locked', 'locktime', 'needsupdate', 'scalegrade', 'timecreated',
                                  'timemodified');
 
     /**
@@ -245,6 +245,12 @@ class grade_item extends grade_object {
      * @var array An array of cached grade item dependencies.
      */
     public $dependson_cache = null;
+
+    /**
+     * If set, then all existing grades will be sacled.
+     * @var bool $scalegrade
+     */
+    public $scalegrade = true;
 
     /**
      * In addition to update() as defined in grade_object, handle the grade_outcome and grade_scale objects.
@@ -742,7 +748,7 @@ class grade_item extends grade_object {
 
             // Standardise score to the new grade range
             // NOTE: this is not compatible with current assignment grading
-            if ($this->itemmodule != 'assignment' and ($rawmin != $this->grademin or $rawmax != $this->grademax)) {
+            if ($this->scalegrade && ($rawmin != $this->grademin or $rawmax != $this->grademax)) {
                 $rawgrade = grade_grade::standardise_score($rawgrade, $rawmin, $rawmax, $this->grademin, $this->grademax);
             }
 

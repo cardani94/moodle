@@ -392,6 +392,8 @@ define('FEATURE_GRADE_OUTCOMES', 'outcomes');
 define('FEATURE_ADVANCED_GRADING', 'grade_advanced_grading');
 /** True if module controls the grade visibility over the gradebook */
 define('FEATURE_CONTROLS_GRADE_VISIBILITY', 'controlsgradevisbility');
+/** True if module supports scaling for existing grades in range */
+define('FEATURE_SCALE_GRADE_IN_RANGE', 'scalegradeinrange');
 
 /** True if module has code to track whether somebody viewed it */
 define('FEATURE_COMPLETION_TRACKS_VIEWS', 'completion_tracks_views');

@@ -88,6 +88,7 @@ function assign_supports($feature) {
         case FEATURE_BACKUP_MOODLE2:          return true;
         case FEATURE_SHOW_DESCRIPTION:        return true;
         case FEATURE_ADVANCED_GRADING:        return true;
+        case FEATURE_SCALE_GRADE_IN_RANGE:    return true;
 
         default: return null;
     }
@@ -722,7 +723,10 @@ function assign_grade_item_update($assign, $grades=NULL) {
         $assign->courseid = $assign->course;
     }
 
-    $params = array('itemname'=>$assign->name, 'idnumber'=>$assign->cmidnumber);
+    $params = array(
+        'itemname' => $assign->name,
+        'idnumber' => $assign->cmidnumber,
+        'scalegrade' => $assign->scalegrade);
 
     if ($assign->grade > 0) {
         $params['gradetype'] = GRADE_TYPE_VALUE;

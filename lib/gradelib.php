@@ -62,7 +62,7 @@ function grade_update($source, $courseid, $itemtype, $itemmodule, $iteminstance,
     global $USER, $CFG, $DB;
 
     // only following grade_item properties can be changed in this function
-    $allowed = array('itemname', 'idnumber', 'gradetype', 'grademax', 'grademin', 'scaleid', 'multfactor', 'plusfactor', 'deleted', 'hidden');
+    $allowed = array('itemname', 'idnumber', 'gradetype', 'grademax', 'grademin', 'scaleid', 'multfactor', 'plusfactor', 'deleted', 'hidden', 'scalegrade');
     // list of 10,5 numeric fields
     $floats  = array('grademin', 'grademax', 'multfactor', 'plusfactor');
 

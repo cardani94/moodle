@@ -88,6 +88,7 @@ abstract class moodleform_mod extends moodleform {
 
         $this->_features->gradecat          = ($this->_features->outcomes or $this->_features->hasgrades);
         $this->_features->advancedgrading   = plugin_supports('mod', $this->_modname, FEATURE_ADVANCED_GRADING, false);
+        $this->_features->scalegradeinrange = plugin_supports('mod', $this->_modname, FEATURE_SCALE_GRADE_IN_RANGE, false);
     }
 
     /**
@@ -758,6 +759,11 @@ abstract class moodleform_mod extends moodleform {
             if (!$this->_features->rating) {
                 $mform->addElement('modgrade', 'grade', get_string('grade'));
                 $mform->setDefault('grade', 100);
+            }
+
+            if ($this->_features->scalegradeinrange) {
+                $mform->addElement('advcheckbox', 'scalegrade', get_string('scalegrade'));
+                $mform->addHelpButton('scalegrade', 'scalegrade');
             }
 
             if ($this->_features->advancedgrading

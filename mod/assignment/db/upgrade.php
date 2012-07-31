@@ -70,6 +70,15 @@ function xmldb_assignment_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2012061701, 'assignment');
     }
 
+    if ($oldversion < 2012073000) {
+        $table = new xmldb_table('assignment');
+
+        // Add scalegrade flag to assignment table
+        $field = new xmldb_field('scalegrade', XMLDB_TYPE_INTEGER, 1, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'grade');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+    }
     return true;
 }
 
