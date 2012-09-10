@@ -918,16 +918,13 @@ class core_renderer extends renderer_base {
             $bc->add_class('block_with_controls');
         }
 
+        $output = html_writer::start_tag('div', $bc->attributes);
         $skiptitle = strip_tags($bc->title);
-        if (empty($skiptitle)) {
-            $output = '';
-            $skipdest = '';
-        } else {
-            $output = html_writer::tag('a', get_string('skipa', 'access', $skiptitle), array('href' => '#sb-' . $bc->skipid, 'class' => 'skip-block'));
+        $skipdest = '';
+        if (!empty($skiptitle)) {
+            $output .= html_writer::tag('a', get_string('skipa', 'access', $skiptitle), array('href' => '#sb-' . $bc->skipid, 'class' => 'skip-block'));
             $skipdest = html_writer::tag('span', '', array('id' => 'sb-' . $bc->skipid, 'class' => 'skip-block-to'));
         }
-
-        $output .= html_writer::start_tag('div', $bc->attributes);
 
         $output .= $this->block_header($bc);
         $output .= $this->block_content($bc);
