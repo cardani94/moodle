@@ -57,7 +57,7 @@ class block_course_overview_renderer extends plugin_renderer_base {
                         array('src' => $this->pix_url('i/move_2d')->out(false),
                             'alt' => get_string('move'), 'class' => 'cursor',
                             'title' => get_string('move'))
-                    ), array('class' => 'move')
+                    ), array('class' => 'move', 'aria-dropeffect' => "move")
                 );
             } else {
                 $url = new moodle_url('/blocks/course_overview/move.php', array('sesskey' => sesskey()));
@@ -149,7 +149,10 @@ class block_course_overview_renderer extends plugin_renderer_base {
             $output .= html_writer::start_tag('div', array('class' => 'activity_overview'));
             $url = new moodle_url("/mod/$module/index.php", array('id' => $cid));
             $modulename = get_string('modulename', $module);
-            $icontext = html_writer::link($url, $this->output->pix_icon('icon', $modulename, 'mod_'.$module, array('class'=>'icon')).' ');
+            $icontextstr = get_string('viewall', 'block_course_overview', $modulename);
+            $icontext = html_writer::link($url,
+                    $this->output->pix_icon('icon', $icontextstr, 'mod_'.$module, array('class'=>'icon')).' ',
+                    array('class' => 'icon_link'));
             if (get_string_manager()->string_exists("activityoverview", $module)) {
                 $icontext .= get_string("activityoverview", $module);
             } else {
@@ -257,7 +260,13 @@ class block_course_overview_renderer extends plugin_renderer_base {
         $output .= '<div id="' . $id . '_caption" class="collapsibleregioncaption">';
         $output .= $caption . ' ';
         $output .= '</div><div id="' . $id . '_inner" class="collapsibleregioninner">';
-        $this->page->requires->js_init_call('M.block_course_overview.collapsible', array($id, $userpref, get_string('clicktohideshow')));
+        $vars = array(
+                    array('id' => $id,
+                        'userpref' => $userpref,
+                        'strtoshow' => get_string('showdetails', 'block_course_overview'),
+                        'strtohide' => get_string('hidedetails', 'block_course_overview'))
+                );
+        $this->page->requires->js_init_call('M.block_course_overview.collapsible', $vars);
 
         return $output;
     }

@@ -98,3 +98,10 @@
     border-width: 2px;
     border-style: dashed;
 }
+
+.collapsibleregioncaption .activity-show-details {
+    padding-right: 5px;
+}
+.collapsibleregioncaption .activity-hide-details {
+    padding-right: 5px;
+}
