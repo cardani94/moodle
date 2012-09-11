@@ -96,3 +96,19 @@
 .block_course_overview .content .course_list .movehere{
     margin-bottom: 15px;
 }
+
+.block_course_overview .coursemovetarget {
+    display: block;
+    height: 1em;
+    margin-bottom: 1em;
+    border-width: 2px;
+    border-style: dashed;
+}
+
+.collapsibleregioncaption .activity-show-details {
+    padding-right: 5px;
+}
+.collapsibleregioncaption .activity-hide-details {
+    padding-right: 5px;
+}
+>>>>>>> MDL-30894 Assessibility: Added aria attributes to Course overview block for accessibility

@@ -44,6 +44,7 @@ M.block_course_overview.add_handles = function(Y) {
                 borderColor: drag.get('node').getStyle('borderColor'),
                 backgroundColor: drag.get('node').getStyle('backgroundColor')
             });
+            drag.get('node').set('aria-grabbed', true);
         });
 
         Y.DD.DDM.on('drag:end', function(e) {
@@ -53,6 +54,7 @@ M.block_course_overview.add_handles = function(Y) {
                 visibility: '',
                 opacity: '1'
             });
+            drag.get('node').set('aria-grabbed', false);
             M.block_course_overview.save(Y);
         });
 
@@ -127,12 +129,12 @@ M.block_course_overview.save = function() {
  * @param {String} userpref the user preference that records the state of this box. false if none.
  * @param {String} strtooltip
  */
-M.block_course_overview.collapsible = function(Y, id, userpref, strtooltip) {
-    if (userpref) {
+M.block_course_overview.collapsible = function(Y, options) {
+    if (options.userpref) {
         M.block_course_overview.userpref = true;
     }
     Y.use('anim', function(Y) {
-        new M.block_course_overview.CollapsibleRegion(Y, id, userpref, strtooltip);
+        new M.block_course_overview.CollapsibleRegion(Y, options);
     });
 };
 
@@ -146,33 +148,56 @@ M.block_course_overview.collapsible = function(Y, id, userpref, strtooltip) {
  * @param {String} userpref The user preference that records the state of this box. false if none.
  * @param {String} strtooltip
  */
-M.block_course_overview.CollapsibleRegion = function(Y, id, userpref, strtooltip) {
+M.block_course_overview.CollapsibleRegion = function(Y, options) {
     // Record the pref name
-    this.userpref = userpref;
+    this.userpref = options.userpref;
 
     // Find the divs in the document.
-    this.div = Y.one('#'+id);
+    this.div = Y.one('#'+options.id);
 
     // Get the caption for the collapsible region
-    var caption = this.div.one('#'+id + '_caption');
-    caption.setAttribute('title', strtooltip);
+    var caption = this.div.one('#'+options.id + '_caption');
+    caption.setStyle("cursor", "pointer");
 
     // Create a link
     var a = Y.Node.create('<a href="#"></a>');
+    var show = Y.Node.create('<img class="activity-show-details" alt="'+options.strtoshow+'" title="'+options.strtoshow+'" />');
+    show.setAttribute('src', M.util.image_url('t/collapsed', 'moodle'));
+    var hide = Y.Node.create('<img class="activity-hide-details" alt="'+options.strtohide+'" title="'+options.strtohide+'" />');
+    hide.setAttribute('src', M.util.image_url('t/expanded', 'moodle'));
+
     // Create a local scoped lamba function to move nodes to a new link
     var movenode = function(node){
-        node.remove();
-        a.append(node);
+        if (!node.hasClass('icon_link')) {
+            node.remove();
+            a.append(node);
+        }
     };
     // Apply the lamba function on each of the captions child nodes
     caption.get('children').each(movenode, this);
     caption.prepend(a);
+
+    // Set title
+    var setcaptionattr = function(collapsed) {
+        if (collapsed) {
+            hide.remove();
+            a.insert(show, 0);
+            caption.setAttribute('title', options.strtoshow);
+            caption.set('aria-expanded', false);
+        } else {
+            show.remove();
+            a.insert(hide, 0);
+            caption.setAttribute('title', options.strtohide);
+            caption.set('aria-expanded', true);
+        }
+    };
 
     // Get the height of the div at this point before we shrink it if required
     var height = this.div.get('offsetHeight');
     if (this.div.hasClass('collapsed')) {
         // Shrink the div as it is collapsed by default
         this.div.setStyle('height', caption.get('offsetHeight')+'px');
+        setcaptionattr(true);
     }
 
     // Create the animation.
@@ -187,6 +212,7 @@ M.block_course_overview.CollapsibleRegion = function(Y, id, userpref, strtooltip
     // Handler for the animation finishing.
     animation.on('end', function() {
         this.div.toggleClass('collapsed');
+        setcaptionattr(this.div.hasClass('collapsed'));
     }, this);
 
     // Hook up the event handler.
