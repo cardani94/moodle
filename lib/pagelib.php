@@ -104,6 +104,15 @@ class moodle_page {
     /** The state the page is in while content is presumably being printed **/
     const STATE_IN_BODY = 2;
 
+    /** General turn edit button **/
+    const EDIT_NOTIFY = 3;
+
+    /** Block edit button **/
+    const BLOCK_EDIT_NOTIFY = 4;
+
+    /** Customise page edit button **/
+    const PAGE_EDIT_NOTIFY = 5;
+
     /**
      * The state the page is when the footer has been printed and its function is
      * complete.
@@ -336,6 +345,11 @@ class moodle_page {
      */
     protected $_popup_notification_allowed = true;
 
+    /**
+     * @var int specifies which editing button should be visible on page.
+     */
+    protected $_editingbutton = null;
+
     // Magic getter methods =============================================================
     // Due to the __get magic below, you normally do not call these as $PAGE->magic_get_x
     // methods, but instead use the $PAGE->x syntax.
@@ -452,6 +466,47 @@ class moodle_page {
             $this->_context = context_system::instance();
         }
         return $this->_context;
+    }
+
+    /**
+     * Returns string to be used for editing button
+     *
+     * @param int|bool $editingstate state of editing
+     * @param int $notificationtype type of edit notification EDIT_NOTIFY | BLOCK_EDIT_NOTIFY | PAGE_EDIT_NOTIFY
+     *
+     * @return string notification string which will be used for edit link or button.
+     */
+    public function get_editingbuttonstr($editingstate, $notificationtype = null) {
+        if (is_null($notificationtype)) {
+            if ($this->_editingbutton) {
+                $notificationtype = $this->_editingbutton;
+            } else {
+                $notificationtype = self::EDIT_NOTIFY;
+            }
+        }
+        // Populate edit string
+        if ($notificationtype === self::EDIT_NOTIFY) {
+            if (empty($editingstate)) {
+                $editnotifystring = get_string('turneditingoff');
+            } else {
+                $editnotifystring = get_string('turneditingon');
+            }
+        } else if ($notificationtype === self::BLOCK_EDIT_NOTIFY) {
+            if (empty($editingstate)) {
+                $editnotifystring = get_string('blockseditoff');
+            } else {
+                $editnotifystring = get_string('blocksediton');
+            }
+        } else if ($notificationtype === self::PAGE_EDIT_NOTIFY) {
+            if (empty($editingstate)) {
+                $editnotifystring = get_string('updatemymoodleoff');
+            } else {
+                $editnotifystring = get_string('updatemymoodleon');
+            }
+        } else {
+            new moodle_exception('Please check edit button type');
+        }
+        return $editnotifystring;
     }
 
     /**
@@ -1076,6 +1131,30 @@ class moodle_page {
      */
     public function set_headingmenu($menu) {
         $this->_headingmenu = $menu;
+    }
+
+    /**
+     * Sets editing button. Currently supported buttons are
+     * 1. Turn editing on
+     * 2. Blocks editing on
+     * 3. Customise this page
+     *
+     * @param int $notificationtype can be EDIT_NOTIFY | BLOCK_EDIT_NOTIFY | PAGE_EDIT_NOTIFY
+     */
+    public function set_editingbutton($notificationtype) {
+        global $USER, $OUTPUT;
+
+        // If user is allowed to edit this page then set editing
+        if ($this->user_allowed_editing()) {
+            $editblock = optional_param('edit', -1, PARAM_TEXT);
+            // Set global editing variable.
+            if (($editblock != -1) && confirm_sesskey()) {
+                $USER->editing = $editblock;
+            }
+            // Set editnotification for this page
+            $this->_editingbutton = $notificationtype;
+            $this->set_button($OUTPUT->edit_button(new moodle_url($this->url), $notificationtype));
+        }
     }
 
     /**

@@ -2110,20 +2110,21 @@ EOD;
      * Returns HTML to display a "Turn editing on/off" button in a form.
      *
      * @param moodle_url $url The URL + params to send through when clicking the button
+     * @param int $notificationtype type of edit notification EDIT_NOTIFY | BLOCK_EDIT_NOTIFY | PAGE_EDIT_NOTIFY
+     *
      * @return string HTML the button
      */
-    public function edit_button(moodle_url $url) {
-
+    public function edit_button(moodle_url $url, $notificationtype = moodle_page::EDIT_NOTIFY) {
         $url->param('sesskey', sesskey());
         if ($this->page->user_is_editing()) {
-            $url->param('edit', 'off');
-            $editstring = get_string('turneditingoff');
+            $url->param('edit', 0);
+            $editstring = $this->page->editingbuttonstr(false, $notificationtype);
         } else {
-            $url->param('edit', 'on');
-            $editstring = get_string('turneditingon');
+            $url->param('edit', 1);
+            $editstring = $this->page->get_editingbuttonstr(true, $notificationtype);
         }
 
-        return $this->single_button($url, $editstring);
+        return $this->single_button($url, $editstring, 'get');
     }
 
     /**

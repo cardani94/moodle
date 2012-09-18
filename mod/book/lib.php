@@ -313,22 +313,7 @@ function book_extend_settings_navigation(settings_navigation $settingsnav, navig
             $function($settingsnav, $booknode);
         }
     }
-
-    $params = $PAGE->url->params();
-
-    if (!empty($params['id']) and !empty($params['chapterid']) and has_capability('mod/book:edit', $PAGE->cm->context)) {
-        if (!empty($USER->editing)) {
-            $string = get_string("turneditingoff");
-            $edit = '0';
-        } else {
-            $string = get_string("turneditingon");
-            $edit = '1';
-        }
-        $url = new moodle_url('/mod/book/view.php', array('id'=>$params['id'], 'chapterid'=>$params['chapterid'], 'edit'=>$edit, 'sesskey'=>sesskey()));
-        $booknode->add($string, $url, navigation_node::TYPE_SETTING);
-    }
 }
-
 
 /**
  * Lists all browsable file areas

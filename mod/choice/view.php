@@ -47,6 +47,7 @@
 
     $PAGE->set_title(format_string($choice->name));
     $PAGE->set_heading($course->fullname);
+    $PAGE->set_editingbutton($PAGE::BLOCK_EDIT_NOTIFY);
 
     // Mark viewed by user (if required)
     $completion = new completion_info($course);

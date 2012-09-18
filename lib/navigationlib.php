@@ -3850,6 +3850,20 @@ class settings_navigation extends navigation_node {
         $modulenode = $this->add(get_string('pluginadministration', $this->page->activityname));
         $modulenode->force_open();
 
+        // User can edit blocks on this page
+        if ($this->page->user_allowed_editing()) {
+            $editurl = clone($this->page->url);
+            $editurl->param('sesskey', sesskey());
+            if ($this->page->user_is_editing()) {
+                $editurl->param('edit', 0);
+                $editstring = $this->page->get_editingbuttonstr(false);
+            } else {
+                $editurl->param('edit', 1);
+                $editstring = $this->page->get_editingbuttonstr(true);
+            }
+            $modulenode->add($editstring, $editurl, navigation_node::TYPE_SETTING, null, null, new pix_icon('i/edit', ''));
+        }
+
         // Settings for the module
         if (has_capability('moodle/course:manageactivities', $this->page->cm->context)) {
             $url = new moodle_url('/course/modedit.php', array('update' => $this->page->cm->id, 'return' => true, 'sesskey' => sesskey()));

@@ -86,6 +86,7 @@ $completion->set_module_viewed($cm);
 
 // Initialize $PAGE
 $PAGE->set_url('/mod/chat/view.php', array('id' => $cm->id));
+$PAGE->set_editingbutton($PAGE::BLOCK_EDIT_NOTIFY);
 $PAGE->set_title($title);
 $PAGE->set_heading($course->fullname);
 

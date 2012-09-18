@@ -50,20 +50,13 @@ require_course_login($course, true, $cm);
 $context = context_module::instance($cm->id);
 require_capability('mod/book:read', $context);
 
+$PAGE->set_context($context);
+$PAGE->set_other_editing_capability('mod/book:viewhiddenchapters');
+
 $allowedit  = has_capability('mod/book:edit', $context);
 $viewhidden = has_capability('mod/book:viewhiddenchapters', $context);
-
-if ($allowedit) {
-    if ($edit != -1 and confirm_sesskey()) {
-        $USER->editing = $edit;
-    } else {
-        if (isset($USER->editing)) {
-            $edit = $USER->editing;
-        } else {
-            $edit = 0;
-        }
-    }
-} else {
+// Make sure user is not allowed to edit.
+if (!$allowedit) {
     $edit = 0;
 }
 
@@ -97,7 +90,7 @@ if ($chapter->hidden and !$viewhidden) {
 }
 
 $PAGE->set_url('/mod/book/view.php', array('id'=>$id, 'chapterid'=>$chapterid));
-
+$PAGE->set_editingbutton($PAGE::EDIT_NOTIFY);
 
 // Unset all page parameters.
 unset($id);

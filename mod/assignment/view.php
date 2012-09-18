@@ -37,7 +37,7 @@ if ($id) {
 
 $PAGE->set_url($url);
 require_login($course, true, $cm);
-
+$PAGE->set_editingbutton($PAGE::BLOCK_EDIT_NOTIFY);
 $PAGE->requires->js('/mod/assignment/assignment.js');
 
 require ("$CFG->dirroot/mod/assignment/type/$assignment->assignmenttype/assignment.class.php");
