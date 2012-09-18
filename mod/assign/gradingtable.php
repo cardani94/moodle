@@ -117,9 +117,11 @@ class assign_grading_table extends table_sql implements renderable {
         $columns = array();
         $headers = array();
 
-        // Select
+        // Select.
         $columns[] = 'select';
-        $headers[] = get_string('select') . '<div class="selectall"><input type="checkbox" name="selectall" title="' . get_string('selectall') . '"/></div>';
+        $headers[] = get_string('select') .
+                '<div class="selectall"><label class="accesshide" for="selectall">' . get_string('selectall') . '</label>
+                <input type="checkbox" id="selectall" name="selectall" title="' . get_string('selectall') . '"/></div>';
 
         // Edit links
         if (!$this->is_downloading()) {
@@ -305,7 +307,9 @@ class assign_grading_table extends table_sql implements renderable {
      * @return string
      */
     function col_select(stdClass $row) {
-        return '<input type="checkbox" name="selectedusers" value="' . $row->userid . '"/>';
+        return '<label class="accesshide" for="selectuser_' . $row->userid . '">' .
+            get_string('selectuser', 'assign', fullname($row)) . '</label>
+            <input type="checkbox" id=="selectuser_' . $row->userid . 'name="selectedusers" value="' . $row->userid . '"/>';
     }
 
     /**
