@@ -174,3 +174,19 @@ input.titleeditor {
 .dndupload-progress-outer {width:70px;border:1px solid black;height:10px;display:inline-block;margin:0;padding:0;overflow:hidden;position:relative;}
 .dndupload-progress-inner {width:0%;height:100%;background-color:green;display:inline-block;margin:0;padding:0;float:left;}
 .dndupload-hidden {display:none;}
+
+.modcommandsmenu.visibleifjs {
+    display: inline-block;
+    height: 0.5em;
+    width: 1px;
+}
+.modcommandsmenu .yui3-menu .yui3-menu-content {
+    border: none;
+    line-height: 1em;
+}
+.modcommandsmenu .yui3-menu .yui3-menu-content ul {
+    list-style: none;
+}
+.section-modedit-link.yui3-menu-label:hover {
+    background-color: #EEE;
+}
