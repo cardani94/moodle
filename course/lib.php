@@ -3389,11 +3389,11 @@ function make_editing_buttons(stdClass $mod, $absolute_ignored = true, $movesele
         $submenufirst = html_writer::tag('ul', $menuitem);
         $submenucontent = html_writer::tag('div', $submenufirst, array('class' => 'yui3-menu-content'));
         $submenu = html_writer::tag('div', $submenucontent, array('class' => 'yui3-menu yui3-menu-hidden'));
-        $icon = $OUTPUT->pix_icon('t/setting', $stredit, '', array('style' => 'height: 1em;'));
-        $modedit1 = html_writer::tag('span', html_writer::link('#', $icon), array('class' => 'section-modedit-link yui3-menu-label yui3-menu-toggle', 'style'=>"background: none;"));
-        $menuoutedit = html_writer::tag('li', $modedit1.$submenu);
-        $menufirst = html_writer::tag('ul', $menuoutedit, array('class' => 'first-of-type'));
-        $menucontent = html_writer::tag('div', $menufirst, array('class' => 'yui3-menu-content'));
+        $icon = $OUTPUT->pix_icon('t/setting', $stredit);
+        $modedit1 = html_writer::link('#', $icon, array('class' => 'section-modedit-link yui3-menu-label'));
+        $menuoutedit = html_writer::tag('li', $modedit1.$submenu, array('class' => ''));
+        $menufirst = html_writer::tag('ul', $menuoutedit);
+        $menucontent = html_writer::tag('div', $menufirst, array('class' => 'yui3-menu-content modeditmenuicon'));
         $modedit = html_writer::tag('div', $menucontent, array('class' => 'yui3-menu'));
 
         // Wrap the normal output in a noscript div
@@ -4577,6 +4577,8 @@ function include_course_ajax($course, $usedmodules = array(), $enabledmodules = 
             'modchooserenable',
             'modchooserdisable',
     ), 'moodle');
+    $PAGE->requires->yui_module('moodle-course-modeditmenu',
+        'M.course.init_modeditmenu');
 
     return true;
 }

@@ -168,7 +168,6 @@ YUI.add('moodle-course-modchooser', function(Y) {
                 toggletext.set('data', M.util.get_string('modchooserdisable', 'moodle'));
                 togglelink.set('href', togglelink.get('href').replace('on', 'off'));
             }
-            M.course.modeditmenu.toggle(e);
             M.util.set_user_preference('usemodchooser', usemodchooser);
 
             // Prevent the page from reloading
@@ -190,6 +189,6 @@ YUI.add('moodle-course-modchooser', function(Y) {
     }
 },
 '@VERSION@', {
-    requires:['base', 'overlay', 'moodle-core-chooserdialogue', 'moodle-course-modeditmenu', 'transition']
+    requires:['base', 'overlay', 'moodle-core-chooserdialogue', 'transition']
 }
 );
