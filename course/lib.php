@@ -3356,42 +3356,19 @@ function make_editing_buttons(stdClass $mod, $absolute_ignored = true, $movesele
         );
     }
 
-    // Add editing icons in command span and add edit link
-    if (course_ajax_enabled($COURSE)) {
-        $stredit = get_string('edit');
-        $output = '';
-        $menuitem = '';
-        foreach ($actions as $action) {
-            if ($action instanceof renderable) {
-                $output .= $OUTPUT->render($action);
-                $url = $action->url;
-                $text = $OUTPUT->render($action->text);
-                if (isset($action->attributes['title'])) {
-                    $text .= $action->attributes['title'];
-                } else if (isset($action->attributes['alt'])) {
-                    $text .= $action->attributes['alt'];
-                }
-            } else {
-                $output .= $action;
-                $url = $action[0];
-                $text = $OUTPUT->render($action[1]);
-                $actionpic = $action[1];
-                if (isset($actionpic->attributes['title'])) {
-                    $text .= $actionpic->attributes['title'];
-                } else if (isset($actionpic->attributes['alt'])) {
-                    $text .= $actionpic->attributes['alt'];
-                }
-            }
-            // Create menu
-            $link = html_writer::link($url, $text, array('class' => 'yui3-menuitem-content'));
-            $menuitem .= html_writer::tag('li', $link, array('class' => 'yui3-menuitem'));
+    $output = '';
+    foreach ($actions as $action) {
+        if ($action instanceof renderable) {
+            $output .= $OUTPUT->render($action);
+        } else {
+            $output .= $action;
         }
-        $submenufirst = html_writer::tag('ul', $menuitem);
-        $submenucontent = html_writer::tag('div', $submenufirst, array('class' => 'yui3-menu-content'));
-        $submenu = html_writer::tag('div', $submenucontent, array('class' => 'yui3-menu yui3-menu-hidden'));
-        $icon = $OUTPUT->pix_icon('t/setting', $stredit);
+    }
+    // Add editing menu space in command span
+    if (course_ajax_enabled($COURSE)) {
+        $icon = $OUTPUT->pix_icon('t/setting', get_string('edit'));
         $modedit1 = html_writer::link('#', $icon, array('class' => 'section-modedit-link yui3-menu-label'));
-        $menuoutedit = html_writer::tag('li', $modedit1.$submenu, array('class' => ''));
+        $menuoutedit = html_writer::tag('li', $modedit1, array('class' => ''));
         $menufirst = html_writer::tag('ul', $menuoutedit);
         $menucontent = html_writer::tag('div', $menufirst, array('class' => 'yui3-menu-content modeditmenuicon'));
         $modedit = html_writer::tag('div', $menucontent, array('class' => 'yui3-menu'));
@@ -3399,14 +3376,16 @@ function make_editing_buttons(stdClass $mod, $absolute_ignored = true, $movesele
         // Wrap the normal output in a noscript div
         $usemodchooser = get_user_preferences('usemodchooser', $CFG->modchooserdefault);
         if ($usemodchooser) {
-            $output = html_writer::tag('span', $output, array('class' => 'hiddenifjs modcommands'));
+            $output = html_writer::tag('span', $output, array('class' => 'hiddenifjs commands'));
             $modedit = html_writer::tag('span', $modedit, array('class' => 'modcommandsmenu visibleifjs'));
         } else {
             $modedit = html_writer::tag('span', $modedit, array('class' => 'modcommandsmenu hiddenifjs'));
-            $output = html_writer::tag('span', $output, array('class' => 'visibleifjs modcommands'));
+            $output = html_writer::tag('span', $output, array('class' => 'visibleifjs commands'));
         }
 
         $output = $modedit . $output;
+    } else {
+        $output = html_writer::tag('span', $output, array('class' => 'commands'));
     }
 
     return $output;

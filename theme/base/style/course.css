@@ -193,4 +193,8 @@ input.titleeditor {
 }
 .yui3-menu .yui3-menu-content.modeditmenuicon ul li, .yui3-menu .yui3-menu-content.modeditmenuicon {
     background-color : transparent;
+    list-style : none;
+}
+.yui3-menu .yui3-menu-content.modeditmenuicon {
+    border: 0 none;
 }

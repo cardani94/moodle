@@ -168,6 +168,7 @@ YUI.add('moodle-course-modchooser', function(Y) {
                 toggletext.set('data', M.util.get_string('modchooserdisable', 'moodle'));
                 togglelink.set('href', togglelink.get('href').replace('on', 'off'));
             }
+
             M.util.set_user_preference('usemodchooser', usemodchooser);
 
             // Prevent the page from reloading
