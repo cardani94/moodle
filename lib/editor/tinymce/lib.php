@@ -142,6 +142,7 @@ class tinymce_texteditor extends texteditor {
             'document_base_url' => $CFG->httpswwwroot,
             'moodle_plugin_base' => "$CFG->httpswwwroot/lib/editor/tinymce/plugins/",
             'content_css' => $contentcss,
+            'popup_css_add' => $contentcss,
             'language' => $lang,
             'directionality' => $directionality,
             'plugin_insertdate_dateFormat ' => $strdate,

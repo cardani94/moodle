@@ -1,0 +1,3 @@
+body[dir=rtl] form .tabs ul li {float:right;}
+body[dir=rtl] form .tabs ul li span {float:right;}
+body[dir=rtl] .panel_wrapper table.properties td {text-align: right;}
