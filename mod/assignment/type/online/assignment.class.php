@@ -311,6 +311,7 @@ class assignment_online extends assignment_base {
                     $exporter->copy_existing_file($f);
                 }
             }
+            $html = $exporter->add_html_wrapper($html, $this->assignment->name);
             return $exporter->write_new_file($html, 'assignment.html', !empty($files));
         } else if ($exporter->get('formatclass') == PORTFOLIO_FORMAT_LEAP2A) {
             $leapwriter = $exporter->get('format')->leap2a_writer();

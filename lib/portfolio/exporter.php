@@ -887,4 +887,22 @@ class portfolio_exporter {
             }
         }
     }
+
+    /**
+     * Add html wrapper to content passed.
+     *
+     * @param string $content data which will be wrapped in html
+     * @param string $title title of the page
+     * @return string content wrapped in html
+     */
+    public function add_html_wrapper($content, $title = '') {
+        // Create head markup with title
+        $head = html_writer::tag('head', "\n".html_writer::tag('title', $title)."\n");
+
+        // Wrap existing content in body.
+        $content = html_writer::tag('body', "\n".  text_to_html($content, null, false)."\n");
+
+        // Wrap head and body in html tag and return
+        return html_writer::tag('html', "\n".$head."\n".$content."\n");
+    }
 }

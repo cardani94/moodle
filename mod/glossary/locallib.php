@@ -315,6 +315,7 @@ class glossary_entry_portfolio_caller extends portfolio_module_caller_base {
 
         if ($this->exporter->get('formatclass') === PORTFOLIO_FORMAT_PLAINHTML) {
             $filename = clean_filename($this->entry->concept) . '.html';
+            $content = $this->exporter->add_html_wrapper($content, $this->entry->concept);
             $this->exporter->write_new_file($content, $filename);
 
         } else if ($this->exporter->get('formatclass') === PORTFOLIO_FORMAT_RICHHTML) {
@@ -324,6 +325,7 @@ class glossary_entry_portfolio_caller extends portfolio_module_caller_base {
                 }
             }
             $filename = clean_filename($this->entry->concept) . '.html';
+            $content = $this->exporter->add_html_wrapper($content, $this->entry->concept);
             $this->exporter->write_new_file($content, $filename);
 
         } else if ($this->exporter->get('formatclass') === PORTFOLIO_FORMAT_LEAP2A) {
