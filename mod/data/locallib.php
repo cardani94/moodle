@@ -225,6 +225,7 @@ class data_portfolio_caller extends portfolio_module_caller_base {
             } else {
                 $filename = clean_filename($this->cm->name . '-full.html');
             }
+            $content = $this->exporter->add_html_wrapper($content, $this->cm->name);
         }
         return $this->exporter->write_new_file(
             $content,
