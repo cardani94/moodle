@@ -4658,6 +4658,8 @@ class assign_portfolio_caller extends portfolio_module_caller_base {
                     foreach ($files as $file) {
                         $this->exporter->copy_existing_file($file);
                     }
+                } else if (method_exists($this->exporter->get('instance'), 'add_html_wrapper')) {
+                    $html = $this->exporter->get('instance')->add_html_wrapper($html, $this->cm->name);
                 }
                 return $this->exporter->write_new_file($html, 'assignment.html', !empty($files));
             } else if ($this->exporter->get('formatclass') == PORTFOLIO_FORMAT_LEAP2A) {

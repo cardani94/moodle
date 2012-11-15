@@ -131,6 +131,9 @@ class chat_portfolio_caller extends portfolio_module_caller_base {
         }
         $content = preg_replace('/\<img[^>]*\>/', '', $content);
 
+        if (method_exists($this->exporter->get('instance'), 'add_html_wrapper')) {
+            $content = $this->exporter->get('instance')->add_html_wrapper($content, $this->cm->name);
+        }
         $this->exporter->write_new_file($content, clean_filename($this->cm->name . '-session.html'), false);
     }
 

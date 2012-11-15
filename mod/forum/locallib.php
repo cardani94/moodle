@@ -208,6 +208,8 @@ class forum_portfolio_caller extends portfolio_module_caller_base {
                 $leapwriter->make_selection($selection, $ids, 'Grouping');
                 $content = $leapwriter->to_xml();
                 $name = $this->get('exporter')->get('format')->manifest_name();
+            } else if (method_exists($this->exporter->get('instance'), 'add_html_wrapper')) {
+                $content = $this->exporter->get('instance')->add_html_wrapper($content, $this->discussion->name);
             }
             $this->get('exporter')->write_new_file($content, $name, $manifest);
 
@@ -222,6 +224,8 @@ class forum_portfolio_caller extends portfolio_module_caller_base {
                 $this->prepare_post_leap2a($leapwriter, $this->post, $posthtml);
                 $content = $leapwriter->to_xml();
                 $name = $this->exporter->get('format')->manifest_name();
+            } else if (method_exists($this->exporter->get('instance'), 'add_html_wrapper')) {
+                $content = $this->exporter->get('instance')->add_html_wrapper($content, $this->post->subject);
             }
             $this->copy_files($this->multifiles);
             $this->get('exporter')->write_new_file($content, $name, $manifest);

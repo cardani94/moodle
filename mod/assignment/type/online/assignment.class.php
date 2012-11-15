@@ -346,6 +346,8 @@ class assignment_online extends assignment_base {
                 foreach ($files as $f) {
                     $exporter->copy_existing_file($f);
                 }
+            } else if (method_exists($exporter->get('instance'), 'add_html_wrapper')) {
+                $html = $exporter->get('instance')->add_html_wrapper($html, $this->assignment->name);
             }
             return $exporter->write_new_file($html, 'assignment.html', !empty($files));
         } else if ($exporter->get('formatclass') == PORTFOLIO_FORMAT_LEAP2A) {
