@@ -83,6 +83,9 @@ class mod_quiz_attempts_report_options {
     /** @var int Number of attempts to show per page. */
     public $pagesize = quiz_attempts_report::DEFAULT_PAGE_SIZE;
 
+    /** @var bool Whether to exclude suspended enrolments from reports. */
+    public $hidesuspended = true;
+
     /** @var string whether the data should be downloaded in some format, or '' to display it. */
     public $download = '';
 
@@ -159,6 +162,7 @@ class mod_quiz_attempts_report_options {
         $toform->attempts   = $this->attempts;
         $toform->onlygraded = $this->onlygraded;
         $toform->pagesize   = $this->pagesize;
+        $toform->hidesuspended   = $this->hidesuspended;
 
         return $toform;
     }
@@ -172,6 +176,7 @@ class mod_quiz_attempts_report_options {
         $this->group      = groups_get_activity_group($this->cm, true);
         $this->onlygraded = !empty($fromform->onlygraded);
         $this->pagesize   = $fromform->pagesize;
+        $this->hidesuspended   = isset($fromform->hidesuspended) ? true : false;
 
         $this->states = array();
         foreach (self::$statefields as $field => $state) {
@@ -189,6 +194,7 @@ class mod_quiz_attempts_report_options {
         $this->group      = groups_get_activity_group($this->cm, true);
         $this->onlygraded = optional_param('onlygraded', $this->onlygraded, PARAM_BOOL);
         $this->pagesize   = optional_param('pagesize', $this->pagesize, PARAM_INT);
+        $this->hidesuspended   = optional_param('hidesuspended', $this->hidesuspended, PARAM_BOOL);
 
         $this->states = explode('-', optional_param('states',
                 implode('-', $this->states), PARAM_ALPHAEXT));
@@ -202,6 +208,7 @@ class mod_quiz_attempts_report_options {
      */
     public function setup_from_user_preferences() {
         $this->pagesize = get_user_preferences('quiz_report_pagesize', $this->pagesize);
+        $this->hidesuspended = get_user_preferences('quiz_report_hidesuspended', $this->hidesuspended);
     }
 
     /**
@@ -210,6 +217,7 @@ class mod_quiz_attempts_report_options {
      */
     public function update_user_preferences() {
         set_user_preference('quiz_report_pagesize', $this->pagesize);
+        set_user_preference('quiz_report_hidesuspended', $this->hidesuspended);
     }
 
     /**

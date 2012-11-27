@@ -453,7 +453,7 @@ class grade_report_grader extends grade_report {
             $this->userselect = "AND g.userid $usql";
             $this->userselect_params = $uparams;
 
-            //add a flag to each user indicating whether their enrolment is active
+            //add a flag to each user indicating whether their enrolment is active (or remove suspended users depending on report setting)
             $sql = "SELECT ue.userid
                       FROM {user_enrolments} ue
                       JOIN {enrol} e ON e.id = ue.enrolid
@@ -466,8 +466,13 @@ class grade_report_grader extends grade_report {
             $params = array_merge($uparams, array('estatus'=>ENROL_INSTANCE_ENABLED, 'uestatus'=>ENROL_USER_ACTIVE, 'courseid'=>$coursecontext->instanceid));
             $useractiveenrolments = $DB->get_records_sql($sql, $params);
 
+            $hidesuspended = get_user_preferences('grade_report_showonlyactiveenrol', 1);
             foreach ($this->users as $user) {
-                $this->users[$user->id]->suspendedenrolment = !array_key_exists($user->id, $useractiveenrolments);
+                if ($hidesuspended && !array_key_exists($user->id, $useractiveenrolments)) {
+                    unset($this->users[$user->id]);
+                } else {
+                    $this->users[$user->id]->suspendedenrolment = !array_key_exists($user->id, $useractiveenrolments);
+                }
             }
         }
 

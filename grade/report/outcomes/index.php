@@ -46,6 +46,12 @@ grade_regrade_final_grades($courseid);
 $report_info = array();
 $outcomes = grade_outcome::fetch_all_available($courseid);
 
+// Will exclude grades of suspended users if required
+$hidesuspended = get_user_preferences('grade_report_showonlyactiveenrol', 1);
+if ($hidesuspended) {
+    $susers = get_suspended_userids($context);
+}
+
 // Get grade_items that use each outcome
 foreach ($outcomes as $outcomeid => $outcome) {
     $report_info[$outcomeid]['items'] = $DB->get_records_select('grade_items', "outcomeid = ? AND courseid = ?", array($outcomeid, $courseid));
@@ -54,11 +60,20 @@ foreach ($outcomes as $outcomeid => $outcome) {
     // Get average grades for each item
     if (is_array($report_info[$outcomeid]['items'])) {
         foreach ($report_info[$outcomeid]['items'] as $itemid => $item) {
+
+            $params = array();
+            $hidesuspendedsql = '';
+            if ($hidesuspended && !empty($susers)) {
+                list($notinusers, $params) = $DB->get_in_or_equal($susers, SQL_PARAMS_QM, null, false);
+                $hidesuspendedsql = ' AND userid ' . $notinusers;
+            }
+            $params = array_merge(array($itemid), $params);
             $sql = "SELECT itemid, AVG(finalgrade) AS avg, COUNT(finalgrade) AS count
                       FROM {grade_grades}
                      WHERE itemid = ?
+                     $hidesuspendedsql
                   GROUP BY itemid";
-            $info = $DB->get_records_sql($sql, array($itemid));
+            $info = $DB->get_records_sql($sql, $params);
 
             if (!$info) {
                 unset($report_info[$outcomeid]['items'][$itemid]);

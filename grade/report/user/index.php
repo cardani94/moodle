@@ -101,8 +101,10 @@ if (has_capability('moodle/grade:viewall', $context)) { //Teachers will see all 
         $user_selector = true;
     }
 
+    $hidesuspended = get_user_preferences('grade_report_showonlyactiveenrol', 1);
     if (empty($userid)) {
         $gui = new graded_users_iterator($course, null, $currentgroup);
+        $gui->require_active_enrolment($hidesuspended);
         $gui->init();
         // Add tabs
         print_grade_page_head($courseid, 'report', 'user');
@@ -113,8 +115,13 @@ if (has_capability('moodle/grade:viewall', $context)) { //Teachers will see all 
             echo $renderer->graded_users_selector('user', $course, $userid, $currentgroup, true);
         }
 
+
+        $context = context_course::instance($course->id);
+        $susers = get_suspended_userids($context);
+
         while ($userdata = $gui->next_user()) {
             $user = $userdata->user;
+
             $report = new grade_report_user($courseid, $gpr, $context, $user->id);
 
             $studentnamelink = html_writer::link(new moodle_url('/user/view.php', array('id' => $report->user->id, 'course' => $courseid)), fullname($report->user));

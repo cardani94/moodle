@@ -163,6 +163,10 @@ class quiz_override_form extends moodleform {
                         $userchoices[$id] = fullname($user) . ', ' . $user->email;
                     }
                 }
+
+                // Remove suspended users
+                extract_suspended_users($this->context, $userchoices);
+
                 unset($users);
 
                 if (count($userchoices) == 0) {

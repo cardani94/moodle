@@ -993,6 +993,7 @@ class assignment_base {
         require_once($CFG->libdir.'/tablelib.php');
         require_once("$CFG->dirroot/repository/lib.php");
         require_once("$CFG->dirroot/grade/grading/lib.php");
+        $hidesuspended = get_user_preferences('assignment_hidesuspended', 1);
         if ($userid==-1) {
             $userid = required_param('userid', PARAM_INT);
         }
@@ -1031,8 +1032,15 @@ class assignment_base {
 
         $currentgroup = groups_get_activity_group($cm);
         $users = get_enrolled_users($context, 'mod/assignment:submit', $currentgroup, 'u.id');
+
         if ($users) {
             $users = array_keys($users);
+            if ($hidesuspended) {
+                // get suspended user IDs
+                $susers = get_suspended_userids($context);
+                // exclude suspended users
+                $users = array_diff($users, $susers);
+            }
             // if groupmembersonly used, remove users who are not in any group
             if (!empty($CFG->enablegroupmembersonly) and $cm->groupmembersonly) {
                 if ($groupingusers = groups_get_grouping_members($cm->groupingid, 'u.id', 'u.id')) {
@@ -1206,9 +1214,11 @@ class assignment_base {
             $perpage = optional_param('perpage', 10, PARAM_INT);
             $perpage = ($perpage <= 0) ? 10 : $perpage ;
             $filter = optional_param('filter', 0, PARAM_INT);
+            $hidesuspended = optional_param('hidesuspended', 0, PARAM_INT);
             set_user_preference('assignment_perpage', $perpage);
             set_user_preference('assignment_quickgrade', optional_param('quickgrade', 0, PARAM_BOOL));
             set_user_preference('assignment_filter', $filter);
+            set_user_preference('assignment_hidesuspended', $hidesuspended);
         }
 
         /* next we get perpage and quickgrade (allow quick grade) params
@@ -1218,6 +1228,7 @@ class assignment_base {
         $quickgrade = get_user_preferences('assignment_quickgrade', 0) && $this->quickgrade_mode_allowed();
         $filter = get_user_preferences('assignment_filter', 0);
         $grading_info = grade_get_grades($this->course->id, 'mod', 'assignment', $this->assignment->id);
+        $hidesuspended = get_user_preferences('assignment_hidesuspended', 1);
 
         if (!empty($CFG->enableoutcomes) and !empty($grading_info->outcomes)) {
             $uses_outcomes = true;
@@ -1290,7 +1301,8 @@ class assignment_base {
         }
 
         /// Get all ppl that are allowed to submit assignments
-        list($esql, $params) = get_enrolled_sql($context, 'mod/assignment:submit', $currentgroup);
+        $hidesuspended = get_user_preferences('assignment_hidesuspended', 1);
+        list($esql, $params) = get_enrolled_sql($context, 'mod/assignment:submit', $currentgroup, $hidesuspended);
 
         if ($filter == self::FILTER_ALL) {
             $sql = "SELECT u.id FROM {user} u ".
@@ -1326,6 +1338,14 @@ class assignment_base {
                 }
             }
             $users = array_keys($users);
+        }
+
+        // get suspended user IDs
+        $susers = get_suspended_userids($context);
+
+        if ($users && $hidesuspended) {
+            // exclude suspended users
+            $users = array_diff($users, $susers);
         }
 
         // if groupmembersonly used, remove users who are not in any group
@@ -1602,6 +1622,10 @@ class assignment_base {
                         foreach ($extrafields as $field) {
                             $extradata[] = $auser->{$field};
                         }
+                        if (!$hidesuspended && isset($susers[$auser->id])) {
+                            $suspendedstring = get_string('userenrolmentsuspended', 'grades');
+                            $userlink .= '&nbsp;' . html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('i/enrolmentsuspended'), 'title'=>$suspendedstring, 'alt'=>$suspendedstring, 'class'=>'usersuspendedicon'));
+                        }
                         $row = array_merge(array($picture, $userlink), $extradata,
                                 array($grade, $comment, $studentmodified, $teachermodified,
                                 $status, $finalgrade));
@@ -1660,6 +1684,9 @@ class assignment_base {
         $mform->addElement('select', 'filter', get_string('show'),  $filters);
 
         $mform->setDefault('filter', $filter);
+
+        $mform->addElement('checkbox', 'hidesuspended', get_string('suspendedexclude'));
+        $mform->setDefault('hidesuspended', $hidesuspended);
 
         $mform->addElement('text', 'perpage', get_string('pagesize', 'assignment'), array('size'=>1));
         $mform->setDefault('perpage', $perpage);
@@ -1935,7 +1962,8 @@ class assignment_base {
         $context = context_module::instance($this->cm->id);
 
         // Get ids of users enrolled in the given course.
-        list($enroledsql, $params) = get_enrolled_sql($context, 'mod/assignment:view', $groupid);
+        $hidesuspended = get_user_preferences('assignment_hidesuspended', 1);
+        list($enroledsql, $params) = get_enrolled_sql($context, 'mod/assignment:view', $groupid, $hidesuspended);
         $params['assignmentid'] = $this->cm->instance;
 
         // Get ids of users enrolled in the given course.
@@ -3569,6 +3597,21 @@ function assignment_get_all_submissions($assignment, $sort="", $dir="DESC") {
         $sort = "a.$sort $dir";
     }
 
+    $params = array($assignment->id);
+
+    // exclude suspended users
+    $hidesuspended = get_user_preferences('assignment_hidesuspended', 1);
+    $suspendedsql = '';
+    if ($hidesuspended) {
+        $context = context_course::instance($assignment->course);
+        $susers = get_suspended_userids($context);
+        if (!empty($susers)) {
+            list($notinsusers, $paramsusers) = $DB->get_in_or_equal($susers, SQL_PARAMS_QM, null, false);
+            $suspendedsql = ' AND u.id ' . $notinsusers;
+            $params = array_merge($params, $paramsusers);
+        }
+    }
+
     /* not sure this is needed at all since assignment already has a course define, so this join?
     $select = "s.course = '$assignment->course' AND";
     if ($assignment->course == SITEID) {
@@ -3582,8 +3625,9 @@ function assignment_get_all_submissions($assignment, $sort="", $dir="DESC") {
                                     FROM {assignment_submissions} a
                                     INNER JOIN (". $enroledsql .") u ON u.id = a.userid
                                   WHERE u.id = a.userid
-                                        AND a.assignment = :assignmentid
-                                  ORDER BY $sort", $params);
+                                        AND a.assignment = ?
+                                        $suspendedsql
+                               ORDER BY $sort", $params);
 
 }
 

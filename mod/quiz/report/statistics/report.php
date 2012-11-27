@@ -70,7 +70,11 @@ class quiz_statistics_report extends quiz_default_report {
         $reporturl = new moodle_url('/mod/quiz/report.php', $pageoptions);
 
         $mform = new quiz_statistics_settings_form($reporturl);
+        $hidesuspended = get_user_preferences('quiz_report_hidesuspended', 1);
         if ($fromform = $mform->get_data()) {
+            $fromformsuspended = isset($fromform->hidesuspended) ? 1 : 0;
+            set_user_preference('quiz_report_hidesuspended', $fromformsuspended);
+
             $useallattempts = $fromform->useallattempts;
             if ($fromform->useallattempts) {
                 set_user_preference('quiz_report_statistics_useallattempts',
@@ -78,7 +82,6 @@ class quiz_statistics_report extends quiz_default_report {
             } else {
                 unset_user_preference('quiz_report_statistics_useallattempts');
             }
-
         } else {
             $useallattempts = get_user_preferences('quiz_report_statistics_useallattempts', 0);
         }
@@ -108,6 +111,12 @@ class quiz_statistics_report extends quiz_default_report {
         if ($recalculate && confirm_sesskey()) {
             $this->clear_cached_data($quiz->id, $currentgroup, $useallattempts);
             redirect($reporturl);
+        }
+
+        // If hide suspended users setting changed, need to recalculate
+        if (isset($fromformsuspended) && $hidesuspended != $fromformsuspended) {
+            $this->clear_cached_data($quiz->id, $currentgroup, $useallattempts);
+            $hidesuspended = $fromformsuspended;
         }
 
         // Set up the main table.
@@ -1080,6 +1089,19 @@ function quiz_statistics_attempts_sql($quizid, $currentgroup, $groupstudents,
 
     if (!$includeungraded) {
         $whereqa .= ' AND quiza.sumgrades IS NOT NULL';
+    }
+
+    // exclude suspended users when required
+    $hidesuspended = get_user_preferences('quiz_report_hidesuspended', 1);
+    if ($hidesuspended) {
+        $quiz = $DB->get_record('quiz', array('id' => $quizid));
+        $context = context_course::instance($quiz->course);
+        $susers = get_suspended_userids($context);
+        if (!empty($susers)) {
+            list($susql, $suparams) = $DB->get_in_or_equal($susers, SQL_PARAMS_NAMED, 'su', false); // not in ()...
+            $whereqa .= " AND quiza.userid $susql";
+            $qaparams += $suparams;
+        }
     }
 
     return array($fromqa, $whereqa, $qaparams);

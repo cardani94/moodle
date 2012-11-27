@@ -131,6 +131,10 @@ M.mod_assign.init_grading_options = function(Y) {
                 Y.one('form.gradingoptionsform').submit();
             });
         }
+        var hidesuspendedelement = Y.one('#id_hidesuspended');
+        hidesuspendedelement.on('change', function(e) {
+            Y.one('form.gradingoptionsform').submit();
+        });
         var quickgradingelement = Y.one('#id_quickgrading');
         if (quickgradingelement) {
             quickgradingelement.on('change', function(e) {

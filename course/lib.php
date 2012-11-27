@@ -226,7 +226,7 @@ function build_mnet_logs_array($hostid, $course, $user=0, $date=0, $order="l.tim
 }
 
 function build_logs_array($course, $user=0, $date=0, $order="l.time ASC", $limitfrom='', $limitnum='',
-                   $modname="", $modid=0, $modaction="", $groupid=0) {
+                   $modname="", $modid=0, $modaction="", $groupid=0, $hidesuspended=1) {
     global $DB, $SESSION, $USER;
     // It is assumed that $date is the GMT time of midnight for that day,
     // and so the next 86400 seconds worth of logs are printed.
@@ -299,6 +299,17 @@ function build_logs_array($course, $user=0, $date=0, $order="l.time ASC", $limit
         $params['userid'] = $user;
     }
 
+    // Excluding suspended users
+    if ($hidesuspended) {
+        $context = context_course::instance($course->id);
+        $susers = get_suspended_userids($context);
+        if (!empty($susers)) {
+            list($notinusers, $paramsusers) = $DB->get_in_or_equal($susers, SQL_PARAMS_NAMED, 'u', false);
+            $joins[] = 'l.userid ' . $notinusers;
+            $params = array_merge($params, $paramsusers);
+        }
+    }
+
     if ($date) {
         $enddate = $date + 86400;
         $joins[] = "l.time > :date AND l.time < :enddate";
@@ -317,12 +328,12 @@ function build_logs_array($course, $user=0, $date=0, $order="l.time ASC", $limit
 
 
 function print_log($course, $user=0, $date=0, $order="l.time ASC", $page=0, $perpage=100,
-                   $url="", $modname="", $modid=0, $modaction="", $groupid=0) {
+                   $url="", $modname="", $modid=0, $modaction="", $groupid=0, $hidesuspended=1) {
 
     global $CFG, $DB, $OUTPUT;
 
     if (!$logs = build_logs_array($course, $user, $date, $order, $page*$perpage, $perpage,
-                       $modname, $modid, $modaction, $groupid)) {
+                       $modname, $modid, $modaction, $groupid, $hidesuspended)) {
         echo $OUTPUT->notification("No logs found!");
         echo $OUTPUT->footer();
         exit;
@@ -353,7 +364,7 @@ function print_log($course, $user=0, $date=0, $order="l.time ASC", $page=0, $per
     print_string("displayingrecords", "", $totalcount);
     echo "</div>\n";
 
-    echo $OUTPUT->paging_bar($totalcount, $page, $perpage, "$url&perpage=$perpage");
+    echo $OUTPUT->paging_bar($totalcount, $page, $perpage, "$url&perpage=$perpage&hidesuspended=$hidesuspended");
 
     $table = new html_table();
     $table->classes = array('logtable','generaltable');
@@ -429,17 +440,17 @@ function print_log($course, $user=0, $date=0, $order="l.time ASC", $page=0, $per
     }
 
     echo html_writer::table($table);
-    echo $OUTPUT->paging_bar($totalcount, $page, $perpage, "$url&perpage=$perpage");
+    echo $OUTPUT->paging_bar($totalcount, $page, $perpage, "$url&perpage=$perpage&hidesuspended=$hidesuspended");
 }
 
 
 function print_mnet_log($hostid, $course, $user=0, $date=0, $order="l.time ASC", $page=0, $perpage=100,
-                   $url="", $modname="", $modid=0, $modaction="", $groupid=0) {
+                   $url="", $modname="", $modid=0, $modaction="", $groupid=0, $hidesuspended=1) {
 
     global $CFG, $DB, $OUTPUT;
 
     if (!$logs = build_mnet_logs_array($hostid, $course, $user, $date, $order, $page*$perpage, $perpage,
-                       $modname, $modid, $modaction, $groupid)) {
+                       $modname, $modid, $modaction, $groupid, $hidesuspended)) {
         echo $OUTPUT->notification("No logs found!");
         echo $OUTPUT->footer();
         exit;
@@ -539,7 +550,7 @@ function print_mnet_log($hostid, $course, $user=0, $date=0, $order="l.time ASC",
 
 
 function print_log_csv($course, $user, $date, $order='l.time DESC', $modname,
-                        $modid, $modaction, $groupid) {
+                        $modid, $modaction, $groupid, $hidesuspended=1) {
     global $DB, $CFG;
 
     require_once($CFG->libdir . '/csvlib.class.php');
@@ -555,7 +566,7 @@ function print_log_csv($course, $user, $date, $order='l.time DESC', $modname,
     $header[] = get_string('info');
 
     if (!$logs = build_logs_array($course, $user, $date, $order, '', '',
-                       $modname, $modid, $modaction, $groupid)) {
+                       $modname, $modid, $modaction, $groupid, $hidesuspended)) {
         return false;
     }
 
@@ -621,14 +632,14 @@ function print_log_csv($course, $user, $date, $order='l.time DESC', $modname,
 
 
 function print_log_xls($course, $user, $date, $order='l.time DESC', $modname,
-                        $modid, $modaction, $groupid) {
+                        $modid, $modaction, $groupid, $hidesuspended=1) {
 
     global $CFG, $DB;
 
     require_once("$CFG->libdir/excellib.class.php");
 
     if (!$logs = build_logs_array($course, $user, $date, $order, '', '',
-                       $modname, $modid, $modaction, $groupid)) {
+                       $modname, $modid, $modaction, $groupid, $hidesuspended)) {
         return false;
     }
 
@@ -735,14 +746,14 @@ function print_log_xls($course, $user, $date, $order='l.time DESC', $modname,
 }
 
 function print_log_ods($course, $user, $date, $order='l.time DESC', $modname,
-                        $modid, $modaction, $groupid) {
+                        $modid, $modaction, $groupid, $hidesuspended=1) {
 
     global $CFG, $DB;
 
     require_once("$CFG->libdir/odslib.class.php");
 
     if (!$logs = build_logs_array($course, $user, $date, $order, '', '',
-                       $modname, $modid, $modaction, $groupid)) {
+                       $modname, $modid, $modaction, $groupid, $hidesuspended)) {
         return false;
     }
 
@@ -1772,6 +1783,16 @@ function print_course($course, $highlightterms = '') {
                 $user->roleshortname = $manager->roleshortname;
                 $user->rolecoursealias = $manager->rolecoursealias;
                 $rusers[$user->id] = $user;
+            }
+        }
+
+        // Remove users with suspended enrolments
+        $susers = get_suspended_userids($context);
+        if (!empty($susers)) {
+            foreach ($rusers as $key => $user) {
+                if (isset($susers[$user->id])) {
+                    unset($rusers[$key]);
+                }
             }
         }
 

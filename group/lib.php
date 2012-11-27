@@ -700,6 +700,14 @@ function groups_get_potential_members($courseid, $roleid = null, $cohortid = nul
         $where = "";
     }
 
+    // exclude suspended enrolled students
+    $susers = get_suspended_userids($context);
+    if (!empty($susers)) {
+        list($susql, $suparams) = $DB->get_in_or_equal($susers, SQL_PARAMS_NAMED, 'su', false); // not in ()...
+        $where .= " AND u.id $susql";
+        $params = array_merge($params, $suparams);
+    }
+
     if ($cohortid) {
         $cohortjoin = "JOIN {cohort_members} cm ON (cm.userid = u.id AND cm.cohortid = :cohortid)";
         $params['cohortid'] = $cohortid;
@@ -916,8 +924,21 @@ function groups_calculate_role_people($rs, $context) {
     $roledata->users = array();
     $roles[0] = $roledata;
 
+    // Add pseudo-role for suspended users
+    $susers = get_suspended_userids($context);
+    if (!empty($susers)) {
+        $roledata = new stdClass();
+        $roledata->name = get_string('suspendedusers');
+        $roledata->users = array();
+        $roles['suspended'] = $roledata;
+    }
+
     // Now we rearrange the data to store users by role
     foreach ($users as $userid=>$userdata) {
+        if (isset($susers[$userid])) {
+            $roles['suspended']->users[$userid] = $userdata;
+            continue;
+        }
         $rolecount = count($userdata->roles);
         if ($rolecount == 0) {
             // does not have any roles

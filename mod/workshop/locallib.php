@@ -661,6 +661,15 @@ class workshop {
         }
         $sql .= " WHERE s.example = 0 AND s.workshopid = :workshopid";
 
+        // exclude suspended enrolled students
+        $coursecontext = context_course::instance($this->course->id);
+        $susers = get_suspended_userids($coursecontext);
+        if (!empty($susers)) {
+            list($susql, $suparams) = $DB->get_in_or_equal($susers, SQL_PARAMS_NAMED, 'su', false); // not in ()...
+            $sql .= " AND u.id $susql";
+            $params = array_merge($params, $suparams);
+        }
+
         if ('all' === $authorid) {
             // no additional conditions
         } elseif (!empty($authorid)) {
@@ -706,6 +715,15 @@ class workshop {
         }
         $sql .= " LEFT JOIN {user} t ON (s.gradeoverby = t.id)
                  WHERE s.example = 0 AND s.workshopid = :workshopid";
+
+        // exclude suspended enrolled students
+        $coursecontext = context_course::instance($this->course->id);
+        $susers = get_suspended_userids($coursecontext);
+        if (!empty($susers)) {
+            list($susql, $suparams) = $DB->get_in_or_equal($susers, SQL_PARAMS_NAMED, 'su', false); // not in ()...
+            $sql .= " AND u.id $susql";
+            $params = array_merge($params, $suparams);
+        }
 
         if ('all' === $authorid) {
             // no additional conditions
@@ -1053,6 +1071,15 @@ class workshop {
         $authorfields   = user_picture::fields('author', null, 'authorid', 'author');
         $overbyfields   = user_picture::fields('overby', null, 'gradinggradeoverbyx', 'overby');
         list($sort, $params) = users_order_by_sql('reviewer');
+
+        // exclude suspended enrolled students
+        $coursecontext = context_course::instance($this->course->id);
+        $susers = get_suspended_userids($coursecontext);
+        if (!empty($susers)) {
+            list($susql, $suparams) = $DB->get_in_or_equal($susers, SQL_PARAMS_NAMED, 'su', false); // not in ()...
+            $susql .= " AND u.id $susql";
+        }
+
         $sql = "SELECT a.id, a.submissionid, a.reviewerid, a.timecreated, a.timemodified,
                        a.grade, a.gradinggrade, a.gradinggradeover, a.gradinggradeoverby,
                        $reviewerfields, $authorfields, $overbyfields,
@@ -1062,10 +1089,10 @@ class workshop {
             INNER JOIN {workshop_submissions} s ON (a.submissionid = s.id)
             INNER JOIN {user} author ON (s.authorid = author.id)
              LEFT JOIN {user} overby ON (a.gradinggradeoverby = overby.id)
-                 WHERE s.workshopid = :workshopid AND s.example = 0
+                 WHERE s.workshopid = :workshopid AND s.example = 0 $susql
               ORDER BY $sort";
         $params['workshopid'] = $this->id;
-
+        $params = array_merge($params, $suparams);
         return $DB->get_records_sql($sql, $params);
     }
 
@@ -2685,12 +2712,30 @@ class workshop_user_plan implements renderable {
             $task->title = get_string('allocate', 'workshop');
             $task->link = $workshop->allocation_url();
             $numofauthors = $workshop->count_potential_authors(false);
-            $numofsubmissions = $DB->count_records('workshop_submissions', array('workshopid'=>$workshop->id, 'example'=>0));
+            $susers = get_suspended_userids($workshop->context);
+            if (!empty($susers)) {
+                list($susql, $suparams) = $DB->get_in_or_equal($susers, SQL_PARAMS_NAMED, 'su', false); // not in ()...
+                $sql = "SELECT COUNT(s.id)
+                        FROM {workshop_submissions} s
+                        WHERE workshopid = :workshopid AND example = :example AND s.authorid $susql";
+                $params = array();
+                $params['workshopid'] = $workshop->id;
+                $params['example'] = 0;
+                $params = array_merge($params, $suparams);
+                $numofsubmissions = $DB->count_records_sql($sql, $params);
+            } else {
+                $numofsubmissions = $DB->count_records('workshop_submissions', array('workshopid'=>$workshop->id, 'example'=>0));
+            }
             $sql = 'SELECT COUNT(s.id) AS nonallocated
                       FROM {workshop_submissions} s
                  LEFT JOIN {workshop_assessments} a ON (a.submissionid=s.id)
                      WHERE s.workshopid = :workshopid AND s.example=0 AND a.submissionid IS NULL';
+            $params = array();
             $params['workshopid'] = $workshop->id;
+            if (!empty($susers)) {
+                $sql .= " AND s.authorid $susql";
+                $params = array_merge($params, $suparams);
+            }
             $numnonallocated = $DB->count_records_sql($sql, $params);
             if ($numofsubmissions == 0) {
                 $task->completed = null;

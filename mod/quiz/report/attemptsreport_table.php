@@ -406,6 +406,16 @@ abstract class quiz_attempts_report_table extends table_sql {
                 break;
         }
 
+        $hidesuspended = get_user_preferences('quiz_report_hidesuspended', 1);
+        if ($hidesuspended) {
+            $susers = get_suspended_userids($this->context);
+            if (!empty($susers)) {
+                list($susql, $suparams) = $DB->get_in_or_equal($susers, SQL_PARAMS_NAMED, 'su', false); // not in ()...
+                $where .= " AND u.id $susql";
+                $params = array_merge($params, $suparams);
+            }
+        }
+
         if ($this->options->states) {
             list($statesql, $stateparams) = $DB->get_in_or_equal($this->options->states,
                     SQL_PARAMS_NAMED, 'state');

@@ -66,6 +66,10 @@ class grade_export_txt extends grade_export {
             $exporttitle[] = $field->fullname;
         }
 
+        if (!$this->onlyactive) {
+            $exporttitle[] = get_string("suspended");
+        }
+
         // Add a feedback column.
         foreach ($this->columns as $grade_item) {
             $exporttitle[] = $this->format_column_name($grade_item);
@@ -90,6 +94,12 @@ class grade_export_txt extends grade_export {
                 $fieldvalue = grade_helper::get_user_field_value($user, $field);
                 $exportdata[] = $fieldvalue;
             }
+
+            if (!$this->onlyactive) {
+                $issuspended = ($user->suspendedenrolment) ? get_string('yes') : '';
+                $exportdata[] = $issuspended;
+            }
+
             foreach ($userdata->grades as $itemid => $grade) {
                 if ($export_tracking) {
                     $status = $geub->track($grade);

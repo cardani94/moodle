@@ -54,6 +54,7 @@ class mod_assign_grading_options_form extends moodleform {
         if ($instance['submissionsenabled']) {
             $mform->addElement('select', 'filter', get_string('filter', 'assign'), $options, $dirtyclass);
         }
+        $mform->addElement('checkbox', 'hidesuspended', get_string('suspendedexclude'), '');
 
         // Quickgrading.
         if ($instance['showquickgrading']) {

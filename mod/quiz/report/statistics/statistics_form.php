@@ -38,6 +38,12 @@ class quiz_statistics_settings_form extends moodleform {
     protected function definition() {
         $mform = $this->_form;
 
+        $mform->addElement('header', 'preferencesuser',
+                get_string('reportdisplayoptions', 'quiz'));
+
+        $mform->addElement('checkbox', 'hidesuspended', get_string('suspendedexclude'));
+        $mform->setDefault('hidesuspended', get_user_preferences('quiz_report_hidesuspended', 1));
+
         $mform->addElement('header', 'preferencespage',
                 get_string('preferencespage', 'quiz_overview'));
 

@@ -82,6 +82,13 @@ class assign {
      */
     private $cache;
 
+    /** @var int hidesuspended - whether to exclude users with inactive enrolment */
+    private $hidesuspended;
+
+    /** @var array susers - array of suspended user IDs in form of ([id1] => id1), ([id2] => id2)
+        see get_suspended_userids() in accesslib.php */
+    private $susers = array();
+
     /** @var array list of the installed submission plugins */
     private $submissionplugins;
 
@@ -122,6 +129,11 @@ class assign {
 
         // Temporary cache only lives for a single request - used to reduce db lookups.
         $this->cache = array();
+
+        $this->hidesuspended = get_user_preferences('assign_hidesuspended', 1);
+        if ($this->hidesuspended && !is_null($this->context)) {
+            $this->susers = get_suspended_userids($this->context);
+        }
 
         $this->submissionplugins = $this->load_plugins('assignsubmission');
         $this->feedbackplugins = $this->load_plugins('assignfeedback');
@@ -1184,9 +1196,9 @@ class assign {
      */
     public function list_participants($currentgroup, $idsonly) {
         if ($idsonly) {
-            return get_enrolled_users($this->context, 'mod/assign:submit', $currentgroup, 'u.id');
+            return get_enrolled_users($this->context, "mod/assign:submit", $currentgroup, 'u.id', null, null, null, $this->hidesuspended);
         } else {
-            return get_enrolled_users($this->context, 'mod/assign:submit', $currentgroup);
+            return get_enrolled_users($this->context, "mod/assign:submit", $currentgroup, 'u.*', null, null, null, $this->hidesuspended);
         }
     }
 
@@ -1219,7 +1231,7 @@ class assign {
      * @return int number of matching users
      */
     public function count_participants($currentgroup) {
-        return count_enrolled_users($this->context, 'mod/assign:submit', $currentgroup);
+        return count_enrolled_users($this->context, "mod/assign:submit", $currentgroup, $this->hidesuspended);
     }
 
     /**
@@ -1255,6 +1267,13 @@ class assign {
                         s.status = :submitted AND
                         (s.timemodified > g.timemodified OR g.timemodified IS NULL)';
 
+        if ($this->hidesuspended && sizeof($this->susers)) {
+            $susql = '';
+            list($susql, $suparams) = $DB->get_in_or_equal($this->susers, SQL_PARAMS_QM, null, false); // not in ()...
+            $sql .= " AND s.userid $susql";
+            $params = array_merge($params, $suparams);
+        }
+
         return $DB->count_records_sql($sql, $params);
     }
 
@@ -1279,6 +1298,15 @@ class assign {
                    FROM {assign_grades} g
                    JOIN(' . $esql . ') e ON e.id = g.userid
                    WHERE g.assignment = :assignid';
+
+        $params = array($this->get_course_module()->instance);
+
+        if ($this->hidesuspended && sizeof($this->susers)) {
+            $susql = '';
+            list($susql, $suparams) = $DB->get_in_or_equal($this->susers, SQL_PARAMS_QM, null, false); // not in ()...
+            $sql .= " AND userid $susql";
+            $params = array_merge($params, $suparams);
+        } 
 
         return $DB->count_records_sql($sql, $params);
     }
@@ -1320,6 +1348,12 @@ class assign {
                        WHERE
                             s.assignment = :assignid AND
                             s.timemodified IS NOT NULL';
+            // only look at team submissions
+            if ($this->hidesuspended && sizeof($this->susers)) {
+                list($susql, $suparams) = $DB->get_in_or_equal($this->susers, SQL_PARAMS_QM, null, false); // not in ()...
+                $sql .= " AND userid $susql";
+                $params = array_merge($params, $suparams);
+            }
         }
 
         return $DB->count_records_sql($sql, $params);
@@ -1357,6 +1391,12 @@ class assign {
                             s.assignment = :assignid AND
                             s.timemodified IS NOT NULL AND
                             s.status = :submissionstatus';
+            // only look at team submissions
+            if ($this->hidesuspended && sizeof($this->susers)) {
+                list($susql, $suparams) = $DB->get_in_or_equal($this->susers, SQL_PARAMS_QM, null, false); // not in ()...
+                $sql .= " AND userid $susql";
+                $params = array_merge($params, $suparams);
+            }
         }
 
         return $DB->count_records_sql($sql, $params);
@@ -1370,7 +1410,7 @@ class assign {
      */
     protected function get_grading_userid_list() {
         $filter = get_user_preferences('assign_filter', '');
-        $table = new assign_grading_table($this, 0, $filter, 0, false);
+        $table = new assign_grading_table($this, 0, $filter, 0, false, null);
 
         $useridlist = $table->get_column_data('userid');
 
@@ -1395,6 +1435,7 @@ class assign {
         if ($zipper->archive_to_pathname($filesforzipping, $tempzip)) {
             return $tempzip;
         }
+
         return false;
     }
 
@@ -1693,6 +1734,12 @@ class assign {
                     $members[] = $user;
                 }
             }
+        }
+
+        // exclude suspended users
+        $hidesuspended = get_user_preferences('assign_hidesuspended', 1);
+        if ($hidesuspended) {
+            extract_suspended_users($this->context, $members);
         }
         return $members;
     }
@@ -2131,7 +2178,7 @@ class assign {
         require_once($CFG->libdir.'/filelib.php');
 
         // Load all users with submit.
-        $students = get_enrolled_users($this->context, "mod/assign:submit");
+        $students = get_enrolled_users($this->context, "mod/assign:submit", null, 'u.*', null, null, null, $this->hidesuspended);
 
         // Build a list of files to zip.
         $filesforzipping = array();
@@ -2620,6 +2667,7 @@ class assign {
 
         $perpage = get_user_preferences('assign_perpage', 10);
         $filter = get_user_preferences('assign_filter', '');
+        $hidesuspended = get_user_preferences('assign_hidesuspended', 1);
         $controller = $gradingmanager->get_active_controller();
         $showquickgrading = empty($controller);
         $quickgrading = get_user_preferences('assign_quickgrading', false);
@@ -2654,6 +2702,7 @@ class assign {
         $gradingoptionsdata = new stdClass();
         $gradingoptionsdata->perpage = $perpage;
         $gradingoptionsdata->filter = $filter;
+        $gradingoptionsdata->hidesuspended = $hidesuspended;
         $gradingoptionsform->set_data($gradingoptionsdata);
 
         $actionformtext = $this->get_renderer()->render($gradingactions);
@@ -2680,14 +2729,15 @@ class assign {
 
         // Load and print the table of submissions.
         if ($showquickgrading && $quickgrading) {
-            $gradingtable = new assign_grading_table($this, $perpage, $filter, 0, true);
+
+            $gradingtable = new assign_grading_table($this, $perpage, $filter, 0, true, null);
             $table = $this->get_renderer()->render($gradingtable);
             $quickformparams = array('cm'=>$this->get_course_module()->id, 'gradingtable'=>$table);
             $quickgradingform = new mod_assign_quick_grading_form(null, $quickformparams);
 
             $o .= $this->get_renderer()->render(new assign_form('quickgradingform', $quickgradingform));
         } else {
-            $gradingtable = new assign_grading_table($this, $perpage, $filter, 0, false);
+            $gradingtable = new assign_grading_table($this, $perpage, $filter, 0, false, null);
             $o .= $this->get_renderer()->render($gradingtable);
         }
 
@@ -3503,8 +3553,9 @@ class assign {
      * @param int $userid The submission to grade
      * @return array
      */
-    protected function get_graders($userid) {
-        $potentialgraders = get_enrolled_users($this->context, 'mod/assign:grade');
+    private function get_graders($userid) {
+        //potential graders
+        $potentialgraders = get_enrolled_users($this->context, "mod/assign:grade", null, 'u.*', null, null, null, true);
 
         $graders = array();
         if (groups_get_activity_groupmode($this->get_course_module()) == SEPARATEGROUPS) {
@@ -4175,9 +4226,18 @@ class assign {
             if (isset($formdata->filter)) {
                 set_user_preference('assign_filter', $formdata->filter);
             }
+
             if ($showquickgrading) {
                 set_user_preference('assign_quickgrading', isset($formdata->quickgrading));
             }
+
+            $hidesuspended = (isset($formdata->hidesuspended) && $formdata->hidesuspended) ? 1 : 0;
+            set_user_preference('assign_hidesuspended', $hidesuspended);
+            if ($hidesuspended && !$this->hidesuspended) {
+                // setting has changed, let's get susers 'cause we'll need them
+                $this->susers = get_suspended_userids($this->context);
+            }
+            $this->hidesuspended = $hidesuspended;
         }
     }
 
@@ -5120,7 +5180,7 @@ class assign {
         $context = context_module::instance($cm->id);
 
         $currentgroup = groups_get_activity_group($cm, true);
-        $users = get_enrolled_users($context, "mod/assign:submit", $currentgroup, 'u.id');
+        $users = get_enrolled_users($context, "mod/assign:submit", $currentgroup, 'u.id', null, null, null, true);
 
         // Shuffle the users.
         shuffle($users);

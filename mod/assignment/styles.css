@@ -12,6 +12,11 @@
 .path-mod-assignment .files a {white-space:nowrap;}
 .path-mod-assignment .late {color: red;}
 
+img.usersuspendedicon {
+    vertical-align:middle;
+    color: #666;
+}
+
 /** Styles for submissions.php **/
 #page-mod-assignment-submissions fieldset.felement {margin-left: 16%;}
 #page-mod-assignment-submissions form#options div {text-align:right;margin-left:auto;margin-right:20px;}

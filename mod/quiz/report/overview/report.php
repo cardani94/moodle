@@ -48,7 +48,6 @@ class quiz_overview_report extends quiz_attempts_report {
 
         if ($fromform = $this->form->get_data()) {
             $options->process_settings_from_form($fromform);
-
         } else {
             $options->process_settings_from_params();
         }

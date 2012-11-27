@@ -208,6 +208,13 @@ class graded_users_iterator {
                     ORDER BY $order";
         $this->users_rs = $DB->get_recordset_sql($users_sql, $params);
 
+        if ($this->onlyactive) {
+            $this->susers = array();
+        } else {
+            $context = context_course::instance($this->course->id);
+            $this->susers = get_suspended_userids($context);
+        }
+
         if (!empty($this->grade_items)) {
             $itemids = array_keys($this->grade_items);
             list($itemidsql, $grades_params) = $DB->get_in_or_equal($itemids, SQL_PARAMS_NAMED, 'items');
@@ -299,6 +306,8 @@ class graded_users_iterator {
                 }
             }
         }
+
+        $user->suspendedenrolment = isset($this->susers[$user->id]);
 
         $result = new stdClass();
         $result->user      = $user;
@@ -408,23 +417,36 @@ function grade_get_graded_users_select($report, $course, $userid, $groupid, $inc
         $userid = $USER->id;
     }
 
+    $hidesuspended = get_user_preferences('grade_report_showonlyactiveenrol', 1);
     $menu = array(); // Will be a list of userid => user name
     $gui = new graded_users_iterator($course, null, $groupid);
+    $gui->require_active_enrolment($hidesuspended);
     $gui->init();
     $label = get_string('selectauser', 'grades');
     if ($includeall) {
         $menu[0] = get_string('allusers', 'grades');
         $label = get_string('selectalloroneuser', 'grades');
     }
+
+    $menususers = array();  // suspended users go to a separate optgroup
     while ($userdata = $gui->next_user()) {
         $user = $userdata->user;
-        $menu[$user->id] = fullname($user);
+        if ($user->suspendedenrolment) {
+            $menususers[$user->id] = fullname($user);
+        } else {
+            $menu[$user->id] = fullname($user);
+        }
     }
     $gui->close();
 
     if ($includeall) {
-        $menu[0] .= " (" . (count($menu) - 1) . ")";
+        $menu[0] .= " (" . (count($menu) + count($menususers) - 1) . ")";
     }
+
+    if (!empty($menususers)) {
+        $menu[] = array(get_string('suspendedusers') => $menususers);
+    }
+
     $select = new single_select(new moodle_url('/grade/report/'.$report.'/index.php', array('id'=>$course->id)), 'userid', $menu, $userid);
     $select->label = $label;
     $select->formid = 'choosegradeuser';

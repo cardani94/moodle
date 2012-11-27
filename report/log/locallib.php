@@ -79,7 +79,7 @@ function report_log_print_graph($course, $userid, $type, $date=0) {
  * @return void
  */
 function report_log_print_mnet_selector_form($hostid, $course, $selecteduser=0, $selecteddate='today',
-                                 $modname="", $modid=0, $modaction='', $selectedgroup=-1, $showcourses=0, $showusers=0, $logformat='showashtml') {
+                                 $modname="", $modid=0, $modaction='', $selectedgroup=-1, $showcourses=0, $showusers=0, $hidesuspended=1, $logformat='showashtml') {
 
     global $USER, $CFG, $SITE, $DB, $OUTPUT, $SESSION;
     require_once $CFG->dirroot.'/mnet/peer.php';
@@ -261,6 +261,12 @@ function report_log_print_mnet_selector_form($hostid, $course, $selecteduser=0, 
 
     asort($users);
 
+    // hide suspended users?
+    $suspendedhidesel = array(
+                            0 => get_string('suspendedinclude'),
+                            1 => get_string('suspendedexclude'),
+                        );
+
     // Prepare the list of action options.
     $actions = array(
         'view' => get_string('view'),
@@ -338,6 +344,10 @@ function report_log_print_mnet_selector_form($hostid, $course, $selecteduser=0, 
 
     if ($showusers) {
         echo html_writer::label(get_string('participantslist'), 'menuuser', false, array('class' => 'accesshide'));
+        $susers = extract_suspended_users($context, $users, array($CFG->siteguest));
+        if (!empty($susers)) {
+            $users[] = array(get_string('suspendedusers') => $susers);
+        }
         echo html_writer::select($users, "user", $selecteduser, get_string("allparticipants"));
     }
     else {
@@ -357,7 +367,8 @@ function report_log_print_mnet_selector_form($hostid, $course, $selecteduser=0, 
     }
 
     echo html_writer::label(get_string('date'), 'menudate', false, array('class' => 'accesshide'));
-    echo html_writer::select($dates, "date", $selecteddate, false);
+    echo html_writer::select($suspendedhidesel, "hidesuspended", $hidesuspended);
+    echo html_writer::select($dates, "date", $selecteddate, get_string("alldays"));
     echo html_writer::label(get_string('showreports'), 'menumodid', false, array('class' => 'accesshide'));
     echo html_writer::select($activities, "modid", $selectedactivity, get_string("allactivities"));
     echo html_writer::label(get_string('actions'), 'menumodaction', false, array('class' => 'accesshide'));
@@ -398,7 +409,7 @@ function report_log_print_mnet_selector_form($hostid, $course, $selecteduser=0, 
  * @return void
  */
 function report_log_print_selector_form($course, $selecteduser=0, $selecteddate='today',
-                                 $modname="", $modid=0, $modaction='', $selectedgroup=-1, $showcourses=0, $showusers=0, $logformat='showashtml') {
+                                 $modname="", $modid=0, $modaction='', $selectedgroup=-1, $showcourses=0, $showusers=0, $hidesuspended=1, $logformat='showashtml') {
 
     global $USER, $CFG, $DB, $OUTPUT, $SESSION;
 
@@ -513,6 +524,12 @@ function report_log_print_selector_form($course, $selecteduser=0, $selecteddate=
 
     asort($users);
 
+    // hide suspended users?
+    $suspendedhidesel = array(
+                            0 => get_string('suspendedinclude'),
+                            1 => get_string('suspendedexclude'),
+                        );
+
     // Prepare the list of action options.
     $actions = array(
         'view' => get_string('view'),
@@ -587,6 +604,12 @@ function report_log_print_selector_form($course, $selecteduser=0, $selecteddate=
 
     if ($showusers) {
         echo html_writer::label(get_string('selctauser'), 'menuuser', false, array('class' => 'accesshide'));
+        $susers = extract_suspended_users($context, $users, array($CFG->siteguest));
+        if (!empty($susers)) {
+            $suspendedstr = get_string('suspendedusers');
+            $selsusers[$suspendedstr] = $susers;
+            $users[] = $selsusers;
+        }
         echo html_writer::select($users, "user", $selecteduser, get_string("allparticipants"));
     }
     else {
@@ -606,6 +629,7 @@ function report_log_print_selector_form($course, $selecteduser=0, $selecteddate=
         print_string('logtoomanyusers','moodle',$a);
     }
     echo html_writer::label(get_string('date'), 'menudate', false, array('class' => 'accesshide'));
+    echo html_writer::select($suspendedhidesel, "hidesuspended", $hidesuspended);
     echo html_writer::select($dates, "date", $selecteddate, get_string("alldays"));
 
     echo html_writer::label(get_string('activities'), 'menumodid', false, array('class' => 'accesshide'));

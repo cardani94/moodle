@@ -2321,12 +2321,13 @@ function get_enrolled_sql(context $context, $withcapability = '', $groupid = 0, 
  * @param string $orderby
  * @param int $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set).
  * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
+ * @param bool $onlyactive consider only active enrolments in enabled plugins and time restrictions
  * @return array of user records
  */
-function get_enrolled_users(context $context, $withcapability = '', $groupid = 0, $userfields = 'u.*', $orderby = null, $limitfrom = 0, $limitnum = 0) {
+function get_enrolled_users(context $context, $withcapability = '', $groupid = 0, $userfields = 'u.*', $orderby = null, $limitfrom = 0, $limitnum = 0, $onlyactive = false) {
     global $DB;
 
-    list($esql, $params) = get_enrolled_sql($context, $withcapability, $groupid);
+    list($esql, $params) = get_enrolled_sql($context, $withcapability, $groupid, $onlyactive);
     $sql = "SELECT $userfields
               FROM {user} u
               JOIN ($esql) je ON je.id = u.id
@@ -2354,10 +2355,10 @@ function get_enrolled_users(context $context, $withcapability = '', $groupid = 0
  * @param int $groupid 0 means ignore groups, any other value limits the result by group id
  * @return array of user records
  */
-function count_enrolled_users(context $context, $withcapability = '', $groupid = 0) {
+function count_enrolled_users(context $context, $withcapability = '', $groupid = 0, $onlyactive = false) {
     global $DB;
 
-    list($esql, $params) = get_enrolled_sql($context, $withcapability, $groupid);
+    list($esql, $params) = get_enrolled_sql($context, $withcapability, $groupid, $onlyactive);
     $sql = "SELECT count(u.id)
               FROM {user} u
               JOIN ($esql) je ON je.id = u.id
@@ -7637,4 +7638,61 @@ function get_related_contexts_string(context $context) {
     } else {
         return (' ='.$context->id);
     }
+}
+
+/**
+ * Given context and array of users, returns array of users whose enrolment is suspended,
+ * also removes those users from the given array
+ *
+ * @param context $context
+ * @param array $users
+ * @param array $ignoreusers    - array of user ids to ignore, e.g. guest
+ * @return array
+ */
+function extract_suspended_users($context, &$users, $ignoreusers=array()) {
+    global $DB;
+
+    // get active enrolled users
+    list($sql, $params) = get_enrolled_sql($context, null, null, true);
+    $activeusers = $DB->get_records_sql($sql, $params);
+
+    // move suspended users to a separate array & remove from the initial one
+    $susers = array();
+    if (sizeof($activeusers)) {
+        foreach ($users as $userid => $user) {
+            if (!array_key_exists($userid, $activeusers) && !in_array($userid, $ignoreusers)) {
+                $susers[$userid] = $user;
+                unset($users[$userid]);
+            }
+        }
+    }
+    return $susers;
+}
+
+/**
+ * Given context and array of users, returns array of user ids whose enrolment is suspended
+ *
+ * @param context $context
+ * @return array
+ */
+function get_suspended_userids($context){
+    global $DB;
+
+    // get all enrolled users
+    list($sql, $params) = get_enrolled_sql($context);
+    $users = $DB->get_records_sql($sql, $params);
+
+    // get active enrolled users
+    list($sql, $params) = get_enrolled_sql($context, null, null, true);
+    $activeusers = $DB->get_records_sql($sql, $params);
+
+    $susers = array();
+    if (sizeof($activeusers) != sizeof($users)) {
+        foreach ($users as $userid => $user) {
+            if (!array_key_exists($userid, $activeusers)) {
+                $susers[$userid] = $userid;
+            }
+        }
+    }
+    return $susers;
 }

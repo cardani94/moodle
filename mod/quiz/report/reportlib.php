@@ -204,6 +204,21 @@ function quiz_report_grade_bands($bandwidth, $bands, $quizid, $userids = array()
         $usql = '';
         $params = array();
     }
+
+    $hidesuspended = get_user_preferences('quiz_report_hidesuspended', 1);
+    if ($hidesuspended) {
+        $quiz = $DB->get_record('quiz', array('id' => $quizid));
+        $context = context_course::instance($quiz->course);
+        $susers = get_suspended_userids($context);
+        if (!empty($susers)) {
+            list($susql, $suparams) = $DB->get_in_or_equal($susers, SQL_PARAMS_NAMED, 'su', false); // not in ()...
+            $susql = " AND qg.userid $susql";
+            $params = array_merge($params, $suparams);
+        }
+    } else {
+        $susql = '';
+    }
+
     $sql = "
 SELECT band, COUNT(1)
 
@@ -211,6 +226,7 @@ FROM (
     SELECT FLOOR(qg.grade / :bandwidth) AS band
       FROM {quiz_grades} qg
      WHERE $usql qg.quiz = :quizid
+           $susql
 ) subquery
 
 GROUP BY
