@@ -1549,14 +1549,20 @@ abstract class admin_setting {
             rebuild_course_cache(0, true);
         }
 
-        // log change
+        // Log change in config value.
         $log = new stdClass();
         $log->userid       = during_initial_install() ? 0 :$USER->id; // 0 as user id during install
         $log->timemodified = time();
         $log->plugin       = $this->plugin;
         $log->name         = $name;
-        $log->value        = $value;
-        $log->oldvalue     = $oldvalue;
+        // If password then show *'s.
+        if ($this instanceof admin_setting_configpasswordunmask) {
+            $log->value    = str_repeat("*", strlen($value));
+            $log->oldvalue = str_repeat("*", strlen($oldvalue));
+        } else {
+            $log->value    = $value;
+            $log->oldvalue = $oldvalue;
+        }
         $DB->insert_record('config_log', $log);
 
         return true; // BC only
