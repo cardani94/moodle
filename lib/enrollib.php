@@ -1039,6 +1039,31 @@ function enrol_get_enrolment_end($courseid, $userid) {
  * this is also the main source of documentation.
  */
 abstract class enrol_plugin {
+    /**
+     * No error found.
+     */
+    const CANENROL = 'canenrol';
+
+    /**
+     * Error if guest user is trying to self enrol.
+     */
+    const ERRGUESTENROL = 'errguestuser';
+
+    /**
+     * Error if user is already enrolled and enrolment is active.
+     */
+    const ERRALREADYENROL = 'erralreadyenroled';
+
+    /**
+     * Error if user is already enrolled and enrolment is suspended.
+     */
+    const ERRINACTIVEENROL = 'errinactiveenrolment';
+
+    /**
+     * Error code, if no new enrols allowed, or time is not within start and end time.
+     */
+    const ERRNONEWENROLS = 'errnonewenrols';
+
     protected $config = null;
 
     /**
@@ -1687,6 +1712,33 @@ abstract class enrol_plugin {
         // invalidate all enrol caches
         $context = context_course::instance($instance->courseid);
         $context->mark_dirty();
+    }
+
+    /**
+     * Validates if user can enrol in course using enrolinstance.
+     *
+     * @param stdClass $enrolinstance self enrolment instance.
+     * @param bool $checkuserenrolment should check if user can self enrol or not. Setting it false will reduce db call and improve
+     *                                 performance.
+     * @param int|stdClass $users user id/object (or null for current user) to check if enrolment is possible.
+     * @return string CANENROL if no error found, else errorcode.
+     */
+    public function can_enrol(stdClass $enrolinstance, $checkuserenrolment = true, $users = null) {
+        // Can't enrol if enrolment is disabled.
+        if ($enrolinstance->status == ENROL_INSTANCE_DISABLED) {
+            return self::ERRNONEWENROLS;
+        }
+
+        // Can't enrol if enrol start date is in future.
+        if (($enrolinstance->enrolstartdate != 0) && ($enrolinstance->enrolstartdate > time())) {
+            return self::ERRNONEWENROLS;
+        }
+
+        // Can't enrol if enrol end date is in past.
+        if (($enrolinstance->enrolenddate != 0) && ($enrolinstance->enrolenddate < time())) {
+            return self::ERRNONEWENROLS;
+        }
+        return self::CANENROL;
     }
 
     /**

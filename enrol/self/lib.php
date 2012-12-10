@@ -33,6 +33,11 @@ class enrol_self_plugin extends enrol_plugin {
     protected $lasternollerinstanceid = 0;
 
     /**
+     * Error code, if self enrol instance has cohort id and user is not a member.
+     */
+    const ERRNOCOHORTMEMBER = 'errorcohortnomemberinfo';
+
+    /**
      * Returns optional enrolment information icons.
      *
      * This is used in course list for quick overview of enrolment options.
@@ -105,23 +110,19 @@ class enrol_self_plugin extends enrol_plugin {
         return true;
     }
 
+    /**
+     * Checks if enrol links should be shown or not
+     *
+     * @param stdClass $instance enrol instance id
+     * @return true if user can self enrol in course, else false
+     */
     public function show_enrolme_link(stdClass $instance) {
-        global $CFG, $USER;
-
-        if ($instance->status != ENROL_INSTANCE_ENABLED) {
+        $canselfenrol = $this->can_enrol($instance, false);
+        if ($canselfenrol === self::CANENROL) {
+            return true;
+        } else {
             return false;
         }
-
-        if (!$instance->customint6) {
-            // New enrols not allowed.
-            return false;
-        }
-
-        if ($instance->customint5) {
-            require_once("$CFG->dirroot/cohort/lib.php");
-            return cohort_is_member($instance->customint5, $USER->id);
-        }
-        return true;
     }
 
     /**
@@ -183,6 +184,137 @@ class enrol_self_plugin extends enrol_plugin {
     }
 
     /**
+     * Validates if current user can self enrol.
+     *
+     * @param stdClass $instance self enrolment instance.
+     * @param bool $checkuserenrolment should check if user can self enrol or not. Setting it false will reduce db call and improve
+     *                                 performance.
+     * @param int|stdClass $users user id/object (or null for current user) to check if enrolment is possible.
+     * @return string CANENROL if no error found, else errorcode.
+     */
+    public function can_enrol(stdClass $enrolinstance, $checkuserenrolment = true, $user = null) {
+        global $CFG, $USER, $DB;
+
+        // Self enrolment is only possible for current user, so ignore $user.
+        $user = $USER;
+
+        if ($checkuserenrolment) {
+            // Can not enrol guest.
+            if (isguestuser($user)) {
+                return self::ERRGUESTENROL;
+            }
+            // Can't enrol enrolled user.
+            if ($userenrolment = $DB->get_record('user_enrolments', array('userid' => $user->id, 'enrolid' => $enrolinstance->id))) {
+                // Check is user is active.
+                if (($userenrolment->status == ENROL_USER_SUSPENDED) ||
+                        (($userenrolment->timestart != 0) && ($userenrolment->timestart > time())) ||
+                        (($userenrolment->timeend != 0) && ($userenrolment->timeend < time()))) {
+                    return self::ERRINACTIVEENROL;
+                }
+                return self::ERRALREADYENROL;
+            }
+        }
+
+        // Can't enrol if enrolment is disabled.
+        if ($enrolinstance->status == ENROL_INSTANCE_DISABLED) {
+            return self::ERRNONEWENROLS;
+        }
+
+        // Can't enrol if enrol start date is in future.
+        if (($enrolinstance->enrolstartdate != 0) && ($enrolinstance->enrolstartdate > time())) {
+            return self::ERRNONEWENROLS;
+        }
+
+        // Can't enrol if enrol end date is in past.
+        if (($enrolinstance->enrolenddate != 0) && ($enrolinstance->enrolenddate < time())) {
+            return self::ERRNONEWENROLS;
+        }
+
+        // New enrols not allowed.
+        if (!$enrolinstance->customint6) {
+            return self::ERRNONEWENROLS;
+        }
+
+        // Can't enrol if cohort is defined and user is not a member of cohort.
+        if ($enrolinstance->customint5) {
+            require_once("$CFG->dirroot/cohort/lib.php");
+            if (!cohort_is_member($enrolinstance->customint5, $user->id)) {
+                return self::ERRNOCOHORTMEMBER;
+            }
+        }
+
+        // Return no error.
+        return self::CANENROL;
+    }
+
+    /**
+     * Validate self enrolment password.
+     *
+     * @param stdClass $instance self enrolment instance.
+     * @param string $enrolpassword enrolment key
+     * @return array errorcode and hint for enrolpassword or empty array if no error.
+     */
+    public function validate_self_enrolment_password($instance, $enrolpassword) {
+        global $DB;
+        $passworderr = array();
+
+        if ($enrolpassword !== $instance->password) {
+            if ($instance->customint1) {
+                $groups = $DB->get_records('groups', array('courseid' => $instance->courseid), 'id ASC', 'id, enrolmentkey');
+                $found = false;
+                foreach ($groups as $group) {
+                    if (empty($group->enrolmentkey)) {
+                        continue;
+                    }
+                    if ($group->enrolmentkey === $enrolpassword) {
+                        $found = true;
+                        break;
+                    }
+                }
+                if (!$found) {
+                    // We can not hint because there are probably multiple passwords.
+                    $passworderr = get_string('passwordinvalid', 'enrol_self');
+                }
+            } else {
+                $plugin = enrol_get_plugin('self');
+                if ($plugin->get_config('showhint')) {
+                    $hint = textlib::substr($instance->password, 0, 1);
+                    $passworderr['errorcode'] = 'passwordinvalidhint';
+                    $passworderr['hint'] = $hint;
+                } else {
+                    $passworderr['errorcode'] = 'passwordinvalid';
+                }
+            }
+        }
+        return $passworderr;
+    }
+
+    /**
+     * This will self enrol current user.
+     *
+     * @param stdClass $instance self enrolment instance.
+     */
+    public function self_enrol(stdClass $instance) {
+        global $USER;
+
+        $timestart = time();
+        if ($instance->enrolperiod) {
+            $timeend = $timestart + $instance->enrolperiod;
+        } else {
+            $timeend = 0;
+        }
+
+        $this->enrol_user($instance, $USER->id, $instance->roleid, $timestart, $timeend);
+        //TODO: There should be userid somewhere!
+        add_to_log($instance->courseid, 'course', 'enrol', '../enrol/users.php?id='.$instance->courseid, $instance->courseid);
+
+        // Send welcome message.
+        if ($instance->customint4) {
+            $this->email_welcome_message($instance, $USER);
+        }
+    }
+
+    /**
      * Creates course enrol form, checks if form submitted
      * and enrols user if necessary. It can also redirect.
      *
@@ -190,80 +322,40 @@ class enrol_self_plugin extends enrol_plugin {
      * @return string html text, usually a form in a text box
      */
     public function enrol_page_hook(stdClass $instance) {
-        global $CFG, $OUTPUT, $SESSION, $USER, $DB;
-
-        if (isguestuser()) {
-            // Can not enrol guest!!
-            return null;
-        }
-        if ($DB->record_exists('user_enrolments', array('userid'=>$USER->id, 'enrolid'=>$instance->id))) {
-            //TODO: maybe we should tell them they are already enrolled, but can not access the course
-            return null;
-        }
-
-        if ($instance->enrolstartdate != 0 and $instance->enrolstartdate > time()) {
-            //TODO: inform that we can not enrol yet
-            return null;
-        }
-
-        if ($instance->enrolenddate != 0 and $instance->enrolenddate < time()) {
-            //TODO: inform that enrolment is not possible any more
-            return null;
-        }
-
-        if (!$instance->customint6) {
-            // New enrols not allowed.
-            return null;
-        }
-
-        if ($instance->customint5) {
-            require_once("$CFG->dirroot/cohort/lib.php");
-            if (!cohort_is_member($instance->customint5, $USER->id)) {
-                $cohort = $DB->get_record('cohort', array('id'=>$instance->customint5));
-                if (!$cohort) {
-                    return null;
-                }
-                $a = format_string($cohort->name, true, array('context'=>context::instance_by_id($cohort->contextid)));
-                return $OUTPUT->box(markdown_to_html(get_string('cohortnonmemberinfo', 'enrol_self', $a)));
-            }
-        }
+        global $CFG, $OUTPUT, $DB, $USER;
 
         require_once("$CFG->dirroot/enrol/self/locallib.php");
         require_once("$CFG->dirroot/group/lib.php");
 
-        $form = new enrol_self_enrol_form(NULL, $instance);
         $instanceid = optional_param('instance', 0, PARAM_INT);
-
+        $form = new enrol_self_enrol_form(NULL, $instance);
+        // Check if user can self enrol.
+        $canselfenrol = $this->can_enrol($instance);
+        if ($canselfenrol != self::CANENROL) {
+            if ($canselfenrol === self::ERRALREADYENROL) {
+                // If user is enroled and enrolment is active then redirect user to course.
+                $url = new moodle_url('/course/view.php', array('id' => $instance->courseid));
+                redirect($url);
+            } else if ($canselfenrol === self::ERRGUESTENROL) {
+                print_error('errorguestuser', 'enrol_self', get_login_url());
+            } else if ($canselfenrol === self::ERRINACTIVEENROL) {
+                print_error('errorinactiveenrolment', 'enrol_self', "$CFG->wwwroot/index.php");
+            } else if ($canselfenrol === self::ERRNONEWENROLS) {
+                print_error('errornonewenrols', 'enrol_self', "$CFG->wwwroot/index.php");
+            } else if ($canselfenrol === self::ERRNOCOHORTMEMBER) {
+                $cohort = $DB->get_record('cohort', array('id' => $instance->customint5));
+                $a = '';
+                if ($cohort) {
+                   $a = format_string($cohort->name, true, array('context' => context::instance_by_id($cohort->contextid)));
+                }
+                notice(markdown_to_html(get_string('cohortnonmemberinfo', 'enrol_self', $a)), "$CFG->wwwroot/index.php");
+            }
+        }
         if ($instance->id == $instanceid) {
+            // If no error and data is submitted then enrol user.
             if ($data = $form->get_data()) {
-                $enrol = enrol_get_plugin('self');
-                $timestart = time();
-                if ($instance->enrolperiod) {
-                    $timeend = $timestart + $instance->enrolperiod;
-                } else {
-                    $timeend = 0;
-                }
-
-                $this->enrol_user($instance, $USER->id, $instance->roleid, $timestart, $timeend);
-                add_to_log($instance->courseid, 'course', 'enrol', '../enrol/users.php?id='.$instance->courseid, $instance->courseid); //TODO: There should be userid somewhere!
-
-                if ($instance->password and $instance->customint1 and $data->enrolpassword !== $instance->password) {
-                    // it must be a group enrolment, let's assign group too
-                    $groups = $DB->get_records('groups', array('courseid'=>$instance->courseid), 'id', 'id, enrolmentkey');
-                    foreach ($groups as $group) {
-                        if (empty($group->enrolmentkey)) {
-                            continue;
-                        }
-                        if ($group->enrolmentkey === $data->enrolpassword) {
-                            groups_add_member($group->id, $USER->id);
-                            break;
-                        }
-                    }
-                }
-                // Send welcome message.
-                if ($instance->customint4) {
-                    $this->email_welcome_message($instance, $USER);
-                }
+                // We don't need to check for data validation, this is done by form validation.
+                $this->self_enrol($instance, $data);
             }
         }
 

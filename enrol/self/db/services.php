@@ -15,16 +15,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Self enrolment plugin version specification.
+ * Self enrol plugin external functions and service definitions.
  *
- * @package    enrol_self
- * @copyright  2010 Petr Skoda  {@link http://skodak.org}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   enrol_self
+ * @copyright 2013 Rajesh Taneja <rajesh@moodle.com>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @since     Moodle 2.5
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version   = 2013030500;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2012112900;        // Requires this Moodle version
-$plugin->component = 'enrol_self';      // Full name of the plugin (used for diagnostics)
-$plugin->cron      = 600;
+$functions = array(
+    'enrol_self_enrol_user' => array(
+        'classname'   => 'enrol_self_external',
+        'methodname'  => 'enrol_user',
+        'classpath'   => 'enrol/self/externallib.php',
+        'description' => 'Self enrol user in course',
+        'type'        => 'write'
+    )
+);

@@ -93,36 +93,16 @@ class enrol_self_enrol_form extends moodleform {
         }
 
         if ($instance->password) {
-            if ($data['enrolpassword'] !== $instance->password) {
-                if ($instance->customint1) {
-                    $groups = $DB->get_records('groups', array('courseid'=>$instance->courseid), 'id ASC', 'id, enrolmentkey');
-                    $found = false;
-                    foreach ($groups as $group) {
-                        if (empty($group->enrolmentkey)) {
-                            continue;
-                        }
-                        if ($group->enrolmentkey === $data['enrolpassword']) {
-                            $found = true;
-                            break;
-                        }
-                    }
-                    if (!$found) {
-                        // We can not hint because there are probably multiple passwords.
-                        $errors['enrolpassword'] = get_string('passwordinvalid', 'enrol_self');
-                    }
-
-                } else {
-                    $plugin = enrol_get_plugin('self');
-                    if ($plugin->get_config('showhint')) {
-                        $hint = textlib::substr($instance->password, 0, 1);
-                        $errors['enrolpassword'] = get_string('passwordinvalidhint', 'enrol_self', $hint);
-                    } else {
-                        $errors['enrolpassword'] = get_string('passwordinvalid', 'enrol_self');
-                    }
+            $selfenrol = enrol_get_plugin('self');
+            $passerror = $selfenrol->validate_self_enrolment_password($instance, $data['enrolpassword']);
+            if (!empty($passerror)) {
+                $hint = null;
+                if (isset($passerror['hint'])) {
+                    $hint = $passerror['hint'];
                 }
+                $errors['enrolpassword'] = get_string($passerror['errorcode'], 'enrol_self', $hint);
             }
         }
-
         return $errors;
     }
 }
