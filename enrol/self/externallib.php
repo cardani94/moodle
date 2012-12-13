@@ -117,4 +117,89 @@ class enrol_self_external extends external_api {
     public static function enrol_user_returns() {
         return null;
     }
+
+    /**
+     * Returns description of unenrol_user parameters.
+     *
+     * @return external_function_parameters
+     */
+    public static function unenrol_user_parameters() {
+        return new external_function_parameters(
+                array('courseid' => new external_value(PARAM_INT, 'Id of course from which user want to unenrol'),
+                      'userid' => new external_value(PARAM_RAW, 'Optional userid who should be unenrolled', VALUE_DEFAULT, null)
+                )
+            );
+    }
+
+    /**
+     * Self unenrolment of user.
+     *
+     * @param int $courseid id of the course from which user want to unenrol.
+     * @param int $userid (optional) id of user else current user is unenrolled.
+     */
+    public static function unenrol_user($courseid, $userid = null) {
+        global $DB, $CFG, $USER;
+        require_once($CFG->libdir . '/enrollib.php');
+
+        $params = self::validate_parameters(self::unenrol_user_parameters(),
+                array('courseid' => $courseid));
+
+        // Retrieve the self enrolment plugin.
+        $enrol = enrol_get_plugin('self');
+        if (empty($enrol)) {
+            throw new moodle_exception('wsselfpluginnotinstalled', 'enrol_self');
+        }
+
+        // Check self enrolment plugin instance is enabled/exist.
+        $enrolinstances = enrol_get_instances($params['courseid'], true);
+        foreach ($enrolinstances as $courseenrolinstance) {
+            if ($courseenrolinstance->enrol == "self") {
+                $instance = $courseenrolinstance;
+                break;
+            }
+        }
+        if (empty($instance)) {
+            throw new moodle_exception('wsnoinstance', 'enrol_self');
+        }
+
+        if (!$enrol->allow_unenrol($instance)) {
+            throw new moodle_exception('errorunenrol', 'enrol_self');
+        }
+
+        $context = context_course::instance($courseid);
+        self::validate_context($context);
+
+        // If userid is not empty then check capability.
+        if (!empty($userid)) {
+            if (($userid != $USER->id) && !has_capability('enrol/self:unenrol', $context)) {
+                throw new moodle_exception('errorunenrol', 'enrol_self');
+            } else if (($userid == $USER->id) &&
+                    !has_any_capability(array('enrol/self:unenrol', 'enrol/self:unenrolself'), $context)) {
+                // Current user should have either capability to unenrol.
+                throw new moodle_exception('errorunenrol', 'enrol_self');
+            }
+        } else {
+            // Current user should have either capability to unenrol.
+            if (!has_any_capability(array('enrol/self:unenrol', 'enrol/self:unenrolself'), $context)) {
+                throw new moodle_exception('errorunenrol', 'enrol_self');
+            }
+            $userid = $USER->id;
+        }
+
+        // Check if user was enrolled in course.
+        if (!$ue = $DB->get_record('user_enrolments', array('enrolid' => $instance->id, 'userid' => $userid))) {
+            throw new moodle_exception('errorunenrol', 'enrol_self');
+        }
+
+        $enrol->unenrol_user($instance, $userid);
+    }
+
+    /**
+     * Returns description of unenrol_user result value.
+     *
+     * @return null
+     */
+    public static function unenrol_user_returns() {
+        return null;
+    }
 }

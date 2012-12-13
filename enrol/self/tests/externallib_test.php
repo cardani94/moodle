@@ -288,4 +288,188 @@ class enrol_self_external_testcase extends externallib_advanced_testcase {
                     'password' => 'correctkey'));
         enrol_self_external::enrol_user($course->id, 'wrongkey');
     }
+
+    /**
+     * Test self unenrol
+     */
+    public function test_unenrol_self() {
+        global $CFG, $DB;
+
+        $this->resetAfterTest(true);
+
+        // Check if self and manual enrolment plugin is enabled.
+        $selfplugin = enrol_get_plugin('self');
+        $this->assertNotEmpty($selfplugin);
+        $manualplugin = enrol_get_plugin('manual');
+        $this->assertNotEmpty($manualplugin);
+
+        // Get student and teacher role for testing.
+        $studentrole = $DB->get_record('role', array('shortname'=>'student'));
+        $this->assertNotEmpty($studentrole);
+        $teacherrole = $DB->get_record('role', array('shortname'=>'teacher'));
+        $this->assertNotEmpty($teacherrole);
+
+        // Create users.
+        $student = self::getDataGenerator()->create_user();
+        $teacher = self::getDataGenerator()->create_user();
+
+        // Create course.
+        $course = $this->getDataGenerator()->create_course();
+
+        // Self enrol student.
+        $this->setUser($student);
+        $id = $selfplugin->add_instance($course, array('status' => ENROL_INSTANCE_ENABLED, 'roleid' => $studentrole->id));
+        enrol_self_external::enrol_user($course->id);
+
+        // Manual enrol teacher.
+        $maninstance = $DB->get_record('enrol', array('courseid'=>$course->id, 'enrol'=>'manual'), '*', MUST_EXIST);
+        $manualplugin->enrol_user($maninstance, $teacher->id, $teacherrole->id);
+
+        // Check if user is enrolled.
+        require_once($CFG->dirroot . '/enrol/externallib.php');
+        $enrolledusers = core_enrol_external::get_enrolled_users($course->id);
+        $this->assertEquals(2, count($enrolledusers));
+
+        // Unenrol current user (student).
+        enrol_self_external::unenrol_user($course->id);
+        $this->setUser($teacher);
+        $enrolledusers = core_enrol_external::get_enrolled_users($course->id);
+        $this->assertEquals(1, count($enrolledusers));
+    }
+
+    /**
+     * Test user unenrol
+     */
+    public function test_unenrol_user() {
+        global $CFG, $DB;
+
+        $this->resetAfterTest(true);
+
+        // Check if self and manual enrolment plugin is enabled.
+        $selfplugin = enrol_get_plugin('self');
+        $this->assertNotEmpty($selfplugin);
+        $manualplugin = enrol_get_plugin('manual');
+        $this->assertNotEmpty($manualplugin);
+
+        // Get student and teacher role for testing.
+        $studentrole = $DB->get_record('role', array('shortname'=>'student'));
+        $this->assertNotEmpty($studentrole);
+        $teacherrole = $DB->get_record('role', array('shortname'=>'editingteacher'));
+        $this->assertNotEmpty($teacherrole);
+
+        // Create users.
+        $student = self::getDataGenerator()->create_user();
+        $teacher = self::getDataGenerator()->create_user();
+
+        // Create course.
+        $course = $this->getDataGenerator()->create_course();
+
+        // Self enrol student.
+        $this->setUser($student);
+        $id = $selfplugin->add_instance($course, array('status' => ENROL_INSTANCE_ENABLED, 'roleid' => $studentrole->id));
+        enrol_self_external::enrol_user($course->id);
+
+        // Manual enrol teacher.
+        $maninstance = $DB->get_record('enrol', array('courseid'=>$course->id, 'enrol'=>'manual'), '*', MUST_EXIST);
+        $manualplugin->enrol_user($maninstance, $teacher->id, $teacherrole->id);
+
+        // Check if user is enrolled.
+        require_once($CFG->dirroot . '/enrol/externallib.php');
+        $enrolledusers = core_enrol_external::get_enrolled_users($course->id);
+        $this->assertEquals(2, count($enrolledusers));
+
+        // As teacher, unenrol student.
+        $this->setUser($teacher);
+        enrol_self_external::unenrol_user($course->id, $student->id);
+        $enrolledusers = core_enrol_external::get_enrolled_users($course->id);
+        $this->assertEquals(1, count($enrolledusers));
+    }
+
+    /**
+     * Test unenrol a user who is not enrolled.
+     * @expectedException moodle_exception
+     */
+    public function test_unenrol_notenrolled_user() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        // Get enrol plugin and student role.
+        $selfplugin = enrol_get_plugin('self');
+        $studentrole = $DB->get_record('role', array('shortname'=>'student'));
+
+        // Create course and enable self enrolment.
+        $course = $this->getDataGenerator()->create_course();
+        $id = $selfplugin->add_instance($course, array('status' => ENROL_INSTANCE_ENABLED, 'roleid' => $studentrole->id));
+        // Try unenrol current user.
+        enrol_self_external::unenrol_user($course->id);
+    }
+
+    /**
+     * Test unenrol self without proper capability
+     * @expectedException moodle_exception
+     */
+    public function test_unenrol_self_without_capability() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        // Get selenrol plugin and student role.
+        $selfplugin = enrol_get_plugin('self');
+        $studentrole = $DB->get_record('role', array('shortname'=>'guest'));
+
+        // Create user.
+        $user = self::getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        // Create course and enable self enrolment.
+        $course = $this->getDataGenerator()->create_course();
+        $context = context_course::instance($course->id);
+        $id = $selfplugin->add_instance($course, array('status' => ENROL_INSTANCE_ENABLED, 'roleid' => $studentrole->id));
+
+        enrol_self_external::enrol_user($course->id);
+
+        // Try unenrol current user.
+        enrol_self_external::unenrol_user($course->id);
+    }
+
+    /**
+     * Test unenrol a user without proper capability
+     * @expectedException moodle_exception
+     */
+    public function test_unenrol_user_without_capability() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+
+        // Check if self and manual enrolment plugin is enabled.
+        $selfplugin = enrol_get_plugin('self');
+        $this->assertNotEmpty($selfplugin);
+        $manualplugin = enrol_get_plugin('manual');
+        $this->assertNotEmpty($manualplugin);
+
+        // Get student and teacher role for testing.
+        $studentrole = $DB->get_record('role', array('shortname'=>'student'));
+        $this->assertNotEmpty($studentrole);
+        $teacherrole = $DB->get_record('role', array('shortname'=>'teacher'));
+        $this->assertNotEmpty($teacherrole);
+
+        // Create users.
+        $student = self::getDataGenerator()->create_user();
+        $teacher = self::getDataGenerator()->create_user();
+
+        // Create course.
+        $course = $this->getDataGenerator()->create_course();
+
+        // Self enrol student.
+        $this->setUser($student);
+        $id = $selfplugin->add_instance($course, array('status' => ENROL_INSTANCE_ENABLED, 'roleid' => $studentrole->id));
+        enrol_self_external::enrol_user($course->id);
+
+        // Manual enrol teacher.
+        $maninstance = $DB->get_record('enrol', array('courseid'=>$course->id, 'enrol'=>'manual'), '*', MUST_EXIST);
+        $manualplugin->enrol_user($maninstance, $teacher->id, $teacherrole->id);
+
+        // As teacher, unenrol student.
+        $this->setUser($teacher);
+        enrol_self_external::unenrol_user($course->id, $student->id);
+    }
 }

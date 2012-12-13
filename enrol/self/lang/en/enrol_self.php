@@ -48,6 +48,7 @@ $string['erroralreadyenrolled'] = 'You are already enrolled in this course; you 
 $string['errorenrolover'] = 'Self enrolment has ended; you can no longer enrol in this course';
 $string['errorguestuser'] = 'Guests cannot self enrol in the course';
 $string['errornoenrolyet'] = 'Self enrolment has not yet started for this course; please try later';
+$string['errorunenrol'] = 'You cannot unenrol from this course';
 $string['expiredaction'] = 'Enrolment expiration action';
 $string['expiredaction_help'] = 'Select action to carry out when user enrolment expires. Please note that some user data and settings are purged from course during course unenrolment.';
 $string['expirymessageenrollersubject'] = 'Self enrolment expiry notification';
