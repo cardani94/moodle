@@ -43,6 +43,11 @@ $string['enrolperiod_desc'] = 'Default length of time that the enrolment is vali
 $string['enrolperiod_help'] = 'Length of time that the enrolment is valid, starting with the moment the user enrols themselves. If disabled, the enrolment duration will be unlimited.';
 $string['enrolstartdate'] = 'Start date';
 $string['enrolstartdate_help'] = 'If enabled, users can enrol themselves from this date onward only.';
+$string['erroralreadyenrolled'] = 'You are already enrolled in this course; you cannot enrol again';
+$string['errorenrolover'] = 'Self enrolment has ended; you can no longer enrol in this course';
+$string['errorguestuser'] = 'Guests cannot self enrol in the course';
+$string['errornoenrolyet'] = 'Self enrolment has not yet started for this course; please try later';
+$string['errornonewenrols'] = 'New enrolments are not allowed';
 $string['expiredaction'] = 'Enrolment expiration action';
 $string['expiredaction_help'] = 'Select action to carry out when user enrolment expires. Please note that some user data and settings are purged from course during course unenrolment.';
 $string['expirymessageenrollersubject'] = 'Self enrolment expiry notification';
@@ -108,3 +113,5 @@ $string['welcometocoursetext'] = 'Welcome to {$a->coursename}!
 If you have not done so already, you should edit your profile page so that we can learn more about you:
 
   {$a->profileurl}';
+$string['wsnoinstance'] = 'Self enrolment is not available as an enrolment method for this course or it is disabled';
+$string['wsselfpluginnotinstalled'] = 'The self enrolment plugin is not installed';
