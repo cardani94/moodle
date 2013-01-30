@@ -30,5 +30,13 @@ $functions = array(
         'classpath'   => 'enrol/self/externallib.php',
         'description' => 'User can self enrol in a course',
         'type'        => 'write'
+    ),
+    'enrol_self_unenrol_user' => array(
+        'classname' => 'enrol_self_external',
+        'methodname' => 'unenrol_user',
+        'classpath' => 'enrol/self/externallib.php',
+        'description' => 'User can self unenrol from a course',
+        'capabilities'=> 'enrol/self:unenrol,enrol/self:unenrolself',
+        'type' => 'write'
     )
 );
