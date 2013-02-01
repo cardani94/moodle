@@ -57,6 +57,8 @@ class navigation_node implements renderable {
     const TYPE_SYSTEM =     1;
     /** @var int Category node type 10 */
     const TYPE_CATEGORY =   10;
+    /** @var int Category node type 11 */
+    const TYPE_MY_CATEGORY =   11;
     /** @var int Course node type 20 */
     const TYPE_COURSE =     20;
     /** @var int Course Structure node type 30 */
@@ -324,7 +326,7 @@ class navigation_node implements renderable {
         // If added node is a category node or the user is logged in and it's a course
         // then mark added node as a branch (makes it expandable by AJAX)
         $type = $childnode->type;
-        if (($type==self::TYPE_CATEGORY) || (isloggedin() && $type==self::TYPE_COURSE)) {
+        if (($type==self::TYPE_CATEGORY) || ($type==self::TYPE_MY_CATEGORY)|| (isloggedin() && $type==self::TYPE_COURSE)) {
             $node->nodetype = self::NODETYPE_BRANCH;
         }
         // If this node is hidden mark it's children as hidden also
@@ -1517,7 +1519,7 @@ class global_navigation extends navigation_node {
             }
             $coursecount = count($this->addedcategories[$category]->children->type(self::TYPE_COURSE));
         } else if ($category instanceof navigation_node) {
-            if ($category->type != self::TYPE_CATEGORY) {
+            if (($category->type != self::TYPE_CATEGORY) || ($category->type != self::TYPE_MY_CATEGORY)) {
                 return false;
             }
             $coursecount = count($category->children->type(self::TYPE_COURSE));
@@ -1689,14 +1691,18 @@ class global_navigation extends navigation_node {
      * @param stdClass $category
      * @param navigation_node $parent
      */
-    protected function add_category(stdClass $category, navigation_node $parent) {
+    protected function add_category(stdClass $category, navigation_node $parent, $myhome = false) {
         if (array_key_exists($category->id, $this->addedcategories)) {
             return;
         }
         $url = new moodle_url('/course/category.php', array('id' => $category->id));
         $context = context_coursecat::instance($category->id);
         $categoryname = format_string($category->name, true, array('context' => $context));
-        $categorynode = $parent->add($categoryname, $url, self::TYPE_CATEGORY, $categoryname, $category->id);
+        if ($myhome) {
+            $categorynode = $parent->add($categoryname, $url, self::TYPE_MY_CATEGORY, $categoryname, $category->id);
+        } else {
+            $categorynode = $parent->add($categoryname, $url, self::TYPE_CATEGORY, $categoryname, $category->id);
+        }
         if (empty($category->visible)) {
             if (has_capability('moodle/category:viewhiddencategories', get_system_context())) {
                 $categorynode->hidden = true;
@@ -2697,6 +2703,9 @@ class global_navigation_for_ajax extends global_navigation {
             case self::TYPE_CATEGORY :
                 $this->load_category($this->instanceid);
                 break;
+            case self::TYPE_MY_CATEGORY :
+                $this->load_category($this->instanceid, true);
+                break;
             case self::TYPE_COURSE :
                 $course = $DB->get_record('course', array('id' => $this->instanceid), '*', MUST_EXIST);
                 require_course_login($course, true, null, false, true);
@@ -2775,7 +2784,7 @@ class global_navigation_for_ajax extends global_navigation {
             list($sql, $params) = $DB->get_in_or_equal($categoryids);
             $categories = $DB->get_recordset_select('course_categories', 'id '.$sql.' AND parent = 0', $params, 'sortorder, id');
             foreach ($categories as $category) {
-                $this->add_category($category, $this->rootnodes['mycourses']);
+                $this->add_category($category, $this->rootnodes['mycourses'], true);
             }
             $categories->close();
         } else {
@@ -2801,9 +2810,10 @@ class global_navigation_for_ajax extends global_navigation {
      * request that.
      *
      * @global moodle_database $DB
-     * @param int $categoryid
+     * @param int $categoryid id of category
+     * @param bool $myhome true if category is in myhome page.
      */
-    protected function load_category($categoryid) {
+    protected function load_category($categoryid, $myhome = false) {
         global $CFG, $DB;
 
         $limit = 20;
@@ -2825,7 +2835,7 @@ class global_navigation_for_ajax extends global_navigation {
         foreach ($categories as $category) {
             context_helper::preload_from_record($category);
             if ($category->id == $categoryid) {
-                $this->add_category($category, $this);
+                $this->add_category($category, $this, $myhome);
                 $basecategory = $this->addedcategories[$category->id];
             } else {
                 $subcategories[] = $category;
@@ -2835,15 +2845,21 @@ class global_navigation_for_ajax extends global_navigation {
 
         if (!is_null($basecategory)) {
             foreach ($subcategories as $category) {
-                $this->add_category($category, $basecategory);
+                $this->add_category($category, $basecategory, $myhome);
             }
         }
-
-        $courses = $DB->get_recordset('course', array('category' => $categoryid), 'sortorder', '*' , 0, $limit);
-        foreach ($courses as $course) {
-            $this->add_course($course);
+        if ($myhome) {
+            $courses = enrol_get_my_courses();
+            foreach ($courses as $course) {
+                $this->add_course($course, true, self::COURSE_MY);
+            }
+        } else {
+            $courses = $DB->get_recordset('course', array('category' => $categoryid), 'sortorder', '*' , 0, $limit);
+            foreach ($courses as $course) {
+                $this->add_course($course);
+            }
+            $courses->close();
         }
-        $courses->close();
     }
 
     /**
@@ -4277,7 +4293,7 @@ class navigation_json {
             $attributes['link'] = $child->action->url->out();
         }
         $attributes['hidden'] = ($child->hidden);
-        $attributes['haschildren'] = ($child->children->count()>0 || $child->type == navigation_node::TYPE_CATEGORY);
+        $attributes['haschildren'] = ($child->children->count() > 0 || $child->type == navigation_node::TYPE_CATEGORY || $child->type == navigation_node::TYPE_MY_CATEGORY);
 
         if ($child->children->count() > 0) {
             $attributes['children'] = array();
