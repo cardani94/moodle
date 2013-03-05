@@ -39,25 +39,25 @@ $context = context_course::instance($course->id);
 
 require_capability('gradereport/outcomes:view', $context);
 
-//first make sure we have proper final grades
+// First make sure we have proper final grades.
 grade_regrade_final_grades($courseid);
 
-// Grab all outcomes used in course
+// Grab all outcomes used in course.
 $report_info = array();
 $outcomes = grade_outcome::fetch_all_available($courseid);
 
-// Will exclude grades of suspended users if required
+// Will exclude grades of suspended users if required.
 $hidesuspended = get_user_preferences('grade_report_showonlyactiveenrol', 1);
 if ($hidesuspended) {
     $susers = get_suspended_userids($context);
 }
 
-// Get grade_items that use each outcome
+// Get grade_items that use each outcome.
 foreach ($outcomes as $outcomeid => $outcome) {
     $report_info[$outcomeid]['items'] = $DB->get_records_select('grade_items', "outcomeid = ? AND courseid = ?", array($outcomeid, $courseid));
     $report_info[$outcomeid]['outcome'] = $outcome;
 
-    // Get average grades for each item
+    // Get average grades for each item.
     if (is_array($report_info[$outcomeid]['items'])) {
         foreach ($report_info[$outcomeid]['items'] as $itemid => $item) {
 
@@ -101,7 +101,7 @@ $html .= '<th class="header c5" scope="col">' . get_string('numberofgrades', 'gr
 $row = 0;
 foreach ($report_info as $outcomeid => $outcomedata) {
     $rowspan = count($outcomedata['items']);
-    // If there are no items for this outcome, rowspan will equal 0, which is not good
+    // If there are no items for this outcome, rowspan will equal 0, which is not good.
     if ($rowspan == 0) {
         $rowspan = 1;
     }
@@ -149,7 +149,7 @@ foreach ($report_info as $outcomeid => $outcomedata) {
         $items_html .= "<td class=\"cell c3\"> - </td><td class=\"cell c4\"> - </td><td class=\"cell c5\"> 0 </td></tr>\n";
     }
 
-    // Calculate outcome average
+    // Calculate outcome average.
     if (is_array($outcomedata['items'])) {
         $count = count($outcomedata['items']);
         if ($count > 0) {

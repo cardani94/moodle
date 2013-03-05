@@ -686,7 +686,7 @@ function groups_get_potential_members($courseid, $roleid = null, $cohortid = nul
 
     $context = context_course::instance($courseid);
 
-    // we are looking for all users with this role assigned in this context or higher
+    // We are looking for all users with this role assigned in this context or higher.
     $listofcontexts = get_related_contexts_string($context);
 
     list($esql, $params) = get_enrolled_sql($context);
@@ -700,7 +700,7 @@ function groups_get_potential_members($courseid, $roleid = null, $cohortid = nul
         $where = "";
     }
 
-    // exclude suspended enrolled students
+    // Exclude suspended enrolled students.
     $susers = get_suspended_userids($context);
     if (!empty($susers)) {
         list($susql, $suparams) = $DB->get_in_or_equal($susers, SQL_PARAMS_NAMED, 'su', false); // not in ()...

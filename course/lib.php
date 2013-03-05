@@ -225,6 +225,22 @@ function build_mnet_logs_array($hostid, $course, $user=0, $date=0, $order="l.tim
     return $result;
 }
 
+/**
+ * Builds and return course log.
+ *
+ * @param stdClass $course course for which log has to be printed
+ * @param int $user (optional) id of the user.
+ * @param int $date (optional)date for which log needs to be printed
+ * @param string $order (optional) sort order
+ * @param int $limitfrom (optional) return contains a subset of records, starting at this point
+ * @param int $limitnum (optional) return contains a subset comprising this many records
+ * @param string $modname (optional) name of the module.
+ * @param int $modid (optional) id of the module
+ * @param string $modaction (optional) module action
+ * @param int $groupid (optional) id of group
+ * @param int $hidesuspended (optional) hide supended/inactive/unenrolled users
+ * @return array course log.
+ */
 function build_logs_array($course, $user=0, $date=0, $order="l.time ASC", $limitfrom='', $limitnum='',
                    $modname="", $modid=0, $modaction="", $groupid=0, $hidesuspended=1) {
     global $DB, $SESSION, $USER;
@@ -285,7 +301,7 @@ function build_logs_array($course, $user=0, $date=0, $order="l.time ASC", $limit
     }
 
 
-    /// Getting all members of a group.
+    // Getting all members of a group.
     if ($groupid and !$user) {
         if ($gusers = groups_get_members($groupid)) {
             $gusers = array_keys($gusers);
@@ -299,7 +315,7 @@ function build_logs_array($course, $user=0, $date=0, $order="l.time ASC", $limit
         $params['userid'] = $user;
     }
 
-    // Excluding suspended users
+    // Excluding suspended users.
     if ($hidesuspended) {
         $context = context_course::instance($course->id);
         $susers = get_suspended_userids($context);
@@ -326,7 +342,23 @@ function build_logs_array($course, $user=0, $date=0, $order="l.time ASC", $limit
     return $result;
 }
 
-
+/**
+ * Prints course log.
+ *
+ * @param stdClass $course course for which log has to be printed
+ * @param int $user (optional) id of the user.
+ * @param int $date (optional)date for which log needs to be printed
+ * @param string $order (optional) sort order
+ * @param int $page (optional) page number
+ * @param int $perpage (optional)records to show per page
+ * @param string $url (optional) url of the current page.
+ * @param string $modname (optional) name of the module.
+ * @param int $modid (optional) id of the module
+ * @param string $modaction (optional) module action
+ * @param int $groupid (optional) id of group
+ * @param int $hidesuspended (optional) hide supended/inactive/unenrolled users
+ * @return bool true if logs are printed successfully.
+ */
 function print_log($course, $user=0, $date=0, $order="l.time ASC", $page=0, $perpage=100,
                    $url="", $modname="", $modid=0, $modaction="", $groupid=0, $hidesuspended=1) {
 
@@ -443,7 +475,23 @@ function print_log($course, $user=0, $date=0, $order="l.time ASC", $page=0, $per
     echo $OUTPUT->paging_bar($totalcount, $page, $perpage, "$url&perpage=$perpage&hidesuspended=$hidesuspended");
 }
 
-
+/**
+ * Prints mnet course log.
+ *
+ * @param stdClass $course course for which log has to be printed
+ * @param int $user (optional) id of the user.
+ * @param int $date (optional)date for which log needs to be printed
+ * @param string $order (optional) sort order
+ * @param int $page (optional) page number
+ * @param int $perpage (optional)records to show per page
+ * @param string $url (optional) url of the current page.
+ * @param string $modname (optional) name of the module.
+ * @param int $modid (optional) id of the module
+ * @param string $modaction (optional) module action
+ * @param int $groupid (optional) id of group
+ * @param int $hidesuspended (optional) hide supended/inactive/unenrolled users
+ * @return bool true if logs are printed successfully.
+ */
 function print_mnet_log($hostid, $course, $user=0, $date=0, $order="l.time ASC", $page=0, $perpage=100,
                    $url="", $modname="", $modid=0, $modaction="", $groupid=0, $hidesuspended=1) {
 
@@ -548,7 +596,20 @@ function print_mnet_log($hostid, $course, $user=0, $date=0, $order="l.time ASC",
     echo $OUTPUT->paging_bar($totalcount, $page, $perpage, "$url&perpage=$perpage");
 }
 
-
+/**
+ * Prints course log in csv format.
+ *
+ * @param stdClass $course course for which log has to be printed
+ * @param int $user (optional) id of the user.
+ * @param int $date (optional)date for which log needs to be printed
+ * @param string $order (optional) sort order
+ * @param string $modname (optional) name of the module.
+ * @param int $modid (optional) id of the module
+ * @param string $modaction (optional) module action
+ * @param int $groupid (optional) id of group
+ * @param int $hidesuspended (optional) hide supended/inactive/unenrolled users
+ * @return bool true if logs are printed successfully.
+ */
 function print_log_csv($course, $user, $date, $order='l.time DESC', $modname,
                         $modid, $modaction, $groupid, $hidesuspended=1) {
     global $DB, $CFG;
@@ -630,7 +691,20 @@ function print_log_csv($course, $user, $date, $order='l.time DESC', $modname,
     return true;
 }
 
-
+/**
+ * Prints course log in xls format.
+ *
+ * @param stdClass $course course for which log has to be printed
+ * @param int $user (optional) id of the user.
+ * @param int $date (optional)date for which log needs to be printed
+ * @param string $order (optional) sort order
+ * @param string $modname (optional) name of the module.
+ * @param int $modid (optional) id of the module
+ * @param string $modaction (optional) module action
+ * @param int $groupid (optional) id of group
+ * @param int $hidesuspended (optional) hide supended/inactive/unenrolled users
+ * @return bool true if logs are printed successfully.
+ */
 function print_log_xls($course, $user, $date, $order='l.time DESC', $modname,
                         $modid, $modaction, $groupid, $hidesuspended=1) {
 
@@ -745,6 +819,20 @@ function print_log_xls($course, $user, $date, $order='l.time DESC', $modname,
     return true;
 }
 
+/**
+ * Prints course log in ods format.
+ *
+ * @param stdClass $course course for which log has to be printed
+ * @param int $user (optional) id of the user.
+ * @param int $date (optional)date for which log needs to be printed
+ * @param string $order (optional) sort order
+ * @param string $modname (optional) name of the module.
+ * @param int $modid (optional) id of the module
+ * @param string $modaction (optional) module action
+ * @param int $groupid (optional) id of group
+ * @param int $hidesuspended (optional) hide supended/inactive/unenrolled users
+ * @return bool true if logs are printed successfully.
+ */
 function print_log_ods($course, $user, $date, $order='l.time DESC', $modname,
                         $modid, $modaction, $groupid, $hidesuspended=1) {
 
@@ -1736,7 +1824,7 @@ function print_courses($category) {
 /**
  * Print a description of a course, suitable for browsing in a list.
  *
- * @param object $course the course object.
+ * @param stdClass $course the course object.
  * @param string $highlightterms (optional) some search terms that should be highlighted in the display.
  */
 function print_course($course, $highlightterms = '') {
@@ -1744,7 +1832,7 @@ function print_course($course, $highlightterms = '') {
 
     $context = context_course::instance($course->id);
 
-    // Rewrite file URLs so that they are correct
+    // Rewrite file URLs so that they are correct.
     $course->summary = file_rewrite_pluginfile_urls($course->summary, 'pluginfile.php', $context->id, 'course', 'summary', NULL);
 
     echo html_writer::start_tag('div', array('class'=>'coursebox clearfix'));
@@ -1762,7 +1850,7 @@ function print_course($course, $highlightterms = '') {
     echo html_writer::link($linkhref, $linktext, $linkparams);
     echo html_writer::end_tag('h3');
 
-    /// first find all roles that are supposed to be displayed
+    // First find all roles that are supposed to be displayed.
     if (!empty($CFG->coursecontact)) {
         $managerroles = explode(',', $CFG->coursecontact);
         $rusers = array();
@@ -1774,8 +1862,8 @@ function print_course($course, $highlightterms = '') {
                  r.name AS rolename, r.sortorder, r.id AS roleid, r.shortname AS roleshortname',
                 'r.sortorder ASC, ' . $sort, null, '', '', '', '', $sortparams);
         } else {
-            //  use the managers array if we have it for perf reasosn
-            //  populate the datastructure like output of get_role_users();
+            // Use the managers array if we have it for perf reason.
+            // Populate the datastructure like output of get_role_users().
             foreach ($course->managers as $manager) {
                 $user = clone($manager->user);
                 $user->roleid = $manager->roleid;
@@ -1786,7 +1874,7 @@ function print_course($course, $highlightterms = '') {
             }
         }
 
-        // Remove users with suspended enrolments
+        // Remove users with suspended enrolments.
         $susers = get_suspended_userids($context);
         if (!empty($susers)) {
             foreach ($rusers as $key => $user) {
@@ -1800,7 +1888,7 @@ function print_course($course, $highlightterms = '') {
         $canviewfullnames = has_capability('moodle/site:viewfullnames', $context);
         foreach ($rusers as $ra) {
             if (isset($namesarray[$ra->id])) {
-                //  only display a user once with the higest sortorder role
+                // Only display a user once with the higest sortorder role.
                 continue;
             }
 
@@ -1824,7 +1912,7 @@ function print_course($course, $highlightterms = '') {
             echo html_writer::end_tag('ul');
         }
     }
-    echo html_writer::end_tag('div'); // End of info div
+    echo html_writer::end_tag('div'); // End of info div.
 
     echo html_writer::start_tag('div', array('class'=>'summary'));
     $options = new stdClass();
@@ -1841,10 +1929,10 @@ function print_course($course, $highlightterms = '') {
             $icon->attributes["alt"] .= ": ". format_string($coursename, true, array('context'=>$context));
             echo $OUTPUT->render($icon);
         }
-        echo html_writer::end_tag('div'); // End of enrolmenticons div
+        echo html_writer::end_tag('div'); // End of enrolmenticons div.
     }
-    echo html_writer::end_tag('div'); // End of summary div
-    echo html_writer::end_tag('div'); // End of coursebox div
+    echo html_writer::end_tag('div'); // End of summary div.
+    echo html_writer::end_tag('div'); // End of coursebox div.
 }
 
 /**

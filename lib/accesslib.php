@@ -7644,19 +7644,19 @@ function get_related_contexts_string(context $context) {
  * Given context and array of users, returns array of users whose enrolment is suspended,
  * also removes those users from the given array
  *
- * @param context $context
- * @param array $users
- * @param array $ignoreusers    - array of user ids to ignore, e.g. guest
- * @return array
+ * @param context $context context in which suspended users should be extracted.
+ * @param array $users list of users.
+ * @param array $ignoreusers array of user ids to ignore, e.g. guest
+ * @return array list of suspended users.
  */
 function extract_suspended_users($context, &$users, $ignoreusers=array()) {
     global $DB;
 
-    // get active enrolled users
+    // Get active enrolled users.
     list($sql, $params) = get_enrolled_sql($context, null, null, true);
     $activeusers = $DB->get_records_sql($sql, $params);
 
-    // move suspended users to a separate array & remove from the initial one
+    // Move suspended users to a separate array & remove from the initial one.
     $susers = array();
     if (sizeof($activeusers)) {
         foreach ($users as $userid => $user) {
@@ -7672,17 +7672,17 @@ function extract_suspended_users($context, &$users, $ignoreusers=array()) {
 /**
  * Given context and array of users, returns array of user ids whose enrolment is suspended
  *
- * @param context $context
- * @return array
+ * @param context $context context in which user enrolment is checked.
+ * @return array list of suspended user id's.
  */
 function get_suspended_userids($context){
     global $DB;
 
-    // get all enrolled users
+    // Get all enrolled users.
     list($sql, $params) = get_enrolled_sql($context);
     $users = $DB->get_records_sql($sql, $params);
 
-    // get active enrolled users
+    // Get active enrolled users.
     list($sql, $params) = get_enrolled_sql($context, null, null, true);
     $activeusers = $DB->get_records_sql($sql, $params);
 

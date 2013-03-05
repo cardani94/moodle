@@ -1036,12 +1036,12 @@ class assignment_base {
         if ($users) {
             $users = array_keys($users);
             if ($hidesuspended) {
-                // get suspended user IDs
+                // Get suspended user IDs.
                 $susers = get_suspended_userids($context);
-                // exclude suspended users
+                // Exclude suspended users.
                 $users = array_diff($users, $susers);
             }
-            // if groupmembersonly used, remove users who are not in any group
+            // If groupmembersonly used, remove users who are not in any group.
             if (!empty($CFG->enablegroupmembersonly) and $cm->groupmembersonly) {
                 if ($groupingusers = groups_get_grouping_members($cm->groupingid, 'u.id', 'u.id')) {
                     $users = array_intersect($users, array_keys($groupingusers));
@@ -1340,15 +1340,15 @@ class assignment_base {
             $users = array_keys($users);
         }
 
-        // get suspended user IDs
+        // Get suspended user IDs.
         $susers = get_suspended_userids($context);
 
         if ($users && $hidesuspended) {
-            // exclude suspended users
+            // Exclude suspended users.
             $users = array_diff($users, $susers);
         }
 
-        // if groupmembersonly used, remove users who are not in any group
+        // If groupmembersonly used, remove users who are not in any group.
         if ($users and !empty($CFG->enablegroupmembersonly) and $cm->groupmembersonly) {
             if ($groupingusers = groups_get_grouping_members($cm->groupingid, 'u.id', 'u.id')) {
                 $users = array_intersect($users, array_keys($groupingusers));
@@ -3586,7 +3586,7 @@ function assignment_count_real_submissions($cm, $groupid=0) {
  * @return array The submission objects indexed by id
  */
 function assignment_get_all_submissions($assignment, $sort="", $dir="DESC") {
-/// Return all assignment submissions by ENROLLED students (even empty)
+    // Return all assignment submissions by ENROLLED students (even empty).
     global $CFG, $DB;
 
     if ($sort == "lastname" or $sort == "firstname") {
@@ -3599,7 +3599,7 @@ function assignment_get_all_submissions($assignment, $sort="", $dir="DESC") {
 
     $params = array($assignment->id);
 
-    // exclude suspended users
+    // Exclude suspended users.
     $hidesuspended = get_user_preferences('assignment_hidesuspended', 1);
     $suspendedsql = '';
     if ($hidesuspended) {

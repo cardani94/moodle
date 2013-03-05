@@ -261,7 +261,7 @@ function report_log_print_mnet_selector_form($hostid, $course, $selecteduser=0, 
 
     asort($users);
 
-    // hide suspended users?
+    // Hide suspended users.
     $suspendedhidesel = array(
                             0 => get_string('suspendedinclude'),
                             1 => get_string('suspendedexclude'),
@@ -524,7 +524,7 @@ function report_log_print_selector_form($course, $selecteduser=0, $selecteddate=
 
     asort($users);
 
-    // hide suspended users?
+    // Hide suspended users.
     $suspendedhidesel = array(
                             0 => get_string('suspendedinclude'),
                             1 => get_string('suspendedexclude'),

@@ -82,11 +82,12 @@ class assign {
      */
     private $cache;
 
-    /** @var int hidesuspended - whether to exclude users with inactive enrolment */
+    /** @var int whether to exclude users with inactive enrolment */
     private $hidesuspended;
 
-    /** @var array susers - array of suspended user IDs in form of ([id1] => id1), ([id2] => id2)
-        see get_suspended_userids() in accesslib.php */
+    /** @var array list of suspended user IDs in form of ([id1] => id1), ([id2] => id2)
+     *             see get_suspended_userids() in accesslib.php
+     */
     private $susers = array();
 
     /** @var array list of the installed submission plugins */
@@ -1269,7 +1270,7 @@ class assign {
 
         if ($this->hidesuspended && sizeof($this->susers)) {
             $susql = '';
-            list($susql, $suparams) = $DB->get_in_or_equal($this->susers, SQL_PARAMS_QM, null, false); // not in ()...
+            list($susql, $suparams) = $DB->get_in_or_equal($this->susers, SQL_PARAMS_NAMED, 'sng', false); // not in ()...
             $sql .= " AND s.userid $susql";
             $params = array_merge($params, $suparams);
         }
@@ -1299,11 +1300,9 @@ class assign {
                    JOIN(' . $esql . ') e ON e.id = g.userid
                    WHERE g.assignment = :assignid';
 
-        $params = array($this->get_course_module()->instance);
-
         if ($this->hidesuspended && sizeof($this->susers)) {
             $susql = '';
-            list($susql, $suparams) = $DB->get_in_or_equal($this->susers, SQL_PARAMS_QM, null, false); // not in ()...
+            list($susql, $suparams) = $DB->get_in_or_equal($this->susers, SQL_PARAMS_NAMED, 'cg', false); // not in ()...
             $sql .= " AND userid $susql";
             $params = array_merge($params, $suparams);
         } 
@@ -1350,7 +1349,7 @@ class assign {
                             s.timemodified IS NOT NULL';
             // only look at team submissions
             if ($this->hidesuspended && sizeof($this->susers)) {
-                list($susql, $suparams) = $DB->get_in_or_equal($this->susers, SQL_PARAMS_QM, null, false); // not in ()...
+                list($susql, $suparams) = $DB->get_in_or_equal($this->susers, SQL_PARAMS_NAMED, 'cs', false); // not in ()...
                 $sql .= " AND userid $susql";
                 $params = array_merge($params, $suparams);
             }
@@ -1393,7 +1392,7 @@ class assign {
                             s.status = :submissionstatus';
             // only look at team submissions
             if ($this->hidesuspended && sizeof($this->susers)) {
-                list($susql, $suparams) = $DB->get_in_or_equal($this->susers, SQL_PARAMS_QM, null, false); // not in ()...
+                list($susql, $suparams) = $DB->get_in_or_equal($this->susers, SQL_PARAMS_NAMED, 'csws', false); // not in ()...
                 $sql .= " AND userid $susql";
                 $params = array_merge($params, $suparams);
             }
@@ -1736,7 +1735,7 @@ class assign {
             }
         }
 
-        // exclude suspended users
+        // Exclude suspended users.
         $hidesuspended = get_user_preferences('assign_hidesuspended', 1);
         if ($hidesuspended) {
             extract_suspended_users($this->context, $members);
@@ -4234,7 +4233,7 @@ class assign {
             $hidesuspended = (isset($formdata->hidesuspended) && $formdata->hidesuspended) ? 1 : 0;
             set_user_preference('assign_hidesuspended', $hidesuspended);
             if ($hidesuspended && !$this->hidesuspended) {
-                // setting has changed, let's get susers 'cause we'll need them
+                // Setting has changed, let's get susers 'cause we'll need them.
                 $this->susers = get_suspended_userids($this->context);
             }
             $this->hidesuspended = $hidesuspended;

@@ -113,7 +113,7 @@ class quiz_statistics_report extends quiz_default_report {
             redirect($reporturl);
         }
 
-        // If hide suspended users setting changed, need to recalculate
+        // If hide suspended users setting changed, need to recalculate.
         if (isset($fromformsuspended) && $hidesuspended != $fromformsuspended) {
             $this->clear_cached_data($quiz->id, $currentgroup, $useallattempts);
             $hidesuspended = $fromformsuspended;
@@ -1091,7 +1091,7 @@ function quiz_statistics_attempts_sql($quizid, $currentgroup, $groupstudents,
         $whereqa .= ' AND quiza.sumgrades IS NOT NULL';
     }
 
-    // exclude suspended users when required
+    // Exclude suspended users when required.
     $hidesuspended = get_user_preferences('quiz_report_hidesuspended', 1);
     if ($hidesuspended) {
         $quiz = $DB->get_record('quiz', array('id' => $quizid));

@@ -164,7 +164,7 @@ class quiz_override_form extends moodleform {
                     }
                 }
 
-                // Remove suspended users
+                // Remove suspended users.
                 extract_suspended_users($this->context, $userchoices);
 
                 unset($users);

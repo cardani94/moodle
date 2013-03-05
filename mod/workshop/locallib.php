@@ -661,7 +661,7 @@ class workshop {
         }
         $sql .= " WHERE s.example = 0 AND s.workshopid = :workshopid";
 
-        // exclude suspended enrolled students
+        // Exclude suspended enrolled students.
         $coursecontext = context_course::instance($this->course->id);
         $susers = get_suspended_userids($coursecontext);
         if (!empty($susers)) {
@@ -671,13 +671,13 @@ class workshop {
         }
 
         if ('all' === $authorid) {
-            // no additional conditions
+            // No additional conditions.
         } elseif (!empty($authorid)) {
             list($usql, $uparams) = $DB->get_in_or_equal($authorid, SQL_PARAMS_NAMED);
             $sql .= " AND authorid $usql";
             $params = array_merge($params, $uparams);
         } else {
-            // $authorid is empty
+            // If $authorid is empty.
             return 0;
         }
 
@@ -716,7 +716,7 @@ class workshop {
         $sql .= " LEFT JOIN {user} t ON (s.gradeoverby = t.id)
                  WHERE s.example = 0 AND s.workshopid = :workshopid";
 
-        // exclude suspended enrolled students
+        // Exclude suspended enrolled students.
         $coursecontext = context_course::instance($this->course->id);
         $susers = get_suspended_userids($coursecontext);
         if (!empty($susers)) {
@@ -726,13 +726,13 @@ class workshop {
         }
 
         if ('all' === $authorid) {
-            // no additional conditions
+            // No additional conditions.
         } elseif (!empty($authorid)) {
             list($usql, $uparams) = $DB->get_in_or_equal($authorid, SQL_PARAMS_NAMED);
             $sql .= " AND authorid $usql";
             $params = array_merge($params, $uparams);
         } else {
-            // $authorid is empty
+            // If $authorid is empty.
             return array();
         }
         list($sort, $sortparams) = users_order_by_sql('u');
@@ -1072,7 +1072,7 @@ class workshop {
         $overbyfields   = user_picture::fields('overby', null, 'gradinggradeoverbyx', 'overby');
         list($sort, $params) = users_order_by_sql('reviewer');
 
-        // exclude suspended enrolled students
+        // Exclude suspended enrolled students.
         $coursecontext = context_course::instance($this->course->id);
         $susers = get_suspended_userids($coursecontext);
         if (!empty($susers)) {

@@ -453,7 +453,7 @@ class grade_report_grader extends grade_report {
             $this->userselect = "AND g.userid $usql";
             $this->userselect_params = $uparams;
 
-            //add a flag to each user indicating whether their enrolment is active (or remove suspended users depending on report setting)
+            // Add a flag to each user indicating whether their enrolment is active/remove suspended users depending on setting.
             $sql = "SELECT ue.userid
                       FROM {user_enrolments} ue
                       JOIN {enrol} e ON e.id = ue.enrolid
