@@ -793,7 +793,7 @@ class comment {
         $replacements[] = $cmt->avatar;
         $replacements[] = html_writer::link($cmt->profileurl, $cmt->fullname);
         $replacements[] = $cmt->content;
-        $replacements[] = userdate($cmt->timecreated, get_string('strftimerecent', 'langconfig'));
+        $replacements[] = $cmt->time;
 
         // use html template to format a single comment.
         return str_replace($patterns, $replacements, $this->template);
