@@ -450,6 +450,11 @@ $CFG->admin = 'admin';
 // To ensure they are never used even when available:
 //      $CFG->svgicons = false;
 //
+// This flag will set maximum number of users which will be displayed within user selector
+// in course, group, cohort, webservice etc. Default value is 100, keep this value low to
+// avoid performance problems.
+//      $CFG->maxusersperpage = 100;
+//
 //=========================================================================
 // 7. SETTINGS FOR DEVELOPMENT SERVERS - not intended for production use!!!
 //=========================================================================
