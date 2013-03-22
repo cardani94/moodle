@@ -41,18 +41,18 @@ class profile_field_datetime extends profile_field_base {
     }
 
     /**
-     * Convert YYYY MM DD uploaded string to timestamp
+     * If timestamp is in YYYY MM DD format, then convert it to timestamp.
      *
-     * Overwrites base class accessor method
-     * @param   mixed    $data - the key returned from the select input in the form
-     * @param   stdClass $datarecord The object that will be used to save the record
+     * @param string|int $date date to be converted.
+     * @param stdClass $datarecord The object that will be used to save the record
+     * @return int timestamp
      */
-    function edit_save_data_preprocess($data, $datarecord) {
-        if (is_string($data)) {
-            $data = explode(' ', $data, 3);
-            return make_timestamp($data[0], $data[1], $data[2]);
+    function edit_save_data_preprocess($date, $datarecord) {
+        if (is_string($date)) {
+            $data = explode(' ', $date, 3);
+            return make_timestamp($date[0], $date[1], $date[2]);
         } else {
-            return $data;
+            return $date;
         }
     }
 
