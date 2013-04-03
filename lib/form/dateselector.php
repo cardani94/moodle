@@ -187,7 +187,7 @@ class MoodleQuickForm_date_selector extends MoodleQuickForm_group
     {
         include_once('HTML/QuickForm/Renderer/Default.php');
         $renderer = new HTML_QuickForm_Renderer_Default();
-        $renderer->setElementTemplate('{element}');
+        $renderer->setElementTemplate('<legend></legend>{element}');
         parent::accept($renderer);
         return $this->_wrap[0] . $renderer->toHtml() . $this->_wrap[1];
     }
