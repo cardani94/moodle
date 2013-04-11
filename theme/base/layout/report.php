@@ -70,6 +70,7 @@ echo $OUTPUT->doctype() ?>
     <div id="page-content" class="clearfix">
         <div id="report-main-content">
             <div class="region-content">
+                <div class="hideblocks"> <?php echo $OUTPUT->hideblocks(); ?></div>
                 <?php echo $coursecontentheader; ?>
                 <?php echo $OUTPUT->main_content() ?>
                 <?php echo $coursecontentfooter; ?>

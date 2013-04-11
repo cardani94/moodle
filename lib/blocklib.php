@@ -439,14 +439,16 @@ class block_manager {
      */
     public function add_fake_block($bc, $region) {
         $this->page->initialise_theme_and_output();
-        if (!$this->is_known_region($region)) {
-            $region = $this->get_default_region();
+        if (!empty($region)) {
+            if (!$this->is_known_region($region)) {
+                $region = $this->get_default_region();
+            }
+            if (array_key_exists($region, $this->visibleblockcontent)) {
+                throw new coding_exception('block_manager has already prepared the blocks in region ' .
+                        $region . 'for output. It is too late to add a fake block.');
+            }
+            $this->extracontent[$region][] = $bc;
         }
-        if (array_key_exists($region, $this->visibleblockcontent)) {
-            throw new coding_exception('block_manager has already prepared the blocks in region ' .
-                    $region . 'for output. It is too late to add a fake block.');
-        }
-        $this->extracontent[$region][] = $bc;
     }
 
     /**

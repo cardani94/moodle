@@ -367,6 +367,16 @@ class core_renderer extends renderer_base {
         // Set up help link popups for all links with the helptooltip class
         $this->page->requires->js_init_call('M.util.help_popups.setup');
 
+        // Set up fullscreen event if page layout supports it.
+        $canhideblocks = !empty($CFG->allowhidingallblocks) &&
+                in_array($this->page->pagelayout, $this->page->theme->hideblocksonpagelayouts);
+        if ($canhideblocks) {
+            $strhideallblocks = get_string('hideallblocks', 'block');
+            $strshowallblocks = get_string('showallblocks', 'block');
+            $this->page->requires->js_init_call('M.util.init_hideallblocks',
+                    array('strhideblocks' => $strhideallblocks, 'strshowblocks' => $strshowallblocks));
+        }
+
         // Setup help icon overlays.
         $this->page->requires->yui_module('moodle-core-popuphelp', 'M.core.init_popuphelp');
         $this->page->requires->strings_for_js(array(
@@ -2657,6 +2667,31 @@ EOD;
         $navbarcontent .= html_writer::tag('ul', join('', $htmlblocks), array('role'=>'navigation'));
         // XHTML
         return $navbarcontent;
+    }
+
+    public function hideblocks() {
+        global $SESSION, $CFG, $PAGE;
+
+        $canhideblocks = !empty($CFG->allowhidingallblocks) &&
+                in_array($this->page->pagelayout, $this->page->theme->hideblocksonpagelayouts);
+        if ($canhideblocks) {
+            $url = new moodle_url($PAGE->url, array('bui_hideallblocks' => (int)empty($SESSION->hideallblocks)));
+            if (get_user_preferences('hideallblocks')) {
+                // Show user can hide blocks
+                $strshowallblocks = get_string('showallblocks', 'block');
+                return html_writer::tag('a',
+                    html_writer::empty_tag('img',  array('src' => $this->pix_url('t/shrink'), 'alt' => $strshowallblocks)),
+                    array('class' => 'icon blockshidden', 'title' => $strshowallblocks, 'href' => $url, 'id' => 'hideallblocks'));
+            } else {
+                $strhideallblocks = get_string('hideallblocks', 'block');
+                // show user can show blocks.
+                return html_writer::tag('a',
+                    html_writer::empty_tag('img',  array('src' => $this->pix_url('t/expand'), 'alt' => $strhideallblocks)),
+                    array('class' => 'icon blocksvisible','title' => $strhideallblocks, 'href' => $url, 'id' => 'hideallblocks'));
+            }
+        } else {
+            return '';
+        }
     }
 
     /**

@@ -11,6 +11,7 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     $setting = new admin_setting_configcheckbox('themedesignermode', new lang_string('themedesignermode', 'admin'), new lang_string('configthemedesignermode', 'admin'), 0);
     $setting->set_updatedcallback('theme_reset_all_caches');
     $temp->add($setting);
+    $temp->add(new admin_setting_configcheckbox('allowhidingallblocks', new lang_string('allowhidingallblocks', 'admin'), new lang_string('configallowhidingallblocks', 'admin'), 0));
     $temp->add(new admin_setting_configcheckbox('allowuserthemes', new lang_string('allowuserthemes', 'admin'), new lang_string('configallowuserthemes', 'admin'), 0));
     $temp->add(new admin_setting_configcheckbox('allowcoursethemes', new lang_string('allowcoursethemes', 'admin'), new lang_string('configallowcoursethemes', 'admin'), 0));
     $temp->add(new admin_setting_configcheckbox('allowcategorythemes',  new lang_string('allowcategorythemes', 'admin'), new lang_string('configallowcategorythemes', 'admin'), 0));

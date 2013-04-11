@@ -46,3 +46,4 @@ $THEME->sheets = array(
     'css3'      /** Sets up CSS 3 + browser specific styles **/
 );
 $THEME->enable_dock = true;
+$THEME->hideblocksonpagelayouts = array('course', 'incourse', 'report', 'coursecategory');

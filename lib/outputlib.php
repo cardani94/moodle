@@ -347,6 +347,12 @@ class theme_config {
     private $usesvg = null;
 
     /**
+     * @var array if $CFG->allowhidingallblocks is set, then user show/hide all blocks on all pagelayouts
+     * defined in this by theme.
+     */
+    public $hideblocksonpagelayouts = array();
+
+    /**
      * Load the config.php file for a particular theme, and return an instance
      * of this class. (That is, this is a factory method.)
      *
@@ -413,8 +419,8 @@ class theme_config {
 
         $configurable = array('parents', 'sheets', 'parents_exclude_sheets', 'plugins_exclude_sheets', 'javascripts', 'javascripts_footer',
                               'parents_exclude_javascripts', 'layouts', 'enable_dock', 'enablecourseajax', 'supportscssoptimisation',
-                              'rendererfactory', 'csspostprocess', 'editor_sheets', 'rarrow', 'larrow', 'hidefromselector', 'doctype',
-                              'yuicssmodules');
+                              'rendererfactory', 'csspostprocess', 'editor_sheets', 'rarrow', 'larrow', 'hidefromselector',
+                              'hideblocksonpagelayouts', 'doctype', 'yuicssmodules');
 
         foreach ($config as $key=>$value) {
             if (in_array($key, $configurable)) {
@@ -1386,8 +1392,19 @@ class theme_config {
      * @param block_manager $blockmanager the block_manger to set up.
      */
     public function setup_blocks($pagelayout, $blockmanager) {
+        global $SESSION, $CFG;
         $layoutinfo = $this->layout_info_for_page($pagelayout);
-        if (!empty($layoutinfo['regions'])) {
+        // TODO: Find best place to get this.
+        $hideallblocks = optional_param('bui_hideallblocks', -1, PARAM_INT);
+        if ($hideallblocks != -1) {
+            set_user_preference('hideallblocks', $hideallblocks);
+        }
+        $hideallmyblocks = get_user_preferences('hideallblocks');
+
+        user_preference_allow_ajax_update('hideallblocks', PARAM_BOOL);
+        $hideallblocks = !empty($CFG->allowhidingallblocks) && (in_array($pagelayout, $this->hideblocksonpagelayouts))
+                    && $hideallmyblocks;
+        if (!empty($layoutinfo['regions']) && !$hideallblocks) {
             $blockmanager->add_regions($layoutinfo['regions']);
             $blockmanager->set_default_region($layoutinfo['defaultregion']);
         }

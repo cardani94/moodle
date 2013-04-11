@@ -40,3 +40,6 @@
 .dir-rtl .block h2.header {text-align:right;}
 .dir-rtl .block .header .commands { text-align: left;}
 .dir-rtl .block .header .block_action { float: left; margin-left: 4px; margin-left: 0;}
+
+.hideblocks {float: right; text-align: center; vertical-align: middle; padding: 2px;}
+.dir-rtl .hideblocks {float: left; text-align: center; vertical-align: middle; padding: 2px;}

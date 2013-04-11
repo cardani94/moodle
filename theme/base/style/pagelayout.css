@@ -32,11 +32,17 @@ body {margin:auto 0px;width:auto;}
 #page-header {float:left;width:100%;}
 #page-content {clear:both;float:left;overflow:hidden;position:relative;width:100%;min-width:900px;}
 #page-content #region-main-box {float:left;left:200px;position:relative;width:200%;}
+#page-content.fullpageview #region-main-box {float:left;left:0px;position:relative; width:100%}
 #page-content #region-post-box {float:left;left:50%;margin-left:-400px;position:relative;width:100%;}
+#page-content.fullpageview #region-post-box {float:left;margin-left: 0px;left:0%}
 #page-content #region-main-wrap {float:right;position:relative;right:100%;width:50%;}
+#page-content.fullpageview #region-main-wrap {clear: both;width:100%;right:0px;}
 #page-content #region-main {margin-right:0px;margin-left:400px;overflow:hidden;}
+#page-content.fullpageview #region-main {clear: both;margin-left:0px;}
 #page-content #region-pre {float:left;left:200px;overflow:hidden;position:relative;width:200px;margin-left:-50%;}
+#page-content.fullpageview #region-pre {display: none}
 #page-content #region-post {float:left;left:0px;overflow:hidden;position:relative;width:200px;}
+#page-content.fullpageview #region-post {display: none;}
 #page-content .region-content {overflow:hidden;padding:10px;}
 #page-footer {clear:both;float:left;width:100%;}
 
@@ -80,6 +86,7 @@ body {margin:auto 0px;width:auto;}
 .pagelayout-report #page-content {float:none;overflow:visible;width:auto;}
 .pagelayout-report #report-main-content {float:left;width:100%;}
 .pagelayout-report #report-main-content .region-content {margin-left:200px;}
+.pagelayout-report #page-content.fullpageview .region-content {margin-left:0px;}
 .pagelayout-report #report-main-content .region-content table {background-color:#FFF;}
 .pagelayout-report #report-region-wrap {width:0;float:right;position:relative;left:-100%;}
 .pagelayout-report #report-region-pre {width:200px;}

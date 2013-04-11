@@ -89,6 +89,7 @@ echo $OUTPUT->doctype() ?>
                 <div id="region-main-wrap">
                     <div id="region-main">
                         <div class="region-content">
+                            <div class="hideblocks"> <?php echo $OUTPUT->hideblocks(); ?></div>
                             <?php echo $coursecontentheader; ?>
                             <?php echo $OUTPUT->main_content() ?>
                             <?php echo $coursecontentfooter; ?>
