@@ -2681,7 +2681,12 @@ class plugininfo_block extends plugininfo_base {
     public function get_uninstall_url() {
 
         $blocksinfo = self::get_blocks_info();
-        return new moodle_url('/admin/blocks.php', array('delete' => $blocksinfo[$this->name]->id, 'sesskey' => sesskey()));
+        // If block is installed then show uninstall link, else return null.
+        if (isset($blocksinfo[$this->name]->id)) {
+            return new moodle_url('/admin/blocks.php', array('delete' => $blocksinfo[$this->name]->id, 'sesskey' => sesskey()));
+        } else {
+            return parent::get_uninstall_url();
+        }
     }
 
     /**
