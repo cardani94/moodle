@@ -82,6 +82,10 @@ class block_section_links extends block_base {
         $course = $this->page->course;
         $courseformat = course_get_format($course);
         $courseformatoptions = $courseformat->get_format_options();
+        if (empty($courseformatoptions)) {
+            return $this->content;
+        }
+
         $context = context_course::instance($course->id);
 
         // Prepare the highlight value.
