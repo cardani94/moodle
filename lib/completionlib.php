@@ -1036,7 +1036,14 @@ class completion_info {
         }
         $transaction->allow_commit();
 
-        events_trigger('activity_completion_changed', $data);
+        // Trigger an event for course module completion changed.
+        $event = \core\event\course_module_completion_updated::create(
+                                                                array('objectid' => $data->id,
+                                                                      'userid' => $data->userid,
+                                                                      'context' => context_module::instance($cm->id)
+                                                                     ));
+        $event->add_record_snapshot('course_modules_completion', $data);
+        $event->trigger();
 
         if ($data->userid == $USER->id) {
             $SESSION->completioncache[$cm->course][$cm->id] = $data;
