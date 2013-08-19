@@ -27,6 +27,7 @@ require('../../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->libdir.'/csvlib.class.php');
 require_once($CFG->dirroot.'/user/profile/lib.php');
+require_once($CFG->dirroot.'/user/lib.php');
 require_once($CFG->dirroot.'/group/lib.php');
 require_once($CFG->dirroot.'/cohort/lib.php');
 require_once('locallib.php');
@@ -654,9 +655,8 @@ if ($formdata = $mform2->is_cancelled()) {
             }
 
             if ($doupdate or $existinguser->password !== $oldpw) {
-                // we want only users that were really updated
-
-                $DB->update_record('user', $existinguser);
+                // We want only users that were really updated.
+                user_update_user($existinguser, false);
 
                 $upt->track('status', $struserupdated);
                 $usersupdated++;
@@ -667,8 +667,6 @@ if ($formdata = $mform2->is_cancelled()) {
                     // save custom profile fields data from csv file
                     profile_save_data($existinguser);
                 }
-
-                events_trigger('user_updated', $existinguser);
 
                 if ($bulk == UU_BULK_UPDATED or $bulk == UU_BULK_ALL) {
                     if (!in_array($user->id, $SESSION->bulk_users)) {

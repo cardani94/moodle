@@ -3440,7 +3440,9 @@ function get_user_key($script, $userid, $instance=null, $iprestriction=null, $va
  * @return bool Always returns true
  */
 function update_user_login_times() {
-    global $USER, $DB;
+    global $USER, $DB, $CFG;
+
+    require_once($CFG->dirroot.'/user/lib.php');
 
     if (isguestuser()) {
         // Do not update guest access times/ips for performance.
@@ -3466,7 +3468,7 @@ function update_user_login_times() {
     $USER->lastaccess = $user->lastaccess = $now;
     $USER->lastip = $user->lastip = getremoteaddr();
 
-    $DB->update_record('user', $user);
+    user_update_user($user, false);
     return true;
 }
 
@@ -3966,6 +3968,7 @@ function get_user_fieldnames() {
 function create_user_record($username, $password, $auth = 'manual') {
     global $CFG, $DB;
     require_once($CFG->dirroot."/user/profile/lib.php");
+
     // Just in case check text case.
     $username = trim(core_text::strtolower($username));
 
@@ -4034,6 +4037,7 @@ function create_user_record($username, $password, $auth = 'manual') {
 function update_user_record($username) {
     global $DB, $CFG;
     require_once($CFG->dirroot."/user/profile/lib.php");
+    require_once($CFG->dirroot.'/user/lib.php');
     // Just in case check text case.
     $username = trim(core_text::strtolower($username));
 
@@ -4076,14 +4080,10 @@ function update_user_record($username) {
         if ($newuser) {
             $newuser['id'] = $oldinfo->id;
             $newuser['timemodified'] = time();
-            $DB->update_record('user', $newuser);
+            user_update_user((object) $newuser, false);
 
             // Save user profile data.
             profile_save_data((object) $newuser);
-
-            // Fetch full user record for the event, the complete user data contains too much info
-            // and we want to be consistent with other places that trigger this event.
-            events_trigger('user_updated', $DB->get_record('user', array('id' => $oldinfo->id)));
         }
     }
 
@@ -4141,6 +4141,7 @@ function delete_user(stdClass $user) {
     require_once($CFG->libdir.'/gradelib.php');
     require_once($CFG->dirroot.'/message/lib.php');
     require_once($CFG->dirroot.'/tag/lib.php');
+    require_once($CFG->dirroot.'/user/lib.php');
 
     // Make sure nobody sends bogus record type as parameter.
     if (!property_exists($user, 'id') or !property_exists($user, 'username')) {
@@ -4235,9 +4236,7 @@ function delete_user(stdClass $user) {
     $updateuser->picture      = 0;
     $updateuser->timemodified = time();
 
-    $DB->update_record('user', $updateuser);
-    // Add this action to log.
-    add_to_log(SITEID, 'user', 'delete', "view.php?id=$user->id", $user->firstname.' '.$user->lastname);
+    user_update_user($updateuser, false);
 
     // We will update the user's timemodified, as it will be passed to the user_deleted event, which
     // should know about this updated property persisted to the user's table.

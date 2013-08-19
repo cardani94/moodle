@@ -29,6 +29,7 @@ require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/user/editadvanced_form.php');
 require_once($CFG->dirroot.'/user/editlib.php');
 require_once($CFG->dirroot.'/user/profile/lib.php');
+require_once($CFG->dirroot.'/user/lib.php');
 
 //HTTPS is required in this page when $CFG->loginhttps enabled
 $PAGE->https_required();
@@ -183,14 +184,12 @@ if ($usernew = $userform->get_data()) {
 
     } else {
         $usernew = file_postupdate_standard_editor($usernew, 'description', $editoroptions, $usercontext, 'user', 'profile', 0);
-        $DB->update_record('user', $usernew);
-        // pass a true $userold here
-        if (! $authplugin->user_update($user, $userform->get_data())) {
-            // auth update failed, rollback for moodle
-            $DB->update_record('user', $user);
+        // Pass a true old $user here.
+        if (!$authplugin->user_update($user, $usernew)) {
+            // Auth update failed.
             print_error('cannotupdateuseronexauth', '', '', $user->auth);
         }
-        add_to_log($course->id, 'user', 'update', "view.php?id=$user->id&course=$course->id", '');
+        user_update_user($usernew, false);
 
         //set new password if specified
         if (!empty($usernew->newpassword)) {
@@ -240,8 +239,6 @@ if ($usernew = $userform->get_data()) {
     // trigger events
     if ($usercreated) {
         events_trigger('user_created', $usernew);
-    } else {
-        events_trigger('user_updated', $usernew);
     }
 
     if ($createpassword) {
