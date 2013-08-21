@@ -178,10 +178,7 @@ if ($usernew = $userform->get_data()) {
         } else {
             $usernew->password = hash_internal_user_password($usernew->newpassword);
         }
-        $usernew->id = $DB->insert_record('user', $usernew);
-        $usercreated = true;
-        add_to_log($course->id, 'user', 'add', "view.php?id=$usernew->id&course=$course->id", '');
-
+        $usernew->id = user_create_user($usernew, false);
     } else {
         $usernew = file_postupdate_standard_editor($usernew, 'description', $editoroptions, $usercontext, 'user', 'profile', 0);
         // Pass a true old $user here.
@@ -205,8 +202,6 @@ if ($usernew = $userform->get_data()) {
         if (isset($usernew->suspended) and $usernew->suspended and !$user->suspended) {
             session_kill_user($user->id);
         }
-
-        $usercreated = false;
     }
 
     $usercontext = context_user::instance($usernew->id);
@@ -235,11 +230,6 @@ if ($usernew = $userform->get_data()) {
 
     // reload from db
     $usernew = $DB->get_record('user', array('id'=>$usernew->id));
-
-    // trigger events
-    if ($usercreated) {
-        events_trigger('user_created', $usernew);
-    }
 
     if ($createpassword) {
         setnew_password_and_mail($usernew);

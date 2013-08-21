@@ -76,4 +76,55 @@ class core_userliblib_testcase extends advanced_testcase {
         $dbuser = $DB->get_record('user', array('id' => $user->id));
         $this->assertSame($password, $dbuser->password);
     }
+
+    /**
+     * Test create_users.
+     */
+    public function test_create_users() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $user = array(
+            'username' => 'usernametest1',
+            'password' => 'Moodle2012!',
+            'idnumber' => 'idnumbertest1',
+            'firstname' => 'First Name User Test 1',
+            'lastname' => 'Last Name User Test 1',
+            'middlename' => 'Middle Name User Test 1',
+            'lastnamephonetic' => '最後のお名前のテスト一号',
+            'firstnamephonetic' => 'お名前のテスト一号',
+            'alternatename' => 'Alternate Name User Test 1',
+            'email' => 'usertest1@email.com',
+            'description' => 'This is a description for user 1',
+            'city' => 'Perth',
+            'country' => 'au'
+            );
+
+        // Create user and capture event.
+        $sink = $this->redirectEvents();
+        $user['id'] = user_create_user($user);
+        $events = $sink->get_events();
+        $sink->close();
+        $event = array_pop($events);
+
+        // Test user info in DB.
+        $dbuser = $DB->get_record('user', array('id' => $user['id']));
+        $this->assertEquals($dbuser->username, $user['username']);
+        $this->assertEquals($dbuser->idnumber, $user['idnumber']);
+        $this->assertEquals($dbuser->firstname, $user['firstname']);
+        $this->assertEquals($dbuser->lastname, $user['lastname']);
+        $this->assertEquals($dbuser->email, $user['email']);
+        $this->assertEquals($dbuser->description, $user['description']);
+        $this->assertEquals($dbuser->city, $user['city']);
+        $this->assertEquals($dbuser->country, $user['country']);
+
+        // Test event.
+        $this->assertInstanceOf('\core\event\user_created', $event);
+        $this->assertEquals($user['id'], $event->objectid);
+        $this->assertEquals('user_created', $event->get_legacy_eventname());
+        $this->assertEventLegacyData($dbuser, $event);
+        $expectedlogdata = array(SITEID, 'user', 'add', '/view.php?id='.$event->objectid, fullname($dbuser));
+        $this->assertEventLegacyLogData($expectedlogdata, $event);
+    }
 }

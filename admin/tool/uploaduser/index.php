@@ -787,8 +787,7 @@ if ($formdata = $mform2->is_cancelled()) {
                 $upt->track('password', '-', 'normal', false);
             }
 
-            // create user - insert_record ignores any extra properties
-            $user->id = $DB->insert_record('user', $user);
+            $user->id = user_create_user($user, false);
             $upt->track('username', html_writer::link(new moodle_url('/user/profile.php', array('id'=>$user->id)), s($user->username)), 'normal', false);
 
             // pre-process custom profile menu fields data from csv file
@@ -809,8 +808,6 @@ if ($formdata = $mform2->is_cancelled()) {
 
             // make sure user context exists
             context_user::instance($user->id);
-
-            events_trigger('user_created', $user);
 
             if ($bulk == UU_BULK_NEW or $bulk == UU_BULK_ALL) {
                 if (!in_array($user->id, $SESSION->bulk_users)) {
