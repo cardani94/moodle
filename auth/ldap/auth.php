@@ -551,7 +551,7 @@ class auth_plugin_ldap extends auth_plugin_base {
             print_error('auth_ldap_create_error', 'auth_ldap');
         }
 
-        $user->id = $DB->insert_record('user', $user);
+        $user->id = user_create_user($user, false);
 
         // Save any custom profile field information
         profile_save_data($user);
@@ -563,7 +563,6 @@ class auth_plugin_ldap extends auth_plugin_base {
         update_internal_user_password($user, $plainslashedpassword);
 
         $user = $DB->get_record('user', array('id'=>$user->id));
-        events_trigger('user_created', $user);
 
         if (! send_confirmation_email($user)) {
             print_error('noemail', 'auth_ldap');
@@ -947,10 +946,10 @@ class auth_plugin_ldap extends auth_plugin_base {
                     $user->lang = $CFG->lang;
                 }
 
-                $id = $DB->insert_record('user', $user);
+                $id = user_create_user($user, false);
                 echo "\t"; print_string('auth_dbinsertuser', 'auth_db', array('name'=>$user->username, 'id'=>$id)); echo "\n";
                 $euser = $DB->get_record('user', array('id' => $id));
-                events_trigger('user_created', $euser);
+
                 if (!empty($this->config->forcechangepassword)) {
                     set_user_preference('auth_forcepasswordchange', 1, $id);
                 }

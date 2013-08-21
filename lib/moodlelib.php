@@ -3967,7 +3967,8 @@ function get_user_fieldnames() {
  */
 function create_user_record($username, $password, $auth = 'manual') {
     global $CFG, $DB;
-    require_once($CFG->dirroot."/user/profile/lib.php");
+    require_once($CFG->dirroot.'/user/profile/lib.php');
+    require_once($CFG->dirroot.'/user/lib.php');
 
     // Just in case check text case.
     $username = trim(core_text::strtolower($username));
@@ -4009,7 +4010,7 @@ function create_user_record($username, $password, $auth = 'manual') {
     $newuser->timemodified = $newuser->timecreated;
     $newuser->mnethostid = $CFG->mnet_localhost_id;
 
-    $newuser->id = $DB->insert_record('user', $newuser);
+    $newuser->id = user_create_user($newuser, false);
 
     // Save user profile data.
     profile_save_data($newuser);
@@ -4020,10 +4021,6 @@ function create_user_record($username, $password, $auth = 'manual') {
     }
     // Set the password.
     update_internal_user_password($user, $password);
-
-    // Fetch full user record for the event, the complete user data contains too much info
-    // and we want to be consistent with other places that trigger this event.
-    events_trigger('user_created', $DB->get_record('user', array('id' => $user->id)));
 
     return $user;
 }
