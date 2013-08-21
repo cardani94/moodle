@@ -2153,7 +2153,14 @@ class core_moodlelib_testcase extends advanced_testcase {
         $user = $this->getDataGenerator()->create_user(array('idnumber'=>'abc'));
         $user2 = $this->getDataGenerator()->create_user(array('idnumber'=>'xyz'));
 
+        // Delete user and capture event.
+        $sink = $this->redirectEvents();
         $result = delete_user($user);
+        $events = $sink->get_events();
+        $sink->close();
+        $event = array_pop($events);
+
+        // Test user is deleted in DB.
         $this->assertTrue($result);
         $deluser = $DB->get_record('user', array('id'=>$user->id), '*', MUST_EXIST);
         $this->assertEquals(1, $deluser->deleted);
@@ -2164,8 +2171,15 @@ class core_moodlelib_testcase extends advanced_testcase {
 
         $this->assertEquals(1, $DB->count_records('user', array('deleted'=>1)));
 
-        // Try invalid params.
+        // Test Event.
+        $this->assertInstanceOf('\core\event\user_deleted', $event);
+        $this->assertSame($user->id, $event->objectid);
+        $this->assertSame('user_deleted', $event->get_legacy_eventname());
+        $this->assertEventLegacyData($user, $event);
+        $expectedlogdata = array(SITEID, 'user', 'delete', "view.php?id=$user->id", $user->firstname.' '.$user->lastname);
+        $this->assertEventLegacyLogData($expectedlogdata, $event);
 
+        // Try invalid params.
         $record = new stdClass();
         $record->grrr = 1;
         try {

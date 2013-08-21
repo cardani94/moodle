@@ -4235,6 +4235,18 @@ function delete_user(stdClass $user) {
 
     user_update_user($updateuser, false);
 
+    // Any plugin that needs to cleanup should register this event.
+    // Trigger event.
+    $event = \core\event\user_deleted::create(
+            array(
+                'objectid' => $user->id,
+                'context' => context_system::instance(),
+                'other' => array('user' => (array)clone $user)
+                )
+            );
+    $event->add_record_snapshot('user', $updateuser);
+    $event->trigger();
+
     // We will update the user's timemodified, as it will be passed to the user_deleted event, which
     // should know about this updated property persisted to the user's table.
     $user->timemodified = $updateuser->timemodified;
@@ -4242,9 +4254,6 @@ function delete_user(stdClass $user) {
     // Notify auth plugin - do not block the delete even when plugin fails.
     $authplugin = get_auth_plugin($user->auth);
     $authplugin->user_delete($user);
-
-    // Any plugin that needs to cleanup should register this event.
-    events_trigger('user_deleted', $user);
 
     return true;
 }

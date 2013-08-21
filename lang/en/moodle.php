@@ -668,6 +668,7 @@ $string['eventcourserestored'] = 'Course restored';
 $string['eventcourseupdated'] = 'Course updated';
 $string['eventcoursesectionupdated'] = ' Course section updated';
 $string['eventusercreated'] = 'User created';
+$string['eventuserdeleted'] = 'User deleted';
 $string['eventuserupdated'] = 'User updated';
 $string['everybody'] = 'Everybody';
 $string['executeat'] = 'Execute at';
