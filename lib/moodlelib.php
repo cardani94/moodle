@@ -4165,6 +4165,9 @@ function delete_user(stdClass $user) {
         return false;
     }
 
+    // Keep a copy of user context, we need it for event.
+    $usercontext = context_user::instance($user->id);
+
     // Delete all grades - backup is kept in grade_grades_history table.
     grade_user_delete($user->id);
 
@@ -4214,9 +4217,6 @@ function delete_user(stdClass $user) {
     // Force logout - may fail if file based sessions used, sorry.
     session_kill_user($user->id);
 
-    // Now do a final accesslib cleanup - removes all role assignments in user context and context itself.
-    context_helper::delete_instance(CONTEXT_USER, $user->id);
-
     // Workaround for bulk deletes of users with the same email address.
     $delname = "$user->email.".time();
     while ($DB->record_exists('user', array('username' => $delname))) { // No need to use mnethostid here.
@@ -4235,6 +4235,21 @@ function delete_user(stdClass $user) {
 
     user_update_user($updateuser, false);
 
+    // Now do a final accesslib cleanup - removes all role assignments in user context and context itself.
+    context_helper::delete_instance(CONTEXT_USER, $user->id);
+
+    // Any plugin that needs to cleanup should register this event.
+    // Trigger event.
+    $event = \core\event\user_deleted::create(
+            array(
+                'objectid' => $user->id,
+                'context' => $usercontext,
+                'other' => array('user' => (array)clone $user)
+                )
+            );
+    $event->add_record_snapshot('user', $updateuser);
+    $event->trigger();
+
     // We will update the user's timemodified, as it will be passed to the user_deleted event, which
     // should know about this updated property persisted to the user's table.
     $user->timemodified = $updateuser->timemodified;
@@ -4242,9 +4257,6 @@ function delete_user(stdClass $user) {
     // Notify auth plugin - do not block the delete even when plugin fails.
     $authplugin = get_auth_plugin($user->auth);
     $authplugin->user_delete($user);
-
-    // Any plugin that needs to cleanup should register this event.
-    events_trigger('user_deleted', $user);
 
     return true;
 }
