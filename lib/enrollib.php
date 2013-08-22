@@ -1303,10 +1303,17 @@ abstract class enrol_plugin {
         }
 
         if ($inserted) {
-            // add extra info and trigger event
-            $ue->courseid  = $courseid;
-            $ue->enrol     = $name;
-            events_trigger('user_enrolled', $ue);
+            // Trigger event.
+            $event = \core\event\user_enrolment_created::create(
+                    array(
+                        'objectid' => $ue->id,
+                        'courseid' => $courseid,
+                        'context' => $context,
+                        'relateduserid' => $ue->userid,
+                        'other' => array('enrol' => $name)
+                        )
+                    );
+            $event->trigger();
         } else if ($updated) {
             $ue->courseid  = $courseid;
             $ue->enrol     = $name;
