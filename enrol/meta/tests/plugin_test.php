@@ -439,4 +439,40 @@ class enrol_meta_plugin_testcase extends advanced_testcase {
         delete_course($course4, false);
 
     }
+
+    /**
+     * Test user_enrolment_created event.
+     */
+    public function test_user_enrolment_created_observer() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $metaplugin = enrol_get_plugin('meta');
+        $user1 = $this->getDataGenerator()->create_user();
+        $course1 = $this->getDataGenerator()->create_course();
+        $course2 = $this->getDataGenerator()->create_course();
+        $student = $DB->get_record('role', array('shortname' => 'student'));
+
+        $e1 = $metaplugin->add_instance($course2, array('customint1' => $course1->id));
+        $enrol1 = $DB->get_record('enrol', array('id' => $e1));
+
+        // Enrol user and capture event.
+        $sink = $this->redirectEvents();
+
+        $metaplugin->enrol_user($enrol1, $user1->id, $student->id);
+        $events = $sink->get_events();
+        $sink->close();
+        $event = array_shift($events);
+
+        // Test Event.
+        $dbuserenrolled = $DB->get_record('user_enrolments', array('userid' => $user1->id));
+        $this->assertInstanceOf('\core\event\user_enrolment_created', $event);
+        $this->assertEquals($dbuserenrolled->id, $event->objectid);
+        $this->assertEquals('user_enrolled', $event->get_legacy_eventname());
+        $expectedlegacyeventdata = $dbuserenrolled;
+        $expectedlegacyeventdata->enrol = 'meta';
+        $expectedlegacyeventdata->courseid = $course2->id;
+        $this->assertEventLegacyData($expectedlegacyeventdata, $event);
+    }
 }

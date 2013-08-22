@@ -294,28 +294,6 @@ class enrol_meta_handler {
     }
 
     /**
-     * Triggered via user enrolled event.
-     * @static
-     * @param stdClass $ue
-     * @return bool success
-     */
-    public static function user_enrolled($ue) {
-        if (!enrol_is_enabled('meta')) {
-            // no more enrolments for disabled plugins
-            return true;
-        }
-
-        if ($ue->enrol === 'meta') {
-            // prevent circular dependencies - we can not sync meta enrolments recursively
-            return true;
-        }
-
-        self::sync_course_instances($ue->courseid, $ue->userid);
-
-        return true;
-    }
-
-    /**
      * Triggered via user unenrolled event.
      * @static
      * @param stdClass $ue
