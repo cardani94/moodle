@@ -2421,4 +2421,35 @@ class core_moodlelib_testcase extends advanced_testcase {
         $expectedarray = array('19' => 'second', '38' => 'first', '44' => 'firsthalf');
         $this->assertEquals($expectedarray, order_in_string($valuearray, $formatstring));
     }
+
+    /**
+     * Test require_logout.
+     */
+    public function test_require_logout() {
+        $this->resetAfterTest();
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+        $course = $this->getDataGenerator()->create_course();
+
+        $this->assertTrue(isloggedin());
+
+        // Logout user and capture event.
+        $sink = $this->redirectEvents();
+        require_logout();
+        $events = $sink->get_events();
+        $sink->close();
+        $event = array_pop($events);
+
+        // Check if user is logged out.
+        $this->assertFalse(isloggedin());
+
+        // Test Event.
+        $this->assertInstanceOf('\core\event\user_loggedout', $event);
+        $this->assertSame($user->id, $event->objectid);
+        $this->assertSame('user_logout', $event->get_legacy_eventname());
+        $this->assertEventLegacyData($user, $event);
+        $expectedlogdata = array(SITEID, 'user', 'logout', 'view.php?id='.$event->objectid.'&course='.SITEID, $event->objectid, 0,
+            $event->objectid);
+        $this->assertEventLegacyLogData($expectedlogdata, $event);
+    }
 }
