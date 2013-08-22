@@ -1447,8 +1447,6 @@ abstract class enrol_plugin {
                  WHERE ue.userid = :userid AND e.courseid = :courseid";
         if ($DB->record_exists_sql($sql, array('userid'=>$userid, 'courseid'=>$courseid))) {
             $ue->lastenrol = false;
-            events_trigger('user_unenrolled', $ue);
-            // user still has some enrolments, no big cleanup yet
 
         } else {
             // the big cleanup IS necessary!
@@ -1465,9 +1463,20 @@ abstract class enrol_plugin {
             $DB->delete_records('user_lastaccess', array('userid'=>$userid, 'courseid'=>$courseid));
 
             $ue->lastenrol = true; // means user not enrolled any more
-            events_trigger('user_unenrolled', $ue);
         }
-
+        // Trigger event.
+        $event = \core\event\user_enrolment_deleted::create(
+                array(
+                    'courseid' => $courseid,
+                    'context' => $context,
+                    'relateduserid' => $ue->userid,
+                    'other' => array(
+                        'userenrolment' => (array)$ue,
+                        'enrol' => $name
+                        )
+                    )
+                );
+        $event->trigger();
         // reset all enrol caches
         $context->mark_dirty();
 

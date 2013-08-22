@@ -55,4 +55,26 @@ class enrol_meta_observer extends enrol_meta_handler {
         self::sync_course_instances($event->courseid, $event->relateduserid);
         return true;
     }
+
+    /**
+     * Triggered via user_enrolment_deleted event.
+     *
+     * @param \core\event\user_enrolment_deleted $event
+     * @return bool true on success.
+     */
+    public static function user_enrolment_deleted(\core\event\user_enrolment_deleted $event) {
+        if (!enrol_is_enabled('meta')) {
+            // This is slow, let enrol_meta_sync() deal with disabled plugin.
+            return true;
+        }
+
+        if ($event->other['enrol'] === 'meta') {
+            // Prevent circular dependencies - we can not sync meta enrolments recursively.
+            return true;
+        }
+
+        self::sync_course_instances($event->courseid, $event->relateduserid);
+
+        return true;
+    }
 }

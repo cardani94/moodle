@@ -70,6 +70,7 @@ $string['errorenrolcohortusers'] = 'Error enrolling cohort members in this cours
 $string['errorthresholdlow'] = 'Notification threshold must be at least 1 day.';
 $string['errorwithbulkoperation'] = 'There was an error while processing your bulk enrolment change.';
 $string['eventuserenrolmentcreated'] = 'User enrolled in course';
+$string['eventuserenrolmentdeleted'] = 'User unenrolled from course';
 $string['expirynotify'] = 'Notify before enrolment expires';
 $string['expirynotify_help'] = 'This setting determines whether enrolment expiry notification messages are sent.';
 $string['expirynotifyall'] = 'Enroller and enrolled user';
