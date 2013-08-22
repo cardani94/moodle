@@ -3213,11 +3213,7 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
 function require_logout() {
     global $USER;
 
-    $params = $USER;
-
     if (isloggedin()) {
-        add_to_log(SITEID, "user", "logout", "view.php?id=$USER->id&course=".SITEID, $USER->id, 0, $USER->id);
-
         $authsequence = get_enabled_auth_plugins(); // Auths, in sequence.
         foreach ($authsequence as $authname) {
             $authplugin = get_auth_plugin($authname);
@@ -3225,9 +3221,16 @@ function require_logout() {
         }
     }
 
-    events_trigger('user_logout', $params);
+    $event = \core\event\user_loggedout::create(
+            array(
+                'objectid' => $USER->id,
+                'context' => context_user::instance($USER->id)
+                )
+            );
+    $event->trigger();
+
     session_get_instance()->terminate_current();
-    unset($params);
+    unset($GLOBALS['USER']);
 }
 
 /**

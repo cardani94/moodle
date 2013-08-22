@@ -669,6 +669,7 @@ $string['eventcourseupdated'] = 'Course updated';
 $string['eventcoursesectionupdated'] = ' Course section updated';
 $string['eventusercreated'] = 'User created';
 $string['eventuserdeleted'] = 'User deleted';
+$string['eventuserloggedout'] = 'User logged out';
 $string['eventuserupdated'] = 'User updated';
 $string['everybody'] = 'Everybody';
 $string['executeat'] = 'Execute at';
