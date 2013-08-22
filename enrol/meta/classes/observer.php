@@ -77,4 +77,26 @@ class enrol_meta_observer extends enrol_meta_handler {
 
         return true;
     }
+
+    /**
+     * Triggered via user_enrolment_updated event.
+     *
+     * @param \core\event\user_enrolment_updated $event
+     * @return bool true on success
+     */
+    public static function user_enrolment_updated(\core\event\user_enrolment_updated $event) {
+        if (!enrol_is_enabled('meta')) {
+            // No modifications if plugin disabled.
+            return true;
+        }
+
+        if ($event->other['enrol'] === 'meta') {
+            // Prevent circular dependencies - we can not sync meta enrolments recursively.
+            return true;
+        }
+
+        self::sync_course_instances($event->courseid, $event->relateduserid);
+
+        return true;
+    }
 }
