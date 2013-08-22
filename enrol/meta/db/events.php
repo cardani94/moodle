@@ -41,13 +41,6 @@ $handlers = array (
         'internal'         => 1,
     ),
 
-    'user_enrol_modified' => array (
-        'handlerfile'      => '/enrol/meta/locallib.php',
-        'handlerfunction'  => array('enrol_meta_handler', 'user_enrol_modified'),
-        'schedule'         => 'instant',
-        'internal'         => 1,
-    ),
-
     'course_deleted' => array (
         'handlerfile'      => '/enrol/meta/locallib.php',
         'handlerfunction'  => array('enrol_meta_handler', 'course_deleted'),
@@ -56,7 +49,7 @@ $handlers = array (
     ),
 );
 
-// Observers for meta enrolment.
+// List of observers.
 $observers = array(
 
     array(
@@ -66,5 +59,9 @@ $observers = array(
     array(
         'eventname'   => '\core\event\user_enrolment_deleted',
         'callback'    => 'enrol_meta_observer::user_enrolment_deleted',
+    ),
+    array(
+        'eventname'   => '\core\event\user_enrolment_updated',
+        'callback'    => 'enrol_meta_observer::user_enrolment_updated',
     ),
 );

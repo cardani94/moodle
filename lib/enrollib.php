@@ -1276,16 +1276,7 @@ abstract class enrol_plugin {
         if ($ue = $DB->get_record('user_enrolments', array('enrolid'=>$instance->id, 'userid'=>$userid))) {
             //only update if timestart or timeend or status are different.
             if ($ue->timestart != $timestart or $ue->timeend != $timeend or (!is_null($status) and $ue->status != $status)) {
-                $ue->timestart    = $timestart;
-                $ue->timeend      = $timeend;
-                if (!is_null($status)) {
-                    $ue->status   = $status;
-                }
-                $ue->modifierid   = $USER->id;
-                $ue->timemodified = time();
-                $DB->update_record('user_enrolments', $ue);
-
-                $updated = true;
+                $this->update_user_enrol($instance, $userid, $status, $timestart, $timeend);
             }
         } else {
             $ue = new stdClass();
@@ -1314,12 +1305,6 @@ abstract class enrol_plugin {
                         )
                     );
             $event->trigger();
-        } else if ($updated) {
-            $ue->courseid  = $courseid;
-            $ue->enrol     = $name;
-            events_trigger('user_enrol_modified', $ue);
-            // resets current enrolment caches
-            $context->mark_dirty();
         }
 
         if ($roleid) {
@@ -1396,10 +1381,17 @@ abstract class enrol_plugin {
         $DB->update_record('user_enrolments', $ue);
         context_course::instance($instance->courseid)->mark_dirty(); // reset enrol caches
 
-        // trigger event
-        $ue->courseid  = $instance->courseid;
-        $ue->enrol     = $instance->name;
-        events_trigger('user_enrol_modified', $ue);
+        // Trigger event.
+        $event = \core\event\user_enrolment_updated::create(
+                array(
+                    'objectid' => $ue->id,
+                    'courseid' => $instance->courseid,
+                    'context' => context_course::instance($instance->courseid),
+                    'relateduserid' => $ue->userid,
+                    'other' => array('enrol' => $name)
+                    )
+                );
+        $event->trigger();
     }
 
     /**
