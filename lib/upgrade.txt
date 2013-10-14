@@ -1,6 +1,10 @@
 This files describes API changes in core lbraries and APIs,
 information provided here is intended especially for developers.
 
+=== 2.4.7 ===
+* shift_course_mod_dates() has been modified to accept optional mod instance id. If mod instance id is passed then
+  dates changed will happen only on specific module instance and not on all instances of that module in course.
+
 === 2.4.6 ===
 * Use new function moodleform::mock_submit() to simulate form submission in unit tests.
 
