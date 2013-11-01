@@ -981,7 +981,7 @@ class behat_course extends behat_base {
         $node = $this->find('css', $selector);
         $node->checkField('bcat[]');
         return array(
-            new Given('I select "'.  get_string('toplevelcategory').'" from "menumovecategoriesto"'),
+            new Given('I select "' .  coursecat::get(0)->get_formatted_name() . '" from "menumovecategoriesto"'),
             new Given('I press "bulkmovecategories"'),
         );
     }
