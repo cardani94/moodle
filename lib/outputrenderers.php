@@ -468,8 +468,12 @@ class core_renderer extends renderer_base {
 
         $output = '';
         if (isset($CFG->maintenance_later) and $CFG->maintenance_later > time()) {
-            $output .= $this->box_start('errorbox maintenancewarning');
-            $output .= get_string('maintenancemodeisscheduled', 'admin', (int)(($CFG->maintenance_later-time())/60));
+            $output .= $this->box_start('maintenancewarning');
+            $timeleft = $CFG->maintenance_later - time();
+            $a = new stdClass();
+            $a->min = gmdate("i", $timeleft);
+            $a->sec = gmdate("s", $timeleft);
+            $output .= get_string('maintenancemodeisscheduled', 'admin', $a) ;
             $output .= $this->box_end();
         }
         return $output;
