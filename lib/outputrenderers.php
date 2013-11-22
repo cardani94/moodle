@@ -462,13 +462,25 @@ class core_renderer extends renderer_base {
 
         $output = '';
         if (isset($CFG->maintenance_later) and $CFG->maintenance_later > time()) {
-            $output .= $this->box_start('maintenancewarning');
             $timeleft = $CFG->maintenance_later - time();
+            // If Timeleft less than 30 sec, set the class on block to error to highlight.
+            $errorclass = ($timeleft < 30) ? 'error' : 'warning';
+            $output .= $this->box_start($errorclass . ' maintenancewarning');
             $a = new stdClass();
-            $a->min = gmdate("i", $timeleft);
-            $a->sec = gmdate("s", $timeleft);
+            $a->min = ltrim(gmdate("i", $timeleft), '0');
+            $a->sec = ltrim(gmdate("s", $timeleft), '0');
             $output .= get_string('maintenancemodeisscheduled', 'admin', $a) ;
             $output .= $this->box_end();
+            $params = array(
+                'name'=>'maintenance_mode_timer',
+                'fullpath'=>'/lib/javascript-static.js',
+                'requires' => array('base', 'node'),
+                'strings' => array(
+                                array('maintenancemodeisscheduled', 'admin'),
+                                array('sitemaintenance', 'admin')
+                             )
+            );
+            $this->page->requires->js_init_call('M.util.maintenance_mode_timer', array('timeleft' => $timeleft), true, $params);
         }
         return $output;
     }
