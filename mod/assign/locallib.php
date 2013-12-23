@@ -747,6 +747,10 @@ class assign {
         require_once($CFG->dirroot.'/mod/assign/lib.php');
         $assign = clone $this->get_instance();
         $assign->cmidnumber = $coursemoduleid;
+
+        // Set assign gradebook feedback plugin status (enabled and visible).
+        $assign->gradefeedbackenabled = $this->is_gradebook_feedback_enabled();
+
         $param = null;
         if ($reset) {
             $param = 'reset';
@@ -3743,7 +3747,8 @@ class assign {
         }
         $assign = clone $this->get_instance();
         $assign->cmidnumber = $this->get_course_module()->idnumber;
-
+        // Set assign gradebook feedback plugin status (enabled and visible).
+        $assign->gradefeedbackenabled = $this->is_gradebook_feedback_enabled();
         return assign_grade_item_update($assign, $gradebookgrade);
     }
 
@@ -6032,7 +6037,6 @@ class assign {
 
         return false;
     }
-
 }
 
 /**
@@ -6306,4 +6310,5 @@ class assign_portfolio_caller extends portfolio_module_caller_base {
     public static function base_supported_formats() {
         return array(PORTFOLIO_FORMAT_FILE, PORTFOLIO_FORMAT_LEAP2A);
     }
+
 }
