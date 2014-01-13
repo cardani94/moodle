@@ -2782,8 +2782,13 @@ class restore_activity_grades_structure_step extends restore_structure_step {
         $gradeitem = new grade_item($data, false);
         $gradeitem->insert('restore');
 
-        //sortorder is automatically assigned when inserting. Re-instate the previous sortorder
-        $gradeitem->sortorder = $data->sortorder;
+        // Reinstate the grade item close to its original sortorder, if something already exists
+        // in the original sortorer then it will be first.
+        if ($DB->record_exists('grade_items', array('courseid' => $data->courseid, 'sortorder' => $data->sortorder))) {
+            $gradeitem->move_after_sortorder($data->sortorder);
+        } else {
+            $gradeitem->sortorder = $data->sortorder;
+        }
         $gradeitem->update('restore');
 
         // Set mapping, saving the original category id into parentitemid
