@@ -1,6 +1,10 @@
 This files describes API changes in /report/* - plugins,
 information provided here is intended especially for developers.
 
+=== 2.7 ===
+* report_log has been modified to use events.
+** mnet logs are removed as they should not be mixed with logs.
+** exporting in different formats should be handled by flexible table and hence deperciated.
 
 === 2.2 ===
 
