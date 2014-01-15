@@ -406,7 +406,8 @@ function report_log_print_mnet_selector_form($hostid, $course, $selecteduser=0, 
  * @return void
  */
 function report_log_print_selector_form($course, $selecteduser=0, $selecteddate='today',
-                                 $modname="", $modid=0, $modaction='', $selectedgroup=-1, $showcourses=0, $showusers=0, $logformat='showashtml') {
+                                 $modname="", $modid=0, $modaction='', $selectedgroup=-1, $showcourses=0, $showusers=0,
+                                 $logformat='showashtml', $reader, $edulevel = -1) {
 
     global $USER, $CFG, $DB, $OUTPUT, $SESSION;
 
@@ -531,14 +532,41 @@ function report_log_print_selector_form($course, $selecteduser=0, $selecteddate=
 
     asort($users);
 
+    $legacyreader = false;
+    $manager = get_log_manager();
+    $availablereaders = $manager->get_readers();
+    $readers = array();
+    if (!empty($availablereaders[$reader]) && ($availablereaders[$reader] instanceof logstore_legacy\log\store)) {
+        $legacyreader = true;
+    }
     // Prepare the list of action options.
-    $actions = array(
-        'view' => get_string('view'),
-        'add' => get_string('add'),
-        'update' => get_string('update'),
-        'delete' => get_string('delete'),
-        '-view' => get_string('allchanges')
-    );
+    //TODO: Put this list in some class and get list properly.
+    if ($legacyreader) {
+        $actions = array(
+            'view' => get_string('view'),
+            'add' => get_string('add'),
+            'update' => get_string('update'),
+            'delete' => get_string('delete'),
+            '-view' => get_string('allchanges')
+        );
+    } else {
+        $actions = array(
+            'viewed' => get_string('view'),
+            'add' => get_string('add'),
+            'created' => get_string('create'),
+            'updated' => get_string('update'),
+            'deleted' => get_string('delete'),
+        );
+        if ($course->id == SITEID) {
+            $actions['loggedin'] = get_string('login');
+            $actions['loggedout'] = get_string('logout');
+        } else {
+            $actions['assigned'] = get_string('assign');
+            $actions['submitted'] = get_string('submitted');
+            $actions['completed'] = get_string('completed');
+        }
+        $actions['-viewed'] = get_string('allchanges');
+    }
 
     // Get all the possible dates
     // Note that we are keeping track of real (GMT) time and user time
@@ -631,6 +659,20 @@ function report_log_print_selector_form($course, $selecteduser=0, $selecteddate=
     echo html_writer::label(get_string('actions'), 'menumodaction', false, array('class' => 'accesshide'));
     echo html_writer::select($actions, 'modaction', $modaction, get_string("allactions"));
 
+    if (!$legacyreader) {
+        $edulevels = array(
+                        -1 => get_string("edulevel"),
+                        1 => get_string('edulevelteacher'),
+                        2 => get_string('edulevelparticipating'),
+                        0 => get_string('edulevelother')
+                        );
+        
+    } else {
+        $edulevels = array(-1 => get_string("edulevel"));
+    }
+    echo html_writer::label(get_string('edulevel'), 'menuedulevel', false, array('class' => 'accesshide'));
+    echo html_writer::select($edulevels, 'edulevel', $edulevel, false);
+
     $logformats = array('showashtml' => get_string('displayonpage'),
                         'downloadascsv' => get_string('downloadtext'),
                         'downloadasods' => get_string('downloadods'),
@@ -638,7 +680,23 @@ function report_log_print_selector_form($course, $selecteduser=0, $selecteddate=
 
     echo html_writer::label(get_string('logsformat', 'report_log'), 'menulogformat', false, array('class' => 'accesshide'));
     echo html_writer::select($logformats, 'logformat', $logformat, false);
-    echo '<input type="submit" value="'.get_string('gettheselogs').'" />';
+
+    // Add reader option.
+    // If there is some reader available then only show submit button.
+    if (!empty($availablereaders)) {
+        if (count($availablereaders) == 1) {
+            $attributes = array('type' => 'hidden', 'name' => 'reader', 'value' => $reader);
+            echo html_writer::empty_tag('input', $attributes);
+        } else {
+            foreach ($availablereaders as $readername => $r) {
+                $readers[$readername] = $r->get_name();
+            }
+            echo html_writer::label(get_string('selectreader'), 'menureader', false, array('class' => 'accesshide'));
+            echo html_writer::select($readers, 'reader', $reader, false);
+        }
+
+        echo '<input type="submit" value="'.get_string('gettheselogs').'" />';
+    }
     echo '</div>';
     echo '</form>';
 }

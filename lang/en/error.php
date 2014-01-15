@@ -425,6 +425,7 @@ $string['nopermissiontoupdatecalendar'] = 'Sorry, but you do not currently have 
 $string['nopermissiontoviewgrades'] = 'Can not view grades.';
 $string['nopermissiontoviewletergrade'] = 'Missing permission to view letter grades';
 $string['nopermissiontoviewpage'] = 'You are not allowed to look at this page';
+$string['noreaderenabled'] = 'No reader enabled to show report';
 $string['nosite'] = 'Could not find a top-level course!';
 $string['nositeid'] = 'No site ID';
 $string['nostatstodisplay'] = 'Sorry, there is no available data to display';

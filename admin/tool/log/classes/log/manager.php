@@ -154,7 +154,7 @@ class manager implements \core\log\manager {
      * @param    int     $cm      The course_module->id if there is one
      * @param    int|\stdClass $user If log regards $user other than $USER
      */
-    public function legacy_add_to_log($courseid, $module, $action, $url, $info, $cm, $user) {
+    public function legacy_add_to_log($courseid, $module, $action, $url, $info = '', $cm = 0, $user = null) {
         $this->init();
         if (isset($this->stores['logstore_legacy'])) {
             $this->stores['logstore_legacy']->legacy_add_to_log($courseid, $module, $action, $url, $info, $cm, $user);

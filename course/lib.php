@@ -228,8 +228,8 @@ function build_mnet_logs_array($hostid, $course, $user=0, $date=0, $order="l.tim
     return $result;
 }
 
-function build_logs_array($course, $user=0, $date=0, $order="l.time ASC", $limitfrom='', $limitnum='',
-                   $modname="", $modid=0, $modaction="", $groupid=0) {
+function build_logs_array($course, $user=0, $date=0, $order="timecreated ASC", $limitfrom='', $limitnum='',
+                   $modname="", $modid=0, $modaction="", $groupid=0, $reader="", $edulevel=-1) {
     global $DB, $SESSION, $USER;
     // It is assumed that $date is the GMT time of midnight for that day,
     // and so the next 86400 seconds worth of logs are printed.
@@ -238,7 +238,8 @@ function build_logs_array($course, $user=0, $date=0, $order="l.time ASC", $limit
 
     /// If the group mode is separate, and this user does not have editing privileges,
     /// then only the user's group can be viewed.
-    if ($course->groupmode == SEPARATEGROUPS and !has_capability('moodle/course:managegroups', context_course::instance($course->id))) {
+    $context = context_course::instance($course->id);
+    if ($course->groupmode == SEPARATEGROUPS and !has_capability('moodle/course:managegroups', $context)) {
         if (isset($SESSION->currentgroup[$course->id])) {
             $groupid =  $SESSION->currentgroup[$course->id];
         } else {
@@ -259,31 +260,35 @@ function build_logs_array($course, $user=0, $date=0, $order="l.time ASC", $limit
     $joins = array();
     $params = array();
 
+    // Get selected reader to extract records from.
+    $logmanager = get_log_manager();
+    $readers = $logmanager->get_readers();
+    if (!empty($readers[$reader])) {
+        $reader = $readers[$reader];
+    } else {
+        return false;
+    }
+
     if ($course->id != SITEID || $modid != 0) {
-        $joins[] = "l.course = :courseid";
+        $joins[] = "courseid = :courseid";
         $params['courseid'] = $course->id;
     }
 
-    if ($modname) {
-        $joins[] = "l.module = :modname";
-        $params['modname'] = $modname;
-    }
-
     if ('site_errors' === $modid) {
-        $joins[] = "( l.action='error' OR l.action='infected' )";
+        $joins[] = "( action='error' OR action='infected' OR action='failed' )";
     } else if ($modid) {
-        $joins[] = "l.cmid = :modid";
-        $params['modid'] = $modid;
+        $joins[] = "contextinstanceid = :contextinstanceid";
+        $params['contextinstanceid'] = $modid;
     }
 
     if ($modaction) {
         $firstletter = substr($modaction, 0, 1);
         if ($firstletter == '-') {
-            $joins[] = $DB->sql_like('l.action', ':modaction', false, true, true);
-            $params['modaction'] = '%'.substr($modaction, 1).'%';
+            $joins[] = $DB->sql_like('action', ':action', false, true, true);
+            $params['action'] = '%'.substr($modaction, 1).'%';
         } else {
-            $joins[] = $DB->sql_like('l.action', ':modaction', false);
-            $params['modaction'] = '%'.$modaction.'%';
+            $joins[] = $DB->sql_like('action', ':action', false);
+            $params['action'] = '%'.$modaction.'%';
         }
     }
 
@@ -292,46 +297,59 @@ function build_logs_array($course, $user=0, $date=0, $order="l.time ASC", $limit
     if ($groupid and !$user) {
         if ($gusers = groups_get_members($groupid)) {
             $gusers = array_keys($gusers);
-            $joins[] = 'l.userid IN (' . implode(',', $gusers) . ')';
+            $joins[] = 'userid IN (' . implode(',', $gusers) . ')';
         } else {
-            $joins[] = 'l.userid = 0'; // No users in groups, so we want something that will always be false.
+            $joins[] = 'userid = 0'; // No users in groups, so we want something that will always be false.
         }
     }
     else if ($user) {
-        $joins[] = "l.userid = :userid";
+        $joins[] = "userid = :userid";
         $params['userid'] = $user;
     }
 
     if ($date) {
         $enddate = $date + 86400;
-        $joins[] = "l.time > :date AND l.time < :enddate";
+        $joins[] = "timecreated > :date AND timecreated < :enddate";
         $params['date'] = $date;
         $params['enddate'] = $enddate;
+    }
+
+    if ($edulevel >= 0 && !($reader instanceof logstore_legacy\log\store)) {
+        $joins[] = "edulevel = :edulevel";
+        $params['edulevel'] = $edulevel;
     }
 
     $selector = implode(' AND ', $joins);
 
     $totalcount = 0;  // Initialise
     $result = array();
-    $result['logs'] = get_logs($selector, $params, $order, $limitfrom, $limitnum, $totalcount);
-    $result['totalcount'] = $totalcount;
+    $result['logs'] = $reader->get_events($selector, $params, $order, $limitfrom, $limitnum);
+    $result['totalcount'] = $reader->get_events_count($selector, $params);
     return $result;
 }
 
-
-function print_log($course, $user=0, $date=0, $order="l.time ASC", $page=0, $perpage=100,
-                   $url="", $modname="", $modid=0, $modaction="", $groupid=0) {
+function print_log($course, $user=0, $date=0, $order="timecreated ASC", $page=0, $perpage=100,
+                   $url="", $modname="", $modid=0, $modaction="", $groupid=0, $reader="", $edulevel=-1) {
 
     global $CFG, $DB, $OUTPUT;
 
     if (!$logs = build_logs_array($course, $user, $date, $order, $page*$perpage, $perpage,
-                       $modname, $modid, $modaction, $groupid)) {
+                       $modname, $modid, $modaction, $groupid, $reader, $edulevel)) {
         echo $OUTPUT->notification("No logs found!");
         echo $OUTPUT->footer();
         exit;
     }
 
+    // Check is selected reader is legacy or not.
+    $legacyreader = false;
+    if ($reader == 'logstore_legacy') {
+        $legacyreader = true;
+        // Education level is not relevant in old logs.
+        $edulevel = -1;
+    }
+
     $courses = array();
+    $users = array();
 
     if ($course->id == SITEID) {
         $courses[0] = '';
@@ -363,11 +381,14 @@ function print_log($course, $user=0, $date=0, $order="l.time ASC", $page=0, $per
     $table->align = array('right', 'left', 'left');
     $table->head = array(
         get_string('time'),
-        get_string('ip_address'),
         get_string('fullnameuser'),
-        get_string('action'),
-        get_string('info')
-    );
+        get_string('relatedfullnameuser'),
+        get_string('context'),
+        get_string('component'),
+        get_string('eventname'),
+        get_string('description'),
+        get_string('origin'),
+        );
     $table->data = array();
 
     if ($course->id == SITEID) {
@@ -380,54 +401,108 @@ function print_log($course, $user=0, $date=0, $order="l.time ASC", $page=0, $per
         $logs['logs'] = array();
     }
 
-    foreach ($logs['logs'] as $log) {
-
-        if (isset($ldcache[$log->module][$log->action])) {
-            $ld = $ldcache[$log->module][$log->action];
+    foreach ($logs['logs'] as $event) {
+        if ($event->contextid) {
+            $context = context::instance_by_id($event->contextid, IGNORE_MISSING);
         } else {
-            $ld = $DB->get_record('log_display', array('module'=>$log->module, 'action'=>$log->action));
-            $ldcache[$log->module][$log->action] = $ld;
-        }
-        if ($ld && is_numeric($log->info)) {
-            // ugly hack to make sure fullname is shown correctly
-            if ($ld->mtable == 'user' && $ld->field == $DB->sql_concat('firstname', "' '" , 'lastname')) {
-                $log->info = fullname($DB->get_record($ld->mtable, array('id'=>$log->info)), true);
-            } else {
-                $log->info = $DB->get_field($ld->mtable, $ld->field, array('id'=>$log->info));
-            }
+            $context = false;
         }
 
-        //Filter log->info
-        $log->info = format_string($log->info);
+        $canviewfullname = false;
+        if ($context) {
+            $canviewfullname = has_capability('moodle/site:viewfullnames', $context);
+        }
 
-        // If $log->url has been trimmed short by the db size restriction
-        // code in add_to_log, keep a note so we don't add a link to a broken url
-        $brokenurl=(core_text::strlen($log->url)==100 && core_text::substr($log->url,97)=='...');
-
+        $logextra = $event->get_logextra();
         $row = array();
+
+        // Keep list of user fullnames who are in report, so you don't have to fetch them again.
+        if (!isset($users[$event->userid])) {
+            $users[$event->userid] = fullname(get_complete_user_data('id', $event->userid));
+        }
+        if (!empty($logextra['realuserid']) && !isset($users[$logextra['realuserid']])) {
+            $users[$logextra['realuserid']] = fullname(get_complete_user_data('id', $logextra['realuserid']));
+        }
+        if (!empty($event->relateduserid) && !isset($users[$event->relateduserid])) {
+            $users[$event->relateduserid] = fullname(get_complete_user_data('id', $event->relateduserid));
+        }
+
         if ($course->id == SITEID) {
-            if (empty($log->course)) {
+            if (empty($event->courseid) || ($event->courseid == SITEID)) {
                 $row[] = get_string('site');
             } else {
-                $row[] = "<a href=\"{$CFG->wwwroot}/course/view.php?id={$log->course}\">". format_string($courses[$log->course])."</a>";
+                $row[] = "<a href=\"{$CFG->wwwroot}/course/view.php?id={$event->courseid}\">". format_string($courses[$event->courseid])."</a>";
             }
         }
+        // Add time stamp.
+        $recenttimestr = get_string('strftimerecent', 'core_langconfig');
+        $row[] = userdate($event->timecreated, $recenttimestr);
 
-        $row[] = userdate($log->time, '%a').' '.userdate($log->time, $strftimedatetime);
-
-        $link = new moodle_url("/iplookup/index.php?ip=$log->ip&user=$log->userid");
-        $row[] = $OUTPUT->action_link($link, $log->ip, new popup_action('click', $link, 'iplookup', array('height' => 440, 'width' => 700)));
-
-        $row[] = html_writer::link(new moodle_url("/user/view.php?id={$log->userid}&course={$log->course}"), fullname($log, has_capability('moodle/site:viewfullnames', context_course::instance($course->id))));
-
-        $displayaction="$log->module $log->action";
-        if ($brokenurl) {
-            $row[] = $displayaction;
+        // Add username who did the action.
+        if (!empty($logextra['realuserid'])) {
+            $a = new stdClass();
+            $a->realusername = html_writer::link(new moodle_url("/user/view.php?id={$event->userid}&course={$event->courseid}"),
+                    $users[$logextra['realuserid']]);
+            $a->asusername = html_writer::link(new moodle_url("/user/view.php?id={$event->userid}&course={$event->courseid}"),
+                    $users[$event->userid]);
+            $username = get_string('loggedas', 'core', $a);
         } else {
-            $link = make_log_url($log->module,$log->url);
-            $row[] = $OUTPUT->action_link($link, $displayaction, new popup_action('click', $link, 'fromloglive'), array('height' => 440, 'width' => 700));
+            $username = $users[$event->userid];
+            $username = html_writer::link(new moodle_url("/user/view.php?id={$event->userid}&course={$event->courseid}"), $username);
         }
-        $row[] = $log->info;
+        $row[] = $username;
+
+        // Add affected user.
+        if (!$legacyreader) {
+            if (!empty($event->relateduserid)) {
+                $row[] = html_writer::link(new moodle_url("/user/view.php?id={$event->relateduserid}&course={$event->courseid}"),
+                        $users[$event->relateduserid]);
+            } else {
+                $row[] = '-';
+            }
+        } else {
+            $row[] = '-';
+        }
+
+        // Add context name.
+        $contextname = get_string('other');
+        if ($context) {
+            $contextname = $context->get_context_name(true);
+            if ($url = $context->get_url()) {
+                $contextname = $OUTPUT->action_link($url, $contextname , new popup_action('click', $url, 'fromloglive'),
+                        array('height' => 440, 'width' => 700));
+            }
+        }
+        if ($url = $event->get_url()) {
+            $contextname = $OUTPUT->action_link($url, $contextname , new popup_action('click', $url, 'fromloglive'),
+                    array('height' => 440, 'width' => 700));
+        }
+        $row[] = $contextname;
+
+        // Component.
+        $componentname = $event->component;
+        if (($event->component === 'core') || ($event->component === 'legacy')){
+            $row[] = get_string('coresystem');
+        } else if (get_string_manager()->string_exists('pluginname', $event->component)) {
+            $row[] = get_string('pluginname', $event->component);
+        } else {
+            $row[] = $componentname;
+        }
+
+        // Event name.
+        if ($legacyreader) {
+            $row[] = $event->eventname;
+        } else {
+            $row[] = $event->get_name();
+        }
+
+        // Description.
+        $row[] = $event->get_description();
+
+        // Add event origin, normally IP/cron.
+        $link = new moodle_url("/iplookup/index.php?ip={$logextra['origin']}&user=$event->userid");
+        $row[] = $OUTPUT->action_link($link, $logextra['origin'], new popup_action('click', $link, 'iplookup',
+                array('height' => 440, 'width' => 700)));
         $table->data[] = $row;
     }
 
@@ -436,7 +511,7 @@ function print_log($course, $user=0, $date=0, $order="l.time ASC", $page=0, $per
 }
 
 
-function print_mnet_log($hostid, $course, $user=0, $date=0, $order="l.time ASC", $page=0, $perpage=100,
+function print_mnet_log($hostid, $course, $user=0, $date=0, $order="timecreated ASC", $page=0, $perpage=100,
                    $url="", $modname="", $modid=0, $modaction="", $groupid=0) {
 
     global $CFG, $DB, $OUTPUT;
@@ -541,8 +616,8 @@ function print_mnet_log($hostid, $course, $user=0, $date=0, $order="l.time ASC",
 }
 
 
-function print_log_csv($course, $user, $date, $order='l.time DESC', $modname,
-                        $modid, $modaction, $groupid) {
+function print_log_csv($course, $user, $date, $order='timecreated DESC', $modname,
+                        $modid, $modaction, $groupid, $reader, $edulevel) {
     global $DB, $CFG;
 
     require_once($CFG->libdir . '/csvlib.class.php');
@@ -558,7 +633,7 @@ function print_log_csv($course, $user, $date, $order='l.time DESC', $modname,
     $header[] = get_string('info');
 
     if (!$logs = build_logs_array($course, $user, $date, $order, '', '',
-                       $modname, $modid, $modaction, $groupid)) {
+                       $modname, $modid, $modaction, $groupid, $reader, $edulevel)) {
         return false;
     }
 
@@ -623,15 +698,15 @@ function print_log_csv($course, $user, $date, $order='l.time DESC', $modname,
 }
 
 
-function print_log_xls($course, $user, $date, $order='l.time DESC', $modname,
-                        $modid, $modaction, $groupid) {
+function print_log_xls($course, $user, $date, $order='timecreated DESC', $modname,
+                        $modid, $modaction, $groupid, $reader, $edulevel) {
 
     global $CFG, $DB;
 
     require_once("$CFG->libdir/excellib.class.php");
 
     if (!$logs = build_logs_array($course, $user, $date, $order, '', '',
-                       $modname, $modid, $modaction, $groupid)) {
+                       $modname, $modid, $modaction, $groupid, $reader, $edulevel)) {
         return false;
     }
 
@@ -737,15 +812,15 @@ function print_log_xls($course, $user, $date, $order='l.time DESC', $modname,
     return true;
 }
 
-function print_log_ods($course, $user, $date, $order='l.time DESC', $modname,
-                        $modid, $modaction, $groupid) {
+function print_log_ods($course, $user, $date, $order='timecreated DESC', $modname,
+                        $modid, $modaction, $groupid, $reader, $edulevel) {
 
     global $CFG, $DB;
 
     require_once("$CFG->libdir/odslib.class.php");
 
     if (!$logs = build_logs_array($course, $user, $date, $order, '', '',
-                       $modname, $modid, $modaction, $groupid)) {
+                       $modname, $modid, $modaction, $groupid, $reader, $edulevel)) {
         return false;
     }
 

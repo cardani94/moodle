@@ -52,6 +52,8 @@ $showcourses = optional_param('showcourses', 0, PARAM_INT); // whether to show c
 $showusers   = optional_param('showusers', 0, PARAM_INT); // whether to show users if we're over our limit.
 $chooselog   = optional_param('chooselog', 0, PARAM_INT);
 $logformat   = optional_param('logformat', 'showashtml', PARAM_ALPHA);
+$reader      = optional_param('reader', '', PARAM_COMPONENT); // Reader which will be used for displaying logs.
+$edulevel    = optional_param('edulevel', -1, PARAM_INT); // Educational level.
 
 $params = array();
 if ($id !== 0) {
@@ -96,6 +98,15 @@ if ($chooselog !== 0) {
 if ($logformat !== 'showashtml') {
     $params['logformat'] = $logformat;
 }
+if ($reader !== '') {
+    $params['reader'] = $reader;
+}
+if (($edulevel != -1)) {
+    $params['edulevel'] = $edulevel;
+} else if ($reader == 'logstore_legacy') { // Legacy store hack, as edulevel is not supported.
+    $params['edulevel'] = -1;
+    $edulevel = -1;
+}
 $PAGE->set_url('/report/log/index.php', $params);
 $PAGE->set_pagelayout('report');
 
@@ -114,6 +125,23 @@ require_login($course);
 $context = context_course::instance($course->id);
 
 require_capability('report/log:view', $context);
+
+// Get appropriate reader.
+$manager = get_log_manager();
+$readers = $manager->get_readers();
+$options = array();
+foreach ($readers as $k => $v) {
+    $options[$k] = $v->get_name();
+}
+
+if (empty($readers)) {
+    echo $OUTPUT->notification(get_string('noreaderenabled'));
+    echo $OUTPUT->footer();
+    exit(1);
+} else if (!isset($readers[$reader])) {
+    reset($readers);
+    $reader = key($readers);
+}
 
 // Trigger a content view event.
 $event = \report_log\event\content_viewed::create(array('courseid' => $course->id,
@@ -164,33 +192,34 @@ if (!empty($chooselog)) {
             }
 
             echo $OUTPUT->heading(format_string($course->fullname) . ": $userinfo, $dateinfo (".usertimezone().")");
-            report_log_print_mnet_selector_form($hostid, $course, $user, $date, $modname, $modid, $modaction, $group, $showcourses, $showusers, $logformat);
 
             if ($hostid == $CFG->mnet_localhost_id) {
-                print_log($course, $user, $date, 'l.time DESC', $page, $perpage,
-                        "index.php?id=$course->id&amp;chooselog=1&amp;user=$user&amp;date=$date&amp;modid=$modid&amp;modaction=$modaction&amp;group=$group",
-                        $modname, $modid, $modaction, $group);
+                report_log_print_selector_form($course, $user, $date, $modname, $modid, $modaction, $group, $showcourses, $showusers, $logformat, $reader, $edulevel);
+                print_log($course, $user, $date, 'timecreated DESC', $page, $perpage,
+                        "index.php?id=$course->id&amp;chooselog=1&amp;user=$user&amp;date=$date&amp;modid=$modid&amp;" . 
+                        "modaction=$modaction&amp;group=$group&amp;reader=$reader&amp;edulevel=$edulevel", $modname, $modid, $modaction, $group, $reader, $edulevel);
             } else {
-                print_mnet_log($hostid, $id, $user, $date, 'l.time DESC', $page, $perpage, "", $modname, $modid, $modaction, $group);
+                report_log_print_mnet_selector_form($hostid, $course, $user, $date, $modname, $modid, $modaction, $group, $showcourses, $showusers, $logformat);
+                print_mnet_log($hostid, $id, $user, $date, 'timecreated DESC', $page, $perpage, "", $modname, $modid, $modaction, $group);
             }
             break;
         case 'downloadascsv':
-            if (!print_log_csv($course, $user, $date, 'l.time DESC', $modname,
-                    $modid, $modaction, $group)) {
+            if (!print_log_csv($course, $user, $date, 'timecreated DESC', $modname,
+                    $modid, $modaction, $group, $reader, $edulevel)) {
                 echo $OUTPUT->notification("No logs found!");
                 echo $OUTPUT->footer();
             }
             exit;
         case 'downloadasods':
-            if (!print_log_ods($course, $user, $date, 'l.time DESC', $modname,
-                    $modid, $modaction, $group)) {
+            if (!print_log_ods($course, $user, $date, 'timecreated DESC', $modname,
+                    $modid, $modaction, $group, $reader, $edulevel)) {
                 echo $OUTPUT->notification("No logs found!");
                 echo $OUTPUT->footer();
             }
             exit;
         case 'downloadasexcel':
-            if (!print_log_xls($course, $user, $date, 'l.time DESC', $modname,
-                    $modid, $modaction, $group)) {
+            if (!print_log_xls($course, $user, $date, 'timecreated DESC', $modname,
+                    $modid, $modaction, $group, $reader, $edulevel)) {
                 echo $OUTPUT->notification("No logs found!");
                 echo $OUTPUT->footer();
             }
@@ -210,7 +239,7 @@ if (!empty($chooselog)) {
 
     echo $OUTPUT->heading(get_string('chooselogs') .':');
 
-    report_log_print_selector_form($course, $user, $date, $modname, $modid, $modaction, $group, $showcourses, $showusers, $logformat);
+    report_log_print_selector_form($course, $user, $date, $modname, $modid, $modaction, $group, $showcourses, $showusers, $logformat, $reader, $edulevel);
 }
 
 echo $OUTPUT->footer();
