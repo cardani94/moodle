@@ -19,8 +19,9 @@ class profile_field_menu extends profile_field_base {
         if ($this->field->required){
             $this->options[''] = get_string('choose').'...';
         }
+
         foreach($options as $key => $option) {
-            $this->options[$key] = format_string($option);//multilang formatting
+            $this->options[$key] = $option;
         }
 
         /// Set the data key
@@ -35,7 +36,11 @@ class profile_field_menu extends profile_field_base {
      * @param   object   moodleform instance
      */
     function edit_field_add($mform) {
-        $mform->addElement('select', $this->inputname, format_string($this->field->name), $this->options);
+        $options = array();
+        foreach ($this->options as $key => $option) {
+            $options[$key] = format_string($option);
+        }
+        $mform->addElement('select', $this->inputname, format_string($this->field->name), $options);
     }
 
     /**
