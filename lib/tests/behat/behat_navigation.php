@@ -123,7 +123,7 @@ class behat_navigation extends behat_base {
     protected function get_top_navigation_node($nodetext) {
         // Avoid problems with quotes.
         $nodetextliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($nodetext);
-        $exception = new ExpectationException('Top navigation node "' . $nodetext . ' not found in "', $this->getSession());
+        $exception = new ExpectationException('Top navigation node "' . $nodetext . '" not found in "', $this->getSession());
 
         // First find in navigation block.
         $xpath = "//div[contains(concat(' ', normalize-space(@class), ' '), ' content ')]" .
@@ -173,7 +173,7 @@ class behat_navigation extends behat_base {
         }
 
         if (!$node) {
-            throw new ExpectationException('Sub-navigation node "' . $nodetext . ' not found under "' . $parentnode->getText() .
+            throw new ExpectationException('Sub-navigation node "' . $nodetext . '" not found under "' . $parentnode->getText() .
                     '" block', $this->getSession());
         }
         return $node;
@@ -186,7 +186,6 @@ class behat_navigation extends behat_base {
      * @throws ExpectationException
      * @param string $nodetext navigation node to click.
      * @param string $parentnodes comma seperated list of parent nodes.
-     * @param strin $blockname name of the block.
      */
     public function i_navigate_to_node_in($nodetext, $parentnodes) {
         // Create array of all parentnodes.
@@ -202,6 +201,8 @@ class behat_navigation extends behat_base {
             $nodetoexpand = $node->find('xpath', $xpath);
             $this->ensure_node_is_visible($nodetoexpand);
             $nodetoexpand->click();
+            // Ensure top navigation is expanded.
+            $this->getSession()->wait(self::TIMEOUT * 1000, self::PAGE_READY_JS);
         }
 
         // If sub-parent nodes then get to the last one.
@@ -229,8 +230,8 @@ class behat_navigation extends behat_base {
 
         // Throw exxeption if no node found.
         if (!$node) {
-            throw new ExpectationException('Navigation node "' . $nodetext . ' not found under "' . $parentnodes .
-                    '" block', $this->getSession());
+            throw new ExpectationException('Navigation node "' . $nodetext . '" not found under "' . $parentnodes .
+                    '"', $this->getSession());
         }
         $this->ensure_node_is_visible($node);
         $node->click();
