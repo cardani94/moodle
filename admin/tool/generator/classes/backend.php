@@ -123,10 +123,11 @@ abstract class tool_generator_backend {
     /**
      * Displays information as part of progress.
      * @param string $langstring Part of langstring (after progress_)
+     * @param string $plugin name of the plugin
      * @param mixed $a Optional lang string parameters
      * @param bool $leaveopen If true, doesn't close LI tag (ready for dots)
      */
-    protected function log($langstring, $a = null, $leaveopen = false) {
+    protected function log($langstring, $plugin, $a = null, $leaveopen = false) {
         if (!$this->progress) {
             return;
         }
@@ -135,7 +136,7 @@ abstract class tool_generator_backend {
         } else {
             echo html_writer::start_tag('li');
         }
-        echo get_string('progress_' . $langstring, 'tool_generator', $a);
+        echo get_string('progress_' . $langstring, $plugin, $a);
         if (!$leaveopen) {
             if (CLI_SCRIPT) {
                 echo "\n";
@@ -156,7 +157,7 @@ abstract class tool_generator_backend {
      * @param int $number Number of completed items
      * @param int $total Total number of items to complete
      */
-    protected function dot($number, $total) {
+    public function dot($number, $total) {
         if (!$this->progress) {
             return;
         }

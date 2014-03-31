@@ -47,6 +47,16 @@ class mod_forum_generator extends testing_module_generator {
     protected $forumpostcount = 0;
 
     /**
+     * @var array Number of forum discussions
+     */
+    public static $paramforumdiscussions = array(1, 10, 100, 500, 1000, 2000);
+
+    /**
+     * @var array Number of forum posts per discussion
+     */
+    public static $paramforumposts = array(2, 2, 5, 10, 10, 10);
+
+    /**
      * To be called from data reset code only,
      * do not use in tests.
      * @return void
@@ -230,5 +240,57 @@ class mod_forum_generator extends testing_module_generator {
             $post = $this->create_post($record);
         }
         return $post;
+    }
+
+    /**
+     * Total records which will be genrated.
+     *
+     * @param int $size
+     * @return int
+     */
+    public function total_records_to_create($size) {
+        $discussions = self::$paramforumdiscussions[$size];
+        $posts = self::$paramforumposts[$size];
+        return $discussions * $posts;
+    }
+
+    /**
+     * Create instances of forum..
+     *
+     * @param int $size size of records to generate.
+     * @param tool_generator_course_backend $coursetoolgenerator
+     * @param array $options
+     */
+    public function create_instances($size, $coursetoolgenerator, array $options = array()) {
+        global $DB;
+
+        $discussions = self::$paramforumdiscussions[$size];
+        $posts = self::$paramforumposts[$size];
+        $totalposts = $discussions * $posts;
+
+        // Create empty forum.
+        $course = $coursetoolgenerator->get_course();
+        $record = array('course' => $course,
+                'name' => get_string('pluginname', 'forum'));
+        $options = array('section' => 0);
+        $forum = $this->create_instance($record, $options);
+
+        // Add discussions and posts.
+        $sofar = 0;
+        for ($i = 0; $i < $discussions; $i++) {
+            $record = array('forum' => $forum->id, 'course' => $course->id,
+                    'userid' => $coursetoolgenerator->get_target_user());
+            $discussion = $this->create_discussion($record);
+            $parentid = $DB->get_field('forum_posts', 'id', array('discussion' => $discussion->id), MUST_EXIST);
+            $sofar++;
+            for ($j = 0; $j < $posts - 1; $j++, $sofar++) {
+                $record = array('discussion' => $discussion->id,
+                        'userid' => $coursetoolgenerator->get_target_user(), 'parent' => $parentid);
+                $this->create_post($record);
+                $coursetoolgenerator->dot($sofar, $totalposts);
+            }
+        }
+
+        return $totalposts;
     }
 }

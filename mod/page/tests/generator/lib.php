@@ -35,6 +35,8 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_page_generator extends testing_module_generator {
+    /** @var array Number of Page activities in course as per size. */
+    public static $parampages = array(1, 50, 200, 1000, 5000, 10000);
 
     public function create_instance($record = null, array $options = null) {
         global $CFG;
@@ -59,5 +61,34 @@ class mod_page_generator extends testing_module_generator {
         }
 
         return parent::create_instance($record, (array)$options);
+    }
+
+    /**
+     * Total records which will be genrated.
+     *
+     * @param int $size
+     * @return int
+     */
+    public function total_records_to_create($size) {
+        return self::$parampages[$size];
+    }
+
+    /**
+     * Create instances of page.
+     *
+     * @param int $size size of records to generate.
+     * @param tool_generator_course_backend $coursetoolgenerator
+     * @param array $options
+     * @return int number of records created
+     */
+    public function create_instances($size, $coursetoolgenerator, array $options = array()) {
+        $number = self::$parampages[$size];
+        for ($i = 0; $i < $number; $i++) {
+            $record = array('course' => $coursetoolgenerator->get_course());
+            $options = array_merge($options, array('section' => $coursetoolgenerator->get_target_section()));
+            $this->create_instance($record, $options);
+            $coursetoolgenerator->dot($i, $number);
+        }
+        return $number;
     }
 }

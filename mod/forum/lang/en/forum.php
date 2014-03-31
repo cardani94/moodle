@@ -372,6 +372,7 @@ $string['postupdated'] = 'Your post was updated';
 $string['potentialsubscribers'] = 'Potential subscribers';
 $string['processingdigest'] = 'Processing email digest for user {$a}';
 $string['processingpost'] = 'Processing post {$a}';
+$string['progress_createforum'] = 'Creating forum ({$a} posts)';
 $string['prune'] = 'Split';
 $string['prunedpost'] = 'A new discussion has been created from that post';
 $string['pruneheading'] = 'Split the discussion and move this post to a new discussion';

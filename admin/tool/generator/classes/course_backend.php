@@ -37,10 +37,6 @@ class tool_generator_course_backend extends tool_generator_backend {
      */
     private static $paramsections = array(1, 10, 100, 500, 1000, 2000);
     /**
-     * @var array Number of Page activities in course
-     */
-    private static $parampages = array(1, 50, 200, 1000, 5000, 10000);
-    /**
      * @var array Number of students enrolled in course
      */
     private static $paramusers = array(1, 100, 1000, 10000, 50000, 100000);
@@ -65,15 +61,6 @@ class tool_generator_course_backend extends tool_generator_backend {
      */
     private static $parambigfilesize = array(8192, 4194304, 16777216, 83886080,
             858993459, 1717986918);
-    /**
-     * @var array Number of forum discussions
-     */
-    private static $paramforumdiscussions = array(1, 10, 100, 500, 1000, 2000);
-    /**
-     * @var array Number of forum posts per discussion
-     */
-    private static $paramforumposts = array(2, 2, 5, 10, 10, 10);
-
     /**
      * @var string Course shortname
      */
@@ -134,6 +121,15 @@ class tool_generator_course_backend extends tool_generator_backend {
     }
 
     /**
+     * Gets course for which data is generated.
+     *
+     * @return stdClass course
+     */
+    public function get_course() {
+        return $this->course;
+    }
+
+    /**
      * Checks that a shortname is available (unused).
      *
      * @param string $shortname Proposed course shortname
@@ -179,13 +175,12 @@ class tool_generator_course_backend extends tool_generator_backend {
         // Make course.
         $this->course = $this->create_course();
         $this->create_users();
-        $this->create_pages();
+        $this->create_activities();
         $this->create_small_files();
         $this->create_big_files();
-        $this->create_forum();
 
         // Log total time.
-        $this->log('coursecompleted', round(microtime(true) - $entirestart, 1));
+        $this->log('coursecompleted', 'tool_generator', round(microtime(true) - $entirestart, 1));
 
         if ($this->progress && !CLI_SCRIPT) {
             echo html_writer::end_tag('ul');
@@ -202,7 +197,7 @@ class tool_generator_course_backend extends tool_generator_backend {
      * @return stdClass Course record
      */
     private function create_course() {
-        $this->log('createcourse', $this->shortname);
+        $this->log('createcourse', 'tool_generator', $this->shortname);
         $courserecord = array('shortname' => $this->shortname,
                 'fullname' => get_string('fullname', 'tool_generator',
                     array('size' => get_string('shortsize_' . $this->size, 'tool_generator'))),
@@ -223,7 +218,7 @@ class tool_generator_course_backend extends tool_generator_backend {
 
         // Get existing users in order. We will 'fill up holes' in this up to
         // the required number.
-        $this->log('checkaccounts', $count);
+        $this->log('checkaccounts', 'tool_generator', $count);
         $nextnumber = 1;
         $rs = $DB->get_recordset_select('user', $DB->sql_like('username', '?'),
                 array('tool_generator_%'), 'username', 'id, username');
@@ -256,7 +251,7 @@ class tool_generator_course_backend extends tool_generator_backend {
         }
 
         // Assign all users to course.
-        $this->log('enrol', $count, true);
+        $this->log('enrol', 'tool_generator', $count, true);
 
         $enrolplugin = enrol_get_plugin('manual');
         $instances = enrol_get_instances($this->course->id, true);
@@ -291,7 +286,7 @@ class tool_generator_course_backend extends tool_generator_backend {
     private function create_user_accounts($first, $last) {
         global $CFG;
 
-        $this->log('createaccounts', (object)array('from' => $first, 'to' => $last), true);
+        $this->log('createaccounts', 'tool_generator', (object)array('from' => $first, 'to' => $last), true);
         $count = $last - $first + 1;
         $done = 0;
         for ($number = $first; $number <= $last; $number++, $done++) {
@@ -319,23 +314,20 @@ class tool_generator_course_backend extends tool_generator_backend {
     }
 
     /**
-     * Creates a number of Page activities.
+     * Creates a number of activities.
      */
-    private function create_pages() {
+    private function create_activities() {
         // Set up generator.
-        $pagegenerator = $this->generator->get_plugin_generator('mod_page');
-
-        // Create pages.
-        $number = self::$parampages[$this->size];
-        $this->log('createpages', $number, true);
-        for ($i = 0; $i < $number; $i++) {
-            $record = array('course' => $this->course);
-            $options = array('section' => $this->get_target_section());
-            $pagegenerator->create_instance($record, $options);
-            $this->dot($i, $number);
+        $plugins = core_plugin_manager::standard_plugins_list('mod');
+        foreach ($plugins as $pluginname) {
+            $modgenerator = $this->generator->get_plugin_generator('mod_'.$pluginname);
+            if (method_exists($modgenerator, 'create_instances')) {
+                $number = $modgenerator->total_records_to_create($this->size);
+                $this->log('create' . $pluginname, 'mod_' . $pluginname, $number, true);
+                $modgenerator->create_instances($this->size, $this);
+                $this->end_log();
+            }
         }
-
-        $this->end_log();
     }
 
     /**
@@ -343,7 +335,7 @@ class tool_generator_course_backend extends tool_generator_backend {
      */
     private function create_small_files() {
         $count = self::$paramsmallfilecount[$this->size];
-        $this->log('createsmallfiles', $count, true);
+        $this->log('createsmallfiles', 'tool_generator', $count, true);
 
         // Create resource with default textfile only.
         $resourcegenerator = $this->generator->get_plugin_generator('mod_resource');
@@ -404,7 +396,7 @@ class tool_generator_course_backend extends tool_generator_backend {
         $blocks = ceil($filesize / 65536);
         $blocksize = floor($filesize / $blocks);
 
-        $this->log('createbigfiles', $count, true);
+        $this->log('createbigfiles', 'tool_generator', $count, true);
 
         // Prepare temp area.
         $tempfolder = make_temp_directory('tool_generator');
@@ -445,51 +437,13 @@ class tool_generator_course_backend extends tool_generator_backend {
     }
 
     /**
-     * Creates one forum activity with a bunch of posts.
-     */
-    private function create_forum() {
-        global $DB;
-
-        $discussions = self::$paramforumdiscussions[$this->size];
-        $posts = self::$paramforumposts[$this->size];
-        $totalposts = $discussions * $posts;
-
-        $this->log('createforum', $totalposts, true);
-
-        // Create empty forum.
-        $forumgenerator = $this->generator->get_plugin_generator('mod_forum');
-        $record = array('course' => $this->course,
-                'name' => get_string('pluginname', 'forum'));
-        $options = array('section' => 0);
-        $forum = $forumgenerator->create_instance($record, $options);
-
-        // Add discussions and posts.
-        $sofar = 0;
-        for ($i = 0; $i < $discussions; $i++) {
-            $record = array('forum' => $forum->id, 'course' => $this->course->id,
-                    'userid' => $this->get_target_user());
-            $discussion = $forumgenerator->create_discussion($record);
-            $parentid = $DB->get_field('forum_posts', 'id', array('discussion' => $discussion->id), MUST_EXIST);
-            $sofar++;
-            for ($j = 0; $j < $posts - 1; $j++, $sofar++) {
-                $record = array('discussion' => $discussion->id,
-                        'userid' => $this->get_target_user(), 'parent' => $parentid);
-                $forumgenerator->create_post($record);
-                $this->dot($sofar, $totalposts);
-            }
-        }
-
-        $this->end_log();
-    }
-
-    /**
      * Gets a section number.
      *
      * Depends on $this->fixeddataset.
      *
      * @return int A section number from 1 to the number of sections
      */
-    private function get_target_section() {
+    public function get_target_section() {
 
         if (!$this->fixeddataset) {
             $key = rand(1, self::$paramsections[$this->size]);
@@ -508,7 +462,7 @@ class tool_generator_course_backend extends tool_generator_backend {
      *
      * @return int A user id for a random created user
      */
-    private function get_target_user() {
+    public function get_target_user() {
 
         if (!$this->fixeddataset) {
             $userid = $this->userids[rand(1, self::$paramusers[$this->size])];

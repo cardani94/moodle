@@ -61,3 +61,4 @@ $string['printheading'] = 'Display page name';
 $string['printheadingexplain'] = 'Display page name above content?';
 $string['printintro'] = 'Display page description';
 $string['printintroexplain'] = 'Display page description above content?';
+$string['progress_createpage'] = 'Creating pages ({$a})';
