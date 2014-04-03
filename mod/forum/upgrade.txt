@@ -1,6 +1,11 @@
 This files describes API changes in /mod/forum/*,
 information provided here is intended especially for developers.
 
+=== 2.7 ===
+
+* forum_get_view_actions() and forum_get_post_actions() will be ignored by new logging system for participation report.
+  view_action and post_action will be detected by event's crud and edulevel.
+
 === 2.6 ===
 
 * The file post_form.php should not be included, the class it contained has

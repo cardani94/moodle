@@ -9,6 +9,8 @@ This files describes API changes in the assign code.
 * A new web service function mod_assign_save_grades has been added which allows multiple grades to be processed.
 * The event submission_updated() [mod/assign/classes/event/submission_updated.php] has been altered to now be an abstract class
   for submission events in the submission plug-ins.
+* assign_get_view_actions() and assign_get_post_actions() will be ignored by new logging system for
+  participation report. view_action and post_action will be detected by event's crud and edulevel.
 
 === 2.6.1 ===
 

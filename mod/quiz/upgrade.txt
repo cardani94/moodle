@@ -30,6 +30,9 @@ This files describes API changes in the quiz code.
       quiz_delete_empty_page: has had its arguments changed to $quiz and $pagenumber.
       quiz_has_question_use: now takes $quiz and $slot, not $questionid.
 
+* quiz_get_view_actions() and quiz_get_post_actions() will be ignored by new logging system for
+  participation report. view_action and post_action will be detected by event's crud and edulevel.
+
 === 2.6 ===
 
 * As part of improving the page usability and accessibility, we updated the

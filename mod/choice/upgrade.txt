@@ -1,0 +1,5 @@
+This files describes API changes in the choice code.
+=== 2.7 ===
+
+* choice_get_view_actions() and choice_get_post_actions() will be ignored by new logging system for participation report.
+  view_action and post_action will be detected by event's crud and edulevel.
