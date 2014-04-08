@@ -229,9 +229,15 @@ class behat_hooks extends behat_base {
             $this->find("xpath", "//head/child::title[normalize-space(.)='" . behat_util::BEHATSITENAME . "']", $notestsiteexception);
 
             self::$initprocessesfinished = true;
+
+            // Run all test with specified screen size, to avoid responsive problems,
+            // default is medium (1024x768)
+            if (empty($CFG->behat_browserscreensize)) {
+                $this->resize_window('medium');
+            } else {
+                $this->resize_window($CFG->behat_browserscreensize);
+            }
         }
-        // Run all test with medium (1024x768) screen size, to avoid responsive problems.
-        $this->resize_window('medium');
     }
 
     /**

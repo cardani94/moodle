@@ -685,6 +685,17 @@ $CFG->admin = 'admin';
 // Example:
 //   $CFG->behat_faildump_path = '/my/path/to/save/failure/dumps';
 //
+// You can force behat to use specific browser window size. This could be useful.
+// - To test site responsiveness.
+// - To avoid selenium driver scroll problems, when element is not on the visible portion of browser.
+// Following values are supported for this setting:
+// * small: 640x480
+// * medium: 1024x768
+// * large: 2560x1600
+// * widthxheight: custom screen size.
+// Example:
+//     $CFG->behat_browserscreensize = 'medium';
+//
 //=========================================================================
 // 12. DEVELOPER DATA GENERATOR
 //=========================================================================
