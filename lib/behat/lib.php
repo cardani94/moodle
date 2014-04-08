@@ -163,6 +163,11 @@ function behat_clean_init_config() {
         $allowed = array_merge($allowed, array_flip($CFG->behat_extraallowedsettings));
     }
 
+    // Give preference to forced_plugin_settings.
+    if (!empty($CFG->forced_plugin_settings)) {
+        $allowed = array_merge($CFG->forced_plugin_settings, $allowed);
+    }
+
     // Also allowing behat_ prefixed attributes.
     foreach ($CFG as $key => $value) {
         if (!isset($allowed[$key]) && strpos($key, 'behat_') !== 0) {
