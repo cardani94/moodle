@@ -208,6 +208,6 @@ class condition extends \core_availability\condition {
      *   time or if it is set to zero
      */
     protected static function is_midnight($time) {
-        return $time && usergetmidnight($time) == $time;
+        return usergetmidnight($time) == $time;
     }
 }
