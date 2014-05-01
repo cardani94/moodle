@@ -54,6 +54,7 @@ Feature: display_availability
     And I set the field "direction" to "until"
     And I set the field "x[year]" to "2013"
     And I set the field "x[month]" to "January"
+    And I set the field "x[hour]" to "1"
     And I click on ".availability-item .availability-eye img" "css_element"
     And I press "Add restriction..."
     And I click on "User profile" "button" in the "Add restriction..." "dialogue"
@@ -69,13 +70,13 @@ Feature: display_availability
 
     # Page 1 should show in single-line format, showing the date
     Then I should see "Available until" in the "#section-1 .availabilityinfo" "css_element"
-    And I should see "2013" in the "#section-1 .availabilityinfo" "css_element"
-    And I should see "2013" in the "#section-1 .availabilityinfo" "css_element"
+    And I should see "2012" in the "#section-1 .availabilityinfo" "css_element"
     And "li" "css_element" should not exist in the "#section-1 .availabilityinfo" "css_element"
 
     # Page 2 should show in list format.
     And "li" "css_element" should exist in the "#section-2 .availabilityinfo" "css_element"
     And I should see "Not available unless:" in the "#section-2 .availabilityinfo" "css_element"
+    And I should see "2013" in the "#section-2 .availabilityinfo" "css_element"
     And I should see "It is before" in the "#section-2 .availabilityinfo" "css_element"
     And I should see "hidden otherwise" in the "#section-2 .availabilityinfo" "css_element"
     And I should see "Email address" in the "#section-2 .availabilityinfo" "css_element"
