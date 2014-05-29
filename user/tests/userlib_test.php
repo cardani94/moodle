@@ -76,6 +76,20 @@ class core_userliblib_testcase extends advanced_testcase {
         user_update_user($user, false);
         $dbuser = $DB->get_record('user', array('id' => $user->id));
         $this->assertSame($password, $dbuser->password);
+
+        // Verify event is not triggred by user_update_user when needed.
+        $sink = $this->redirectEvents();
+        user_update_user($user, false, false);
+        $events = $sink->get_events();
+        $sink->close();
+        $this->assertCount(0, $events);
+
+        // With password, there should be 1 event.
+        $sink = $this->redirectEvents();
+        user_update_user($user, true, false);
+        $events = $sink->get_events();
+        $sink->close();
+        $this->assertCount(1, $events);
     }
 
     /**
@@ -128,6 +142,14 @@ class core_userliblib_testcase extends advanced_testcase {
         $this->assertEventLegacyData($dbuser, $event);
         $expectedlogdata = array(SITEID, 'user', 'add', '/view.php?id='.$event->objectid, fullname($dbuser));
         $this->assertEventLegacyLogData($expectedlogdata, $event);
+
+        // Verify event is not triggred by user_create_user when needed.
+        $user = array('username' => 'usernametest2'); // Create another user.
+        $sink = $this->redirectEvents();
+        user_create_user($user, true, false);
+        $events = $sink->get_events();
+        $sink->close();
+        $this->assertCount(0, $events);
     }
 
     /**
