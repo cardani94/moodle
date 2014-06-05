@@ -5,3 +5,4 @@ here is intended especially for developers.
 
 * user_update_user() and user_create_user() api's accept optional param
   $triggerevent to avoid respective events to be triggred from the api's.
+

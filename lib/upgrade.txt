@@ -1,6 +1,13 @@
 This files describes API changes in core libraries and APIs,
 information provided here is intended especially for developers.
 
+=== 2.7.1 ===
+* setnew_password_and_mail() and update_internal_user_password() will trigger
+  \core\event\user_password_updated. Previously they used to generate
+  \core\event\user_updated event.
+* update_internal_user_password() accepts optional boolean $fasthash for fast
+  hashing.
+
 === 2.7 ===
 
 * PHPUnit cannot be installed via PEAR any more, please use composer package manager instead.
