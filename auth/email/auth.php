@@ -89,15 +89,23 @@ class auth_plugin_email extends auth_plugin_base {
         require_once($CFG->dirroot.'/user/profile/lib.php');
         require_once($CFG->dirroot.'/user/lib.php');
 
-        $user->password = hash_internal_user_password($user->password);
+        // Save password to be updated later.
+        $password = $user->password;
+        unset($user->password);
+
         if (empty($user->calendartype)) {
             $user->calendartype = $CFG->calendartype;
         }
 
-        $user->id = user_create_user($user, false);
+        $user->id = user_create_user($user, false, false);
 
         // Save any custom profile field information.
         profile_save_data($user);
+
+        // Update user password.
+        update_internal_user_password($user, $password);
+
+        \core\event\user_created::create_from_userid($user->id)->trigger();
 
         if (! send_confirmation_email($user)) {
             print_error('auth_emailnoemail','auth_email');
