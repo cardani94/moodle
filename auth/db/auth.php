@@ -260,6 +260,8 @@ class auth_plugin_db extends auth_plugin_base {
     function sync_users(progress_trace $trace, $do_updates=false) {
         global $CFG, $DB;
 
+        require_once($CFG->dirroot.'/user/lib.php');
+
         // List external users.
         $userlist = $this->get_userlist();
 
@@ -399,17 +401,14 @@ class auth_plugin_db extends auth_plugin_base {
                 if (empty($user->lang)) {
                     $user->lang = $CFG->lang;
                 }
-                if (empty($user->calendartype)) {
-                    $user->calendartype = $CFG->calendartype;
-                }
-                $user->timecreated = time();
-                $user->timemodified = $user->timecreated;
+
+                // Make sure user don't exist, before creating new user.
                 if ($collision = $DB->get_record_select('user', "username = :username AND mnethostid = :mnethostid AND auth <> :auth", array('username'=>$user->username, 'mnethostid'=>$CFG->mnet_localhost_id, 'auth'=>$this->authtype), 'id,username,auth')) {
                     $trace->output(get_string('auth_dbinsertuserduplicate', 'auth_db', array('username'=>$user->username, 'auth'=>$collision->auth)), 1);
                     continue;
                 }
                 try {
-                    $id = $DB->insert_record ('user', $user); // it is truly a new user
+                    $id = user_create_user($user, false);
                     $trace->output(get_string('auth_dbinsertuser', 'auth_db', array('name'=>$user->username, 'id'=>$id)), 1);
                 } catch (moodle_exception $e) {
                     $trace->output(get_string('auth_dbinsertusererror', 'auth_db', $user->username), 1);
@@ -548,6 +547,10 @@ class auth_plugin_db extends auth_plugin_base {
         if ($updated) {
             $DB->set_field('user', 'timemodified', time(), array('id'=>$userid));
         }
+
+        // Trigger update event.
+        \core\event\user_updated::create_from_userid($userid)->trigger();
+
         return $DB->get_record('user', array('id'=>$userid, 'deleted'=>0));
     }
 
@@ -555,6 +558,7 @@ class auth_plugin_db extends auth_plugin_base {
      * Called when the user record is updated.
      * Modifies user in external database. It takes olduser (before changes) and newuser (after changes)
      * compares information saved modified information to external db.
+     * Note: No event is triggred, as it updates external db.
      *
      * @param stdClass $olduser     Userobject before modifications
      * @param stdClass $newuser     Userobject new modified userobject
