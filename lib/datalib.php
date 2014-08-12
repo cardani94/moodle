@@ -1637,7 +1637,7 @@ function add_to_config_log($name, $oldvalue, $value, $plugin) {
 function user_accesstime_log($courseid=0) {
     global $USER, $CFG, $DB;
 
-    if (!isloggedin() or \core\session\manager::is_loggedinas()) {
+    if (!isloggedin() or \core\session\manager::is_loggedinas() or defined('PERFORMANCE_TEST_RUNNING')) {
         // no access tracking
         return;
     }

@@ -207,7 +207,7 @@ class database extends handler {
             $data = '';
             $this->lasthash = sha1('');
         } else {
-            $data = base64_decode($record->sessdata);
+            $data = json_decode($record->sessdata);
             $this->lasthash = sha1($record->sessdata);
         }
 
@@ -232,7 +232,7 @@ class database extends handler {
             return false;
         }
 
-        $sessdata = base64_encode($session_data); // There might be some binary mess :-(
+        $sessdata = json_encode($session_data); // There might be some binary mess :-(
         $hash = sha1($sessdata);
 
         if ($hash === $this->lasthash) {
