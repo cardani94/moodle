@@ -27,6 +27,7 @@
 
 require_once(__DIR__ . '/../../../../../lib/behat/behat_base.php');
 require_once(__DIR__ . '/../../../../../lib/behat/behat_field_manager.php');
+require_once(__DIR__ . '/../../../../../lib/tests/behat/behat_navigation.php');
 
 use Behat\Gherkin\Node\TableNode as TableNode,
     Behat\Mink\Exception\ElementNotFoundException as ElementNotFoundException,
@@ -60,8 +61,9 @@ class behat_backup extends behat_base {
         $this->find_link($backupcourse)->click();
 
         // Click the backup link.
-        $this->find_link(get_string('backup'))->click();
-        $this->wait();
+        $behatnavigation = new behat_navigation();
+        $behatnavigation->setMink($this->getMink());
+        $behatnavigation->i_navigate_to_node_in(get_string('backup'), 'Course administration');
 
         // Initial settings.
         $this->fill_backup_restore_form($this->get_step_options($options, "Initial"));
