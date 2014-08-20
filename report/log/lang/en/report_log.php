@@ -39,5 +39,5 @@ $string['nologreaderenabled'] = 'No log reader enabled';
 $string['page-report-log-x'] = 'Any log report';
 $string['page-report-log-index'] = 'Course log report';
 $string['page-report-log-user'] = 'User course log report';
-$string['pluginname'] = 'Logs';
+$string['pluginname'] = 'Backup options';
 $string['selectlogreader'] = 'Select log reader';
