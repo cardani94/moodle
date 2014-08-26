@@ -87,10 +87,19 @@ class behat_mod_workshop extends behat_base {
      * @param string $workshopname
      * @param TableNode $table data to fill the submission form with, must contain 'Title'
      */
-    public function i_edit_assessment_form_in_workshop_as($workshopname, $table) {
+    public function i_edit_assessment_form_in_workshop_as($workshopname, TableNode $table) {
         $workshopname = $this->escape($workshopname);
         $editassessmentform = $this->escape(get_string('editassessmentform', 'workshop'));
         $saveandclose = $this->escape(get_string('saveandclose', 'workshop'));
+        // If running JS, then textarea will be replaced with Atto, so add editable to id.
+        if (!$this->running_javascript()) {
+            $rows = $table->getRows();
+            foreach ($rows as $key => $value) {
+                $value[0] = str_replace('editable', '',$value[0]);
+                $rows[$key] = $value;
+            }
+            $table->setRows($rows);
+        }
         return array(
             new Given("I follow \"$workshopname\""),
             new Given("I follow \"$editassessmentform\""),

@@ -29,9 +29,9 @@ Feature: Workshop submission and assessment
     When I log in as "teacher1"
     And I follow "Course1"
     And I edit assessment form in workshop "TestWorkshop" as:"
-      | id_description__idx_0_editor | Aspect1 |
-      | id_description__idx_1_editor | Aspect2 |
-      | id_description__idx_2_editor |         |
+      | id_description__idx_0_editoreditable | Aspect1 |
+      | id_description__idx_1_editoreditable | Aspect2 |
+      | id_description__idx_2_editoreditable |         |
     And I change phase in workshop "TestWorkshop" to "Submission phase"
     And I log out
 # student1 submits

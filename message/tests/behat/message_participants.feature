@@ -26,7 +26,7 @@ Feature: An user can message course participants
     And I click on "input[type='checkbox']" "css_element" in the "Student 1" "table_row"
     And I set the field "With selected users..." to "Send a message"
     And I set the following fields to these values:
-      | messagebody | Here it is, the message content |
+      | edit-messagebodyeditable | Here it is, the message content |
     And I press "Preview"
     And I press "Send message"
     And I follow "Home"

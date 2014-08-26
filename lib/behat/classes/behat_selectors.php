@@ -114,6 +114,14 @@ XPATH
         , 'table' => <<<XPATH
 .//table[(./@id = %locator% or contains(.//caption, %locator%) or contains(concat(' ', normalize-space(@class), ' '), %locator% ))]
 XPATH
+        , 'field' => <<<XPATH
+.//*[self::input | self::textarea | self::select | self::*[@contenteditable='true']]
+    [not(./@type = 'submit' or ./@type = 'image' or ./@type = 'hidden')]
+    [(((./@id = %locator% or ./@name = %locator%) or ./@id = //label[contains(normalize-space(string(.)), %locator%)]/@for)
+    or ./@placeholder = %locator%)] | .//label[contains(normalize-space(string(.)), %locator%)]//.//*[self::input |
+    self::textarea | self::select | self::*[@contenteditable='true']]
+    [not(./@type = 'submit' or ./@type = 'image' or ./@type = 'hidden')]
+XPATH
     );
 
     /**

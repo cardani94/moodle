@@ -49,14 +49,16 @@ class behat_form_editor extends behat_form_textarea {
     public function set_value($value) {
 
         $editorid = $this->field->getAttribute('id');
-        if ($this->running_javascript()) {
+        if ($this->running_javascript() && (substr($editorid, -strlen('editable')) == 'editable')) {
             $value = addslashes($value);
             $js = '
-var editor = Y.one(document.getElementById("'.$editorid.'editable"));
+var editor = Y.one(document.getElementById("'.$editorid.'")),
+    textarea = "'.$editorid.'".substring(0, "'.$editorid.'".indexOf(\'editable\'));
 if (editor) {
     editor.setHTML("' . $value . '");
 }
-editor = Y.one(document.getElementById("'.$editorid.'"));
+
+editor = Y.one(document.getElementById(textarea));
 editor.set("value", "' . $value . '");
 ';
             $this->session->executeScript($js);
@@ -77,7 +79,7 @@ editor.set("value", "' . $value . '");
 
         $editorid = $this->field->getAttribute('id');
         $js = ' (function() {
-    var e = document.getElementById("'.$editorid.'editable"),
+    var e = document.getElementById("'.$editorid.'"),
         r = rangy.createRange(),
         s = rangy.getSelection();
 
@@ -89,6 +91,28 @@ editor.set("value", "' . $value . '");
     s.setSingleRange(r);
 }()); ';
         $this->session->executeScript($js);
+    }
+
+    /**
+     * Returns the text in editor.
+     *
+     * @return string
+     */
+    public function get_value() {
+        $editorid = $this->field->getAttribute('id');
+
+        // If running JS and editor is div, then use custom way to get value.
+        if ($this->running_javascript() && (substr($editorid, -strlen('editable')) == 'editable')) {
+            $js = '
+var editor = Y.one(document.getElementById("'.$editorid.'"));
+if (editor) {
+    return editor.get("innerHTML");
+}
+';
+            return $this->session->evaluateScript($js);
+        } else {
+            return parent::get_value();
+        }
     }
 
     /**

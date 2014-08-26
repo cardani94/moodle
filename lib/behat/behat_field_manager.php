@@ -147,14 +147,7 @@ class behat_field_manager {
         // Textareas are considered text based elements.
         $tagname = strtolower($fieldnode->getTagName());
         if ($tagname == 'textarea') {
-
-            // If there is an iframe with $id + _ifr there a TinyMCE editor loaded.
-            $xpath = '//div[@id="' . $fieldnode->getAttribute('id') . 'editable"]';
-            if ($session->getPage()->find('xpath', $xpath)) {
-                return 'editor';
-            }
             return 'textarea';
-
         } else if ($tagname == 'input') {
             $type = $fieldnode->getAttribute('type');
             switch ($type) {
@@ -178,6 +171,8 @@ class behat_field_manager {
         } else if ($tagname == 'select') {
             // Select tag.
             return 'select';
+        } else if ($fieldnode->hasAttribute('contenteditable')) {
+            return 'editor';
         }
 
         // We can not provide a closer field type.
