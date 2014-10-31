@@ -1514,7 +1514,11 @@ function make_localcache_directory($directory, $exceptiononerror = true) {
         }
         touch($timestampfile);
         @chmod($timestampfile, $CFG->filepermissions);
-        clearstatcache();
+        clearstatcache(false, $timestampfile);
+    } else if (($directory === '') && PHPUNIT_TEST) {
+        // Update timestampfile, if no new $timestampfile created between unit tests.
+        touch($timestampfile);
+        clearstatcache(false, $timestampfile);
     }
 
     if ($directory === '') {
