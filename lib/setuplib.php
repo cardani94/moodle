@@ -1514,7 +1514,7 @@ function make_localcache_directory($directory, $exceptiononerror = true) {
         }
         touch($timestampfile);
         @chmod($timestampfile, $CFG->filepermissions);
-        clearstatcache();
+        clearstatcache(false, $timestampfile);
     }
 
     if ($directory === '') {

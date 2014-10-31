@@ -155,6 +155,8 @@ class core_setuplib_testcase extends advanced_testcase {
         $this->setCurrentTimeStart();
         $timestampfile = "$CFG->localcachedir/.lastpurged";
 
+        // Delete existing $timestampfile file.
+        unlink($timestampfile);
         $dir = make_localcache_directory('', false);
         $this->assertSame($CFG->localcachedir, $dir);
         $this->assertFileNotExists("$CFG->localcachedir/.htaccess");
