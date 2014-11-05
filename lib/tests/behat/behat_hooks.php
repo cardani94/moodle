@@ -405,7 +405,7 @@ class behat_hooks extends behat_base {
         for ($i = 0; $i < self::EXTENDED_TIMEOUT * 10; $i++) {
             $pending = '';
             try {
-                $jscode = 'return ' . self::PAGE_READY_JS . ' ? "" : M.util.pending_js.join(":");';
+                $jscode = 'return ' . self::PAGE_READY_JS . ' ? "" : ((typeof M !== "undefined") ? M.util.pending_js.join(":") : false);';
                 $pending = $this->getSession()->evaluateScript($jscode);
             } catch (NoSuchWindow $nsw) {
                 // We catch an exception here, in case we just closed the window we were interacting with.
