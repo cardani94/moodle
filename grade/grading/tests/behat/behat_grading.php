@@ -93,7 +93,7 @@ class behat_grading extends behat_base {
 
         // Shortcut in case we already are in the grading page.
         $usergradetextliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($usergradetext);
-        if ($this->getSession()->getPage()->find('named', array('link', $usergradetextliteral))) {
+        if ($this->getSession()->getPage()->find('named_partial', array('link', $usergradetextliteral))) {
             return $gradeuserstep;
         }
 
