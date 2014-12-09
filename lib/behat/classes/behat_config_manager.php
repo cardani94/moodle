@@ -206,29 +206,24 @@ class behat_config_manager {
         $basedir = $CFG->dirroot . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'behat';
         $config = array(
             'default' => array(
-                'paths' => array(
-                    'features' => $basedir . DIRECTORY_SEPARATOR . 'features',
-                    'bootstrap' => $basedir . DIRECTORY_SEPARATOR . 'features' . DIRECTORY_SEPARATOR . 'bootstrap',
+                'formatters' => array(
+                    'moodle_progress' => true
                 ),
-                'context' => array(
-                    'class' => 'behat_init_context'
+                'suites' => array(
+                    'default' => array(
+                        'paths' => $features,
+                        'contexts' => array_keys($stepsdefinitions)
+                    )
                 ),
                 'extensions' => array(
-                    'Behat\MinkExtension\Extension' => array(
+                    'Behat\MinkExtension' => array(
                         'base_url' => $CFG->behat_wwwroot,
                         'goutte' => null,
                         'selenium2' => null
                     ),
                     'Moodle\BehatExtension\Extension' => array(
-                        'formatters' => array(
-                            'moodle_progress' => 'Moodle\BehatExtension\Formatter\MoodleProgressFormatter'
-                        ),
-                        'features' => $features,
                         'steps_definitions' => $stepsdefinitions
                     )
-                ),
-                'formatter' => array(
-                    'name' => 'moodle_progress'
                 )
             )
         );
