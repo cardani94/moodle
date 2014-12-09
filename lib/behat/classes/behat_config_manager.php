@@ -401,31 +401,24 @@ class behat_config_manager {
 
         $config = array(
             'default' => array(
-                'paths' => array(
-                    'features' => $basedir . DIRECTORY_SEPARATOR . 'features',
-                    'bootstrap' => $basedir . DIRECTORY_SEPARATOR . 'features' . DIRECTORY_SEPARATOR . 'bootstrap',
+                'formatters' => array(
+                    'moodle_progress' => true
                 ),
-                'context' => array(
-                    'class' => 'behat_init_context'
+                'suites' => array(
+                    'default' => array(
+                        'paths' => $features,
+                        'contexts' => array_keys($stepsdefinitions)
+                    )
                 ),
                 'extensions' => array(
-                    'Behat\MinkExtension\Extension' => array(
+                    'Behat\MinkExtension' => array(
                         'base_url' => $CFG->behat_wwwroot,
                         'goutte' => null,
                         'selenium2' => $selenium2wdhost
                     ),
                     'Moodle\BehatExtension\Extension' => array(
-                        'formatters' => array(
-                            'moodle_progress' => 'Moodle\BehatExtension\Formatter\MoodleProgressFormatter',
-                            'moodle_list' => 'Moodle\BehatExtension\Formatter\MoodleListFormatter',
-                            'moodle_step_count' => 'Moodle\BehatExtension\Formatter\MoodleStepCountFormatter'
-                        ),
-                        'features' => $features,
                         'steps_definitions' => $stepsdefinitions
                     )
-                ),
-                'formatter' => array(
-                    'name' => 'moodle_progress'
                 )
             )
         );
