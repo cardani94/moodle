@@ -481,7 +481,7 @@ class behat_course extends behat_base {
 
             // The 'Hide' button should be available.
             $nohideexception = new ExpectationException('"' . $activityname . '" don\'t have a "' . get_string('hide') . '" icon', $this->getSession());
-            $this->find('named', array('link', get_string('hide')), $nohideexception, $activitynode);
+            $this->find('named_partial', array('link', get_string('hide')), $nohideexception, $activitynode);
         }
     }
 
@@ -505,7 +505,7 @@ class behat_course extends behat_base {
 
             // Also 'Show' icon.
             $noshowexception = new ExpectationException('"' . $activityname . '" don\'t have a "' . get_string('show') . '" icon', $this->getSession());
-            $this->find('named', array('link', get_string('show')), $noshowexception, $activitynode);
+            $this->find('named_partial', array('link', get_string('show')), $noshowexception, $activitynode);
 
         } else {
 

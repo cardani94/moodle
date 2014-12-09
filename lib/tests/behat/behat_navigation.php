@@ -214,7 +214,7 @@ class behat_navigation extends behat_base {
             if ($parentnodes[0] === $siteadminstr) {
                 // We don't know if there if Site admin is already expanded so
                 // don't wait, it is non-JS and we already waited for the DOM.
-                if ($siteadminlink = $this->getSession()->getPage()->find('named', array('link', "'" . $siteadminstr . "'"))) {
+                if ($siteadminlink = $this->getSession()->getPage()->find('named_exact', array('link', "'" . $siteadminstr . "'"))) {
                     $siteadminlink->click();
                 }
             }
