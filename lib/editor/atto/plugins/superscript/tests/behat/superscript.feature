@@ -5,8 +5,13 @@ Feature: Atto superscript button
   @javascript
   Scenario: Subscript some text
     Given I log in as "admin"
+<<<<<<< HEAD
     And I follow "Profile" in the user menu
     And I follow "Edit profile"
+=======
+    And I navigate to "Edit profile" node in "My profile settings"
+    And I expand all fieldsets
+>>>>>>> MDL-46891 behat: Expand fields before setting value
     And I set the field "Description" to "Helicopter"
     And I select the text in the "Description" Atto editor
     And I click on "Show more buttons" "button"
