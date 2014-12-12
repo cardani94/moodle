@@ -27,8 +27,8 @@
 
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
-use Behat\Behat\Context\Step\Given as Given,
-    Behat\Behat\Context\Step\When as When,
+use Moodle\BehatExtension\Step\Given as Given,
+    Moodle\BehatExtension\Step\When as When,
     Behat\Gherkin\Node\TableNode as TableNode;
 /**
  * Database-related steps definitions.
