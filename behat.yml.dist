@@ -9,5 +9,5 @@ default:
       goutte: null
       selenium2: null
     Moodle\BehatExtension:
-      moodlerootdir: /home/rajesh/moodles/behat3/moodle
+      moodledirroot: /Should/Change/To/Moodle/www/dir
       steps_definitions: {  }

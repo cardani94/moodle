@@ -203,7 +203,6 @@ class behat_config_manager {
             $CFG->behat_wwwroot = 'http://itwillnotbeused.com';
         }
 
-        $basedir = $CFG->dirroot . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'behat';
         $config = array(
             'default' => array(
                 'formatters' => array(
@@ -222,6 +221,7 @@ class behat_config_manager {
                         'selenium2' => null
                     ),
                     'Moodle\BehatExtension' => array(
+                        'moodledirroot' => $CFG->dirroot,
                         'steps_definitions' => $stepsdefinitions
                     )
                 )
