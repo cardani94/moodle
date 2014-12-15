@@ -218,7 +218,7 @@ class behat_config_manager {
                     'Behat\MinkExtension' => array(
                         'base_url' => $CFG->behat_wwwroot,
                         'goutte' => null,
-                        'selenium2' => null
+                        'moodleselenium2' => null
                     ),
                     'Moodle\BehatExtension' => array(
                         'moodledirroot' => $CFG->dirroot,
