@@ -97,7 +97,7 @@ class behat_course extends behat_base {
                     unset($rows[$key]);
                 }
             }
-            $table->setRows($rows);
+            $table = new TableNode($rows);
 
             // Adding a forced wait until editors are loaded as otherwise selenium sometimes tries clicks on the
             // format field when the editor is being rendered and the click misses the field coordinates.
