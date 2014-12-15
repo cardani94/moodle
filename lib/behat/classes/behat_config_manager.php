@@ -412,7 +412,7 @@ class behat_config_manager {
                     'Behat\MinkExtension' => array(
                         'base_url' => $CFG->behat_wwwroot,
                         'goutte' => null,
-                        'selenium2' => $selenium2wdhost
+                        'moodleselenium2' => $selenium2wdhost
                     ),
                     'Moodle\BehatExtension' => array(
                         'moodledirroot' => $CFG->dirroot,
