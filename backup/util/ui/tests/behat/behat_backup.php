@@ -417,8 +417,6 @@ class behat_backup extends behat_base {
             return;
         }
 
-        $pageoptions = clone $options;
-
         $rows = $options->getRows();
         $newrows = array();
         foreach ($rows as $k => $data) {
@@ -430,7 +428,8 @@ class behat_backup extends behat_base {
                 $newrows[] = $data;
             }
         }
-        $pageoptions->setRows($newrows);
+        $pageoptions = new TableNode($newrows);
+
         return $pageoptions;
     }
 
