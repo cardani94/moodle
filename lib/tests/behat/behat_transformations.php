@@ -101,7 +101,9 @@ class behat_transformations extends behat_base {
         }
 
         // Return the transformed TableNode.
-        $tablenode->setRows($rows);
+        unset($tablenode);
+        $tablenode = new TableNode($rows);
+
         return $tablenode;
     }
 
