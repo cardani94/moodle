@@ -183,7 +183,7 @@ class behat_general extends behat_base {
         // unnamed window (presumably the main window) to some other named
         // window, then we first set the main window name to a conventional
         // value that we can later use this name to switch back.
-        $this->getSession()->evaluateScript(
+        $this->getSession()->executeScript(
                 'if (window.name == "") window.name = "' . self::MAIN_WINDOW_NAME . '"');
 
         $this->getSession()->switchToWindow($windowname);
@@ -1279,7 +1279,7 @@ class behat_general extends behat_base {
 
         $this->pageloaddetectionrunning = true;
 
-        $session->evaluateScript(
+        $session->executeScript(
                 'var span = document.createElement("span");
                 span.setAttribute("data-rel", "' . self::PAGE_LOAD_DETECTION_STRING . '");
                 span.setAttribute("style", "display: none;");

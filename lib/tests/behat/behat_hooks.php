@@ -407,17 +407,19 @@ class behat_hooks extends behat_base {
             $pending = '';
             try {
                 $jscode =
-                    'if (typeof M === "undefined") {
-                        if (document.readyState === "complete") {
+                    'return function() {
+                        if (typeof M === "undefined") {
+                            if (document.readyState === "complete") {
+                                return "";
+                            } else {
+                                return "incomplete";
+                            }
+                        } else if (' . self::PAGE_READY_JS . ') {
                             return "";
                         } else {
-                            return "incomplete";
+                            return M.util.pending_js.join(":");
                         }
-                    } else if (' . self::PAGE_READY_JS . ') {
-                        return "";
-                    } else {
-                        return M.util.pending_js.join(":");
-                    }';
+                    }();';
                 $pending = $this->getSession()->evaluateScript($jscode);
             } catch (NoSuchWindow $nsw) {
                 // We catch an exception here, in case we just closed the window we were interacting with.
