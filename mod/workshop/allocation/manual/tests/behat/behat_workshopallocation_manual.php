@@ -107,8 +107,20 @@ class behat_workshopallocation_manual extends behat_base {
         if ($participant === null) {
             throw new ElementTextException('Neither "Participant" nor "Reviewee" column could be located', $this->getSession());
         }
-        for ($i = 1; $i < count($rows); $i++) {
-            $this->i_add_a_reviewer_for_workshop_participant($rows[$i][$reviewer], $rows[$i][$participant]);
-        }
+
+        // It will stop spinning once all reviewer for workshop participants are added or it time out.
+        $this->spin(
+            function($context, $args) {
+                $rows = $args['rows'];
+                $reviewer = $args['reviewer'];
+                $participant = $args['participant'];
+                for ($i = 1; $i < count($rows); $i++) {
+                    $this->i_add_a_reviewer_for_workshop_participant($rows[$i][$reviewer], $rows[$i][$participant]);
+                }
+                return true;
+            },
+            array('rows' => $rows, 'reviewer' => $reviewer, 'participant' => $participant),
+            self::EXTENDED_TIMEOUT
+        );
     }
 }
