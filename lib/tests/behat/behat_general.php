@@ -1081,7 +1081,9 @@ class behat_general extends behat_base {
 
         // Check if value exists in specific row/column.
         // Get row xpath.
-        $rowxpath = $tablexpath."/tbody/tr[th[normalize-space(.)=" . $rowliteral . "] | td[normalize-space(.)=" . $rowliteral . "]]";
+        // GoutteDriver uses DomCrawler\Crawler and it is making XPath relative to the current context, so use descendant.
+        $rowxpath = $tablexpath."/tbody/tr[descendant::th[normalize-space(.)=" . $rowliteral .
+                    "] | descendant::td[normalize-space(.)=" . $rowliteral . "]]";
 
         $columnvaluexpath = $rowxpath . $columnpositionxpath . "[contains(normalize-space(.)," . $valueliteral . ")]";
 
