@@ -203,10 +203,15 @@ class behat_config_manager {
             $CFG->behat_wwwroot = 'http://itwillnotbeused.com';
         }
 
+        // Comments use black color, so failure path is not visible. Using color other then black/white is safer.
+        // https://github.com/Behat/Behat/pull/628
         $config = array(
             'default' => array(
                 'formatters' => array(
-                    'moodle_progress' => true
+                    'moodle_progress' =>
+                        array('output_styles' =>
+                            array('comment' => array('magenta'))
+                        )
                 ),
                 'suites' => array(
                     'default' => array(
