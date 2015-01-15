@@ -418,7 +418,14 @@
             $validrecords = array();
             $recordids = array();
             foreach ($multidelete as $value) {
-                if ($deleterecord = $DB->get_record('data_records', array('id'=>$value))) {   // Need to check this is valid
+                $allnamefields = get_all_user_name_fields(true, 'u');
+                $userpicturefields = user_picture::fields('u');
+                // Remove the id from the string. This already exists in the sql statement.
+                $userpicturefields = str_replace('u.id,', '', $userpicturefields);
+                if ($deleterecord = $DB->get_record_sql("SELECT dr.*, $allnamefields, $userpicturefields
+                                                       FROM {data_records} dr
+                                                            JOIN {user} u ON dr.userid = u.id
+                                                       WHERE dr.id = ?", array('id'=>$value), MUST_EXIST)) { // Need to check this is valid.
                     if ($deleterecord->dataid == $data->id) {                       // Must be from this database
                         $validrecords[] = $deleterecord;
                         $recordids[] = $deleterecord->id;
