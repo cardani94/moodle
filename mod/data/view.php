@@ -380,8 +380,11 @@
             }
         } else {   // Print a confirmation page
             $allnamefields = get_all_user_name_fields(true, 'u');
+            $userpicturefields = user_picture::fields('u');
+            // Remove the id from the string. This already exists in the sql statement.
+            $userpicturefields = str_replace('u.id,', '', $userpicturefields);
             $dbparams = array($delete);
-            if ($deleterecord = $DB->get_record_sql("SELECT dr.*, $allnamefields
+            if ($deleterecord = $DB->get_record_sql("SELECT dr.*, $allnamefields, $userpicturefields
                                                        FROM {data_records} dr
                                                             JOIN {user} u ON dr.userid = u.id
                                                       WHERE dr.id = ?", $dbparams, MUST_EXIST)) { // Need to check this is valid.
