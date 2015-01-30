@@ -111,11 +111,15 @@ class behat_util extends testing_util {
         // Disable some settings that are not wanted on test sites.
         set_config('noemailever', 1);
 
+        // Set default htmleditor to text area.
+        set_user_preference('htmleditor', 'textarea', $user);
+
         // Keeps the current version of database and dataroot.
         self::store_versions_hash();
 
         // Stores the database contents for fast reset.
         self::store_database_state();
+
     }
 
     /**

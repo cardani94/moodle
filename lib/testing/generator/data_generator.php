@@ -272,7 +272,15 @@ EOD;
             context_user::instance($userid);
         }
 
-        return $DB->get_record('user', array('id'=>$userid), '*', MUST_EXIST);
+        $usernew = $DB->get_record('user', array('id'=>$userid), '*', MUST_EXIST);
+
+        // Set default htmleditor to be textarea for performance.
+        if (isset($record['htmleditor'])) {
+            set_user_preference('htmleditor', $record['htmleditor'], $usernew);
+        } else {
+            set_user_preference('htmleditor', 'textarea', $usernew);
+        }
+        return $usernew;
     }
 
     /**
