@@ -18,10 +18,10 @@ Feature: Reuse my rubrics in other activities
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
-      | Assignment name | Test assignment 1 name |
+      | Assignment name | Test assignment 1 |
       | Description | Test assignment 1 description |
       | Grading method | Rubric |
-    And I go to "Test assignment 1 name" advanced grading definition page
+    And I go to "Test assignment 1" advanced grading definition page
     And I set the following fields to these values:
       | Name | Assignment 1 rubric |
       | Description | Assignment 1 description |
@@ -32,15 +32,15 @@ Feature: Reuse my rubrics in other activities
     And I press "Save rubric and make it ready"
     And I follow "Course 1"
     When I add a "Assignment" to section "1" and I fill the form with:
-      | Assignment name | Test assignment 2 name |
+      | Assignment name | Test assignment 2 |
       | Description | Test assignment 2 description |
       | Grading method | Rubric |
-    And I set "Test assignment 2 name" activity to use "Assignment 1 rubric" grading form
+    And I set "Test assignment 2" activity to use "Assignment 1 rubric" grading form
     Then I should see "Ready for use"
     And I should see "Criterion 1"
     And I should see "Criterion 2"
     And I should see "Criterion 3"
-    And I go to "Test assignment 1 name" advanced grading definition page
+    And I go to "Test assignment 1" advanced grading definition page
     And I should see "Criterion 1"
     And I should see "Criterion 2"
     And I should see "Criterion 3"
