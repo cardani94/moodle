@@ -108,6 +108,7 @@ class behat_blocks extends behat_base {
         // Note that since $blockname may be either block name or CSS class, we can not use the exact label of "Configure" link.
         return array(
             new Given('I open the "'.$this->escape($blockname).'" blocks action menu'),
+            new Given('I wait until the page is ready'),
             new Given('I click on "Configure" "link" in the "'.$this->escape($blockname).'" "block"')
         );
     }
