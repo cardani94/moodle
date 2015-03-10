@@ -38,7 +38,7 @@ class behat_editor_atto extends behat_base {
     /**
      * Select the text in an Atto field.
      *
-     * @Given /^I select the text in the "([^"]*)" Atto editor$/
+     * @Given /^I select the text in the "(?P<field_locator_string>(?:[^"]|\\")*)" Atto editor$/
      * @throws ElementNotFoundException Thrown by behat_base::find
      * @param string $field
      * @return void

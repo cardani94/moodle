@@ -61,7 +61,7 @@ class behat_mod_quiz extends behat_question_base {
      * @param string $quizname the name of the quiz to add questions to.
      * @param TableNode $data information about the questions to add.
      *
-     * @Given /^quiz "([^"]*)" contains the following questions:$/
+     * @Given /^quiz "(?P<quiz_name_string>(?:[^"]|\\")*)" contains the following questions:$/
      */
     public function quiz_contains_the_following_questions($quizname, TableNode $data) {
         global $DB;

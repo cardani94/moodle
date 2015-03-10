@@ -76,10 +76,10 @@ class tool_behat_renderer extends plugin_renderer_base {
             );
 
             // Replace simple OR options.
-            $regex = '#\(\?P<[^>]+>([^\)|]+\|[^\)]+)\)#';
+            $regex = '#["|\^|<.*>]\((\?P<.*>)?([^\)|]+\|[^\)]+)\)["|$]#';
             $stepsdefinitions = preg_replace_callback($regex,
                 function($matches){
-                    return html_writer::select(explode('|', $matches[1]), uniqid());
+                    return html_writer::select(explode('|', $matches[2]), uniqid());
                 },
                 $stepsdefinitions
             );

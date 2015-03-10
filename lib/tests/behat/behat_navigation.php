@@ -92,7 +92,7 @@ class behat_navigation extends behat_base {
     /**
      * Returns true if the navigation node with the given text is expandable.
      *
-     * @Given /^navigation node "([^"]*)" should be expandable$/
+     * @Given /^navigation node "(?P<node_text_string>(?:[^"]|\\")*)" should be expandable$/
      *
      * @throws ExpectationException
      * @param string $nodetext
@@ -115,7 +115,7 @@ class behat_navigation extends behat_base {
     /**
      * Returns true if the navigation node with the given text is not expandable.
      *
-     * @Given /^navigation node "([^"]*)" should not be expandable$/
+     * @Given /^navigation node "(?P<node_text_string>(?:[^"]|\\")*)" should not be expandable$/
      *
      * @throws ExpectationException
      * @param string $nodetext

@@ -56,7 +56,7 @@ class behat_tool_langimport extends behat_base {
      * Downloads a langpack and fakes it being outdated
      *
      * @param string $langcode The language code (e.g. en)
-     * @Given /^outdated langpack \'([^\']*)\' is installed$/
+     * @Given /^outdated langpack "(?P<lang_code_string>(?:[^"]|\\")*)" is installed$/
      */
     public function outdated_langpack_is_installed($langcode) {
         global $CFG;

@@ -982,7 +982,7 @@ class behat_general extends behat_base {
      * Example: I change window size to "small" or I change window size to "1024x768"
      *
      * @throws ExpectationException
-     * @Then /^I change window size to "([^"](small|medium|large|\d+x\d+))"$/
+     * @Then /^I change window size to "(small|medium|large|\d+x\d+)"$/
      * @param string $windowsize size of the window (small|medium|large|wxh).
      */
     public function i_change_window_size_to($windowsize) {
@@ -1378,7 +1378,7 @@ class behat_general extends behat_base {
     /**
      * Wait unit user press Enter/Return key. Useful when debugging a scenario.
      *
-     * @Then /^(?:|I )pause(?:| scenario execution)$/
+     * @Then /^(pause|I pause|I pause scenario execution)$/
      */
     public function i_pause_scenario_executon() {
         global $CFG;
