@@ -29,9 +29,6 @@ require_once(__DIR__ . '/../../../lib/behat/behat_base.php');
 require_once(__DIR__ . '/../../../lib/behat/behat_field_manager.php');
 
 use Behat\Gherkin\Node\TableNode as TableNode,
-    Moodle\BehatExtension\Context\Step\Given as Given;
-    Moodle\BehatExtension\Context\Step\When as When;
-    Moodle\BehatExtension\Context\Step\Then as Then
     Behat\Mink\Exception\ExpectationException as ExpectationException,
     Behat\Mink\Exception\ElementNotFoundException as ElementNotFoundException;
 

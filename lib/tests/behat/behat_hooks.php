@@ -171,7 +171,7 @@ class behat_hooks extends behat_base {
      * @param FeatureEvent $event event fired before feature.
      * @BeforeFeature
      */
-    public static function before_feature(FeatureEvent $event) {
+    public static function before_feature(BeforeFeatureScope $event) {
         if (!defined('BEHAT_FEATURE_TIMING_FILE')) {
             return;
         }
@@ -185,7 +185,7 @@ class behat_hooks extends behat_base {
      * @param FeatureEvent $event event fired after feature.
      * @AfterFeature
      */
-    public static function after_feature(FeatureEvent $event) {
+    public static function after_feature(AfterFeatureScope $event) {
         if (!defined('BEHAT_FEATURE_TIMING_FILE')) {
             return;
         }
@@ -203,7 +203,7 @@ class behat_hooks extends behat_base {
      * @param SuiteEvent $event event fired after suite.
      * @AfterSuite
      */
-    public static function after_suite(SuiteEvent $event) {
+    public static function after_suite(AfterSuiteScope $event) {
         if (!defined('BEHAT_FEATURE_TIMING_FILE')) {
             return;
         }
@@ -343,38 +343,39 @@ class behat_hooks extends behat_base {
     public function after_step_javascript(AfterStepScope $scope) {
         global $CFG;
 
-        // Only run if JS.
-        if ($this->running_javascript()) {
-
-            // Save a screenshot if the step failed.
-            if (!empty($CFG->behat_faildump_path) &&
-                $scope->getTestResult()->getResultCode() === Behat\Testwork\Tester\Result\TestResult::FAILED) {
-                $this->take_screenshot($scope);
-            }
-
-            try {
-                $this->wait_for_pending_js();
-                self::$currentstepexception = null;
-            } catch (UnexpectedAlertOpen $e) {
-                self::$currentstepexception = $e;
-
-                // Accepting the alert so the framework can continue properly running
-                // the following scenarios. Some browsers already closes the alert, so
-                // wrapping in a try & catch.
-                try {
-                    $this->getSession()->getDriver()->getWebDriverSession()->accept_alert();
-                } catch (Exception $e) {
-                    // Catching the generic one as we never know how drivers reacts here.
-                }
-            } catch (Exception $e) {
-                self::$currentstepexception = $e;
-            }
-        }
-
         // Save the page content if the step failed.
         if (!empty($CFG->behat_faildump_path) &&
             $scope->getTestResult()->getResultCode() === Behat\Testwork\Tester\Result\TestResult::FAILED) {
             $this->take_contentdump($scope);
+        }
+
+        // Only run if JS.
+        if (!$this->running_javascript()) {
+            return;
+        }
+
+        // Save a screenshot if the step failed.
+        if (!empty($CFG->behat_faildump_path) &&
+            $scope->getTestResult()->getResultCode() === Behat\Testwork\Tester\Result\TestResult::FAILED) {
+            $this->take_screenshot($scope);
+        }
+
+        try {
+            $this->wait_for_pending_js();
+            self::$currentstepexception = null;
+        } catch (UnexpectedAlertOpen $e) {
+            self::$currentstepexception = $e;
+
+            // Accepting the alert so the framework can continue properly running
+            // the following scenarios. Some browsers already closes the alert, so
+            // wrapping in a try & catch.
+            try {
+                $this->getSession()->getDriver()->getWebDriverSession()->accept_alert();
+            } catch (Exception $e) {
+                // Catching the generic one as we never know how drivers reacts here.
+            }
+        } catch (Exception $e) {
+            self::$currentstepexception = $e;
         }
     }
 
@@ -448,7 +449,7 @@ class behat_hooks extends behat_base {
         $filename = $scope->getFeature()->getTitle() . '_' . $scope->getStep()->getText();
         $filename = preg_replace('/([^a-zA-Z0-9\_]+)/', '-', $filename);
 
-        // File name limited to 255 characters. Leaving 4 chars for the file
+        // File name limited to 255 characters. Leaving 5 chars for line number and 4 chars for the file.
         // extension as we allow .png for images and .html for DOM contents.
         $filename = substr($filename, 0, 245) . '_' . $scope->getStep()->getLine() . '.' . $filetype;
 

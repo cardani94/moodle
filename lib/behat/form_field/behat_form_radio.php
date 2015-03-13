@@ -80,10 +80,7 @@ class behat_form_radio extends behat_form_checkbox {
 
             // Trigger the onchange event as triggered when 'selecting' the radio.
             if (!empty($value) && !$this->field->isSelected()) {
-                $this->session->getDriver()->triggerSynScript(
-                    $this->field->getXPath(),
-                    "Syn.trigger('change', {}, {{ELEMENT}})"
-                );
+                $this->trigger_on_change();
             }
         } else {
             // Goutte does not accept a check nor a click in an input[type=radio].
