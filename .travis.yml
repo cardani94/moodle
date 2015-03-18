@@ -1,0 +1,106 @@
+notifications:
+  email:
+    recipients:
+      - test@moodle.com
+    on_success: never
+    on_failure: never
+before_install:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+language: php
+php:
+  - "5.4"
+env:
+ global:
+  # NUMBEROFPARALLELRUNS: Number of parallel runs in total.
+  # MaxDB: Limits how many db's you want to use.
+  # GITHUBTOKEN should be secure, so add this in travis Settings -> Environment Variables
+  - NUMBEROFPARALLELRUNS=90 MAXDB=4 dbname='moodle' dbuser='postgres' behat_dataroot='/home/travis/moodledata_behat' behat_prefix='bht_'
+  # Total VM's which will be created on travis.Keep it a int for NUMBEROFPARALLELRUNS/CI_NODE_TOTAL
+  - CI_NODE_TOTAL=45
+ matrix:
+  - CI_NODE_INDEX=1
+  - CI_NODE_INDEX=2
+  - CI_NODE_INDEX=3
+  - CI_NODE_INDEX=4
+  - CI_NODE_INDEX=5
+  - CI_NODE_INDEX=6
+  - CI_NODE_INDEX=7
+  - CI_NODE_INDEX=8
+  - CI_NODE_INDEX=9
+  - CI_NODE_INDEX=10
+  - CI_NODE_INDEX=11
+  - CI_NODE_INDEX=12
+  - CI_NODE_INDEX=13
+  - CI_NODE_INDEX=14
+  - CI_NODE_INDEX=15
+  - CI_NODE_INDEX=16
+  - CI_NODE_INDEX=17
+  - CI_NODE_INDEX=18
+  - CI_NODE_INDEX=19
+  - CI_NODE_INDEX=20
+  - CI_NODE_INDEX=21
+  - CI_NODE_INDEX=22
+  - CI_NODE_INDEX=23
+  - CI_NODE_INDEX=24
+  - CI_NODE_INDEX=25
+  - CI_NODE_INDEX=26
+  - CI_NODE_INDEX=27
+  - CI_NODE_INDEX=28
+  - CI_NODE_INDEX=29
+  - CI_NODE_INDEX=30
+  - CI_NODE_INDEX=31
+  - CI_NODE_INDEX=32
+  - CI_NODE_INDEX=33
+  - CI_NODE_INDEX=34
+  - CI_NODE_INDEX=35
+  - CI_NODE_INDEX=36
+  - CI_NODE_INDEX=37
+  - CI_NODE_INDEX=38
+  - CI_NODE_INDEX=39
+  - CI_NODE_INDEX=40
+  - CI_NODE_INDEX=41
+  - CI_NODE_INDEX=42
+  - CI_NODE_INDEX=43
+  - CI_NODE_INDEX=44
+  - CI_NODE_INDEX=45
+before_script:
+  # Find Maximum runs on this vm.
+  - MAXPARALLELINSTALL=$(($NUMBEROFPARALLELRUNS/$CI_NODE_TOTAL))
+  - TORUN=$(($CI_NODE_INDEX*$MAXPARALLELINSTALL))
+  - FROMRUN=$(($TORUN-$MAXPARALLELINSTALL+1))
+  # Copy config-dist and modify values.
+  - cp config-dist.php config.php
+  - sed -i s/\'pgsql\'/\'pgsql\'/ config.php
+  - sed -i s/\'localhost\'/\'localhost\'/ config.php
+  - sed -i s/\'moodle\'/\'$dbname\'/ config.php
+  - sed -i s/\'username\'/\'$dbuser\'/ config.php
+  - sed -i s/\'password\'/\'$dbpass\'/ config.php
+  - sed -i s%\'http://example.com/moodle\'%\'http://moodle.travis/moodle\'% config.php
+  - sed -i s%\'/home/example/moodledata\'%\'home/travis/moodledata\'% config.php
+  - sed -i s/require.*setup.php.*// config.php
+  - echo "\$CFG->behat_wwwroot = 'http://localhost:8000';" >> config.php
+  - echo "\$CFG->behat_dataroot = '$behat_dataroot';" >> config.php
+  - echo "\$CFG->behat_prefix = '$behat_prefix';" >> config.php
+  - echo "\$CFG->behat_parallel_run = array(" >> config.php
+  - for ((i=1;i<=$NUMBEROFPARALLELRUNS;i+=1)); do DBSUFFIX=$(($i%$MAXDB+1)) && echo "array('dbname' => '$dbname$DBSUFFIX', 'behat_prefix' => '$behat_prefix$i')," >> config.php; done;
+  - echo ");" >> config.php
+  - echo "define('BEHAT_FEATURE_TIMING_FILE', '$HOME/behat_timing.json');" >> config.php
+  - echo "require_once(dirname(__FILE__) . '/lib/setup.php');" >> config.php
+  # Create database
+  - for ((i=1;i<=$MAXDB;i+=1)); do sh -c "psql -c 'create database $dbname$i;' -U $dbuser"; done;
+  # Create directories
+  - mkdir -m777 $behat_dataroot
+  - cp behat_timing.json $HOME/behat_timing.json
+  - for ((i=1;i<=$NUMBEROFPARALLELRUNS;i+=1)); do mkdir -m777 $behat_dataroot$i; done;
+  - if [ -n "$GITHUBTOKEN" ]; then echo "{\"config\":{\"github-oauth\":{\"github.com\":\"$GITHUBTOKEN\"}}}" > ~/.composer/config.json; fi
+  - php -S localhost:8000 > /dev/null 2>&1 &
+  - php admin/tool/behat/cli/init.php -j=$NUMBEROFPARALLELRUNS -m=$MAXPARALLELINSTALL --fromrun=$FROMRUN --torun=$TORUN
+  - wget http://selenium-release.storage.googleapis.com/2.45/selenium-server-standalone-2.45.0.jar
+  - xvfb-run -a java -jar selenium-server-standalone-2.45.0.jar -maxSession $NUMBEROFPARALLELRUNS -browser "browserName=firefox, maxInstances=$NUMBEROFPARALLELRUNS" > /dev/null 2>&1 &
+  - sleep 10
+script:
+  - php admin/tool/behat/cli/run.php --rerun="$behat_dataroot/rerun{runprocess}.txt" --replace="{runprocess}" --fromrun=$FROMRUN --torun=$TORUN
+  # - cat $HOME/behat_timing.json
+after_failure:
+  - for ((i=$FROMRUN;i<=$TORUN;i+=1)); do rerunfile="$behat_dataroot/rerun$i.txt"; if [ -e "${rerunfile}" ]; then if [ -s "${rerunfile}" ]; then echo "---Running behat again for failed steps in $i run---"; if [ ! -L $HOME/moodle/behatrun$i ]; then ln -s $HOME/moodle $HOME/moodle/behatrun$i ; fi; vendor/bin/behat --config $behat_dataroot$i/behat/behat.yml --rerun="$behat_dataroot/rerun$i.txt" ; exitcode=${PIPESTATUS[0]}; if [ "${exitcode}" -eq 1 ]; then exit $exitcode; fi; fi; fi; done; exit 0;
