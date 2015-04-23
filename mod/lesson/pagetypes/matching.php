@@ -485,6 +485,8 @@ class lesson_add_page_form_matching extends lesson_add_page_form_base {
 
     public $qtype = 'matching';
     public $qtypestring = 'matching';
+    protected $answerformat = LESSON_ANSWER_HTML;
+    protected $responseformat = LESSON_ANSWER_HTML;
 
     public function custom_definition() {
 
@@ -524,6 +526,20 @@ class lesson_add_page_form_matching extends lesson_add_page_form_base {
 }
 
 class lesson_display_answer_form_matching extends moodleform {
+
+    /**
+     * Returns answer format used by question type.
+     */
+    public function get_answer_format() {
+        return LESSON_ANSWER_HTML;
+    }
+
+    /**
+     * Returns response format used by question type.
+     */
+    public function get_response_format() {
+        return LESSON_ANSWER_HTML;
+    }
 
     public function definition() {
         global $USER, $OUTPUT, $PAGE;

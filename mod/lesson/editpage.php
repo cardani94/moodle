@@ -112,9 +112,7 @@ if ($edit) {
         $answereditor = 'answer_editor['.$answerscount.']';
         if (is_array($data->$answereditor)) {
             $answerdata = $data->$answereditor;
-            if ($data->qtype != LESSON_PAGE_NUMERICAL && $data->qtype != LESSON_PAGE_SHORTANSWER
-                && $data->qtype != LESSON_PAGE_BRANCHTABLE) {
-                $answerdata = $data->$answereditor;
+            if ($mform->get_answer_format() !== '') {
                 $answerdraftid = file_get_submitted_draft_itemid($answereditor);
                 $answertext = file_prepare_draft_area($answerdraftid, $PAGE->cm->context->id,
                         'mod_lesson', 'page_answers', $answer->id, $editoroptions, $answerdata['text']);
@@ -127,7 +125,7 @@ if ($edit) {
         $responseeditor = 'response_editor['.$answerscount.']';
         if (is_array($data->$responseeditor)) {
             $responsedata = $data->$responseeditor;
-            if ($data->qtype != LESSON_PAGE_MATCHING) {
+            if ($mform->get_response_format() !== '') {
                 $responsedraftid = file_get_submitted_draft_itemid($responseeditor);
                 $responsetext = file_prepare_draft_area($responsedraftid, $PAGE->cm->context->id,
                         'mod_lesson', 'page_responses', $answer->id, $editoroptions, $responsedata['text']);
