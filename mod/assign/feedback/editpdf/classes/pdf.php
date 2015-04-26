@@ -481,6 +481,7 @@ class pdf extends \FPDI {
             // PDF was not valid - try running it through ghostscript to clean it up.
             $pagecount = 0;
         }
+        $pdf->Close(); // PDF loaded and never saved/outputted needs to be closed.
 
         if ($pagecount > 0) {
             // Page is valid and can be read by tcpdf.
@@ -507,6 +508,8 @@ class pdf extends \FPDI {
             // PDF was not valid - try running it through ghostscript to clean it up.
             $pagecount = 0;
         }
+        $pdf->Close(); // PDF loaded and never saved/outputted needs to be closed.
+
         if ($pagecount <= 0) {
             @unlink($tempdst);
             // Could not parse the converted pdf.
@@ -568,6 +571,7 @@ class pdf extends \FPDI {
             $ret->status = self::GSPATH_ERROR;
             $ret->message = $e->getMessage();
         }
+        $pdf->Close(); // PDF loaded and never saved/outputted needs to be closed.
 
         return $ret;
     }
