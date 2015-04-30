@@ -192,12 +192,8 @@ class document_services {
 
         $files = self::list_compatible_submission_files_for_attempt($assignment, $userid, $attemptnumber);
 
-        $pdf = new pdf();
-        if (!$files) {
-            // No valid submission files - create an empty pdf.
-            $pdf->AddPage();
-        } else {
-
+        $combinedpdf = new pdf();
+        if ($files) {
             // Create a mega joined PDF.
             $compatiblepdfs = array();
             foreach ($files as $file) {
@@ -210,9 +206,11 @@ class document_services {
             $tmpdir = \make_temp_directory('assignfeedback_editpdf/combined/' . self::hash($assignment, $userid, $attemptnumber));
             $tmpfile = $tmpdir . '/' . self::COMBINED_PDF_FILENAME;
 
-            @unlink($tmpfile);
+            if (file_exists($tmpfile)) {
+                unlink($tmpfile);
+            }
             try {
-                $pagecount = $pdf->combine_pdfs($compatiblepdfs, $tmpfile);
+                $pagecount = $combinedpdf->combine_pdfs($compatiblepdfs, $tmpfile);
             } catch (\Exception $e) {
                 debugging('TCPDF could not process the pdf files:' . $e->getMessage(), DEBUG_DEVELOPER);
                 // TCPDF does not recover from errors so we need to re-initialise the class.
@@ -221,12 +219,13 @@ class document_services {
             if ($pagecount == 0) {
                 // We at least want a single blank page.
                 debugging('TCPDF did not produce a valid pdf:' . $tmpfile . '. Replacing with a blank pdf.', DEBUG_DEVELOPER);
-                $pdf = new pdf();
-                $pdf->AddPage();
-                @unlink($tmpfile);
+                if (file_exists($tmpfile)) {
+                    unlink($tmpfile);
+                }
                 $files = false;
             }
         }
+        $combinedpdf->Close();
 
         $grade = $assignment->get_user_grade($userid, true, $attemptnumber);
         $record = new \stdClass();
@@ -243,23 +242,26 @@ class document_services {
 
         // Detect corrupt generated pdfs and replace with a blank one.
         if ($files) {
-            $pdf = new pdf();
-            $pagecount = $pdf->load_pdf($tmpfile);
+            $verifypdf = new pdf();
+            $pagecount = $verifypdf->load_pdf($tmpfile);
             if ($pagecount <= 0) {
                 $files = false;
             }
-            $pdf->Close(); // PDF loaded and never saved/outputted needs to be closed.
+            $verifypdf->Close();
         }
 
         if (!$files) {
             // This was a blank pdf.
-            $pdf = new pdf();
-            $content = $pdf->Output(self::COMBINED_PDF_FILENAME, 'S');
+            $verifypdf = new pdf();
+            $content = $verifypdf->Output(self::COMBINED_PDF_FILENAME, 'S');
             $file = $fs->create_file_from_string($record, $content);
+            $verifypdf->Close();
         } else {
             // This was a combined pdf.
             $file = $fs->create_file_from_pathname($record, $tmpfile);
-            @unlink($tmpfile);
+            if (file_exists($tmpfile)) {
+                unlink($tmpfile);
+            }
 
             // Test the generated file for correctness.
             $compatiblepdf = pdf::ensure_pdf_compatible($file);
@@ -607,6 +609,7 @@ class document_services {
 
         $generatedpdf = $tmpdir . '/' . $filename;
         $pdf->save_pdf($generatedpdf);
+        $pdf->Close();
 
 
         $record = new \stdClass();
