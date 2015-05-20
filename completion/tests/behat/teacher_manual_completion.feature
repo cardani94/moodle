@@ -4,6 +4,7 @@ Feature: Allow teachers to manually mark users as complete when configured
   As a teacher
   I need to be able to use the completion report mark complete functionality
 
+  @javascript
   Scenario: Mark a student as complete using the completion report
     Given the following "courses" exist:
       | fullname          | shortname | category |
@@ -25,6 +26,7 @@ Feature: Allow teachers to manually mark users as complete when configured
     And I follow "Completion course"
     And completion tracking is "Enabled" in current course
     And I follow "Course completion"
+    And I expand all fieldsets
     And I set the field "Teacher" to "1"
     And I press "Save changes"
     And I turn editing mode on
@@ -41,6 +43,7 @@ Feature: Allow teachers to manually mark users as complete when configured
     And I follow "View course report"
     And I should see "Student First"
     And I follow "Click to mark user complete"
+    And I wait to be redirected
     And I trigger cron
     And I am on site homepage
     And I log out
