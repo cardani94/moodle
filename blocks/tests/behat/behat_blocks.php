@@ -46,14 +46,25 @@ class behat_blocks extends behat_base {
      * @param string $blockname
      */
     public function i_add_the_block($blockname) {
-        $steps = new Given('I set the field "bui_addblock" to "' . $this->escape($blockname) . '"');
+        $steps = array();
 
         // If we are running without javascript we need to submit the form.
         if (!$this->running_javascript()) {
             $steps = array(
-                $steps,
+                new Given('I set the field "bui_addblock" to "' . $this->escape($blockname) . '"'),
                 new Given('I click on "' . get_string('go') . '" "button" in the "#add_block" "css_element"')
             );
+        } else {
+            // Not using form element to select this field, as multiple events gets generated for different drivers.
+            $selectnode = $this->get_selected_node('select', 'bui_addblock');
+            $blockliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral(trim($blockname));
+            $optionxpath = $selectnode->getXpath() . "/descendant::option[(./@value=" . $blockliteral .
+                " or normalize-space(.)= " . $blockliteral . ")]";
+            $optionnode = $this->getSession()->getDriver()->find($optionxpath);
+            $optionnode = array_pop($optionnode);
+            // Don't set the value, just trigger click event.
+            // We don't want multiple events being fired here.
+            $optionnode->click();
         }
         return $steps;
     }
