@@ -184,6 +184,15 @@ function cli_error($text, $errorcode=1) {
  * @return mixed void or string
  */
 function cli_logo($padding=2, $return=false) {
+    $logo = "\033[?7l";
+    $logolineend = "\033[?7h";
+
+    // Windows don't support ANSI code by default, but with ANSICON.
+    $isansicon = getenv('ANSICON');
+    if ((strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') && empty($isansicon)) {
+        $logo = "";
+        $logolineend = "";
+    }
 
     $lines = array(
         '                               .-..-.       ',
@@ -194,13 +203,13 @@ function cli_logo($padding=2, $return=false) {
         '  |_| |_| |_|\\_____/\\_____/\\_____||_|\\_____)',
     );
 
-    $logo = '';
-
     foreach ($lines as $line) {
         $logo .= str_repeat(' ', $padding);
         $logo .= $line;
         $logo .= PHP_EOL;
     }
+
+    $logo .= $logolineend;
 
     if ($return) {
         return $logo;
