@@ -94,6 +94,13 @@ class behat_hooks extends behat_base {
     protected static $timings = array();
 
     /**
+     * Keeps track of browsermob proxy.
+     *
+     * @var PHPBrowserMobProxy_Client
+     */
+    protected static $browsermob;
+
+    /**
      * Gives access to moodle codebase, ensures all is ready and sets up the test lock.
      *
      * Includes config.php to use moodle codebase with $CFG->behat_*
@@ -161,6 +168,11 @@ class behat_hooks extends behat_base {
         if (!empty($CFG->behat_faildump_path) && !is_writable($CFG->behat_faildump_path)) {
             throw new Exception('You set $CFG->behat_faildump_path to a non-writable directory');
         }
+
+        // Create new browser proxy client.
+        if (defined('PERF_CREATE_JMX') && empty(self::$browsermob)) {
+            self::$browsermob = new PHPBrowserMobProxy_Client("localhost:9090");
+        }
     }
 
     /**
@@ -170,11 +182,19 @@ class behat_hooks extends behat_base {
      * @BeforeFeature
      */
     public static function before_feature(FeatureEvent $event) {
+        global $CFG;
+
         if (!defined('BEHAT_FEATURE_TIMING_FILE')) {
-            return;
+            $file = $event->getFeature()->getFile();
+            self::$timings[$file] = microtime(true);
         }
-        $file = $event->getFeature()->getFile();
-        self::$timings[$file] = microtime(true);
+
+        if (defined('PERF_CREATE_JMX')) {
+            $httpproxy = $CFG->behat_config['default']['extensions']['Moodle\BehatExtension\Extension']['capabilities']['proxy']['httpProxy'];
+            $parts = parse_url($httpproxy);
+            self::$browsermob->port = $parts["port"];
+            self::$browsermob->newHar($event->getFeature()->getTitle());
+         }
     }
 
     /**
@@ -185,13 +205,21 @@ class behat_hooks extends behat_base {
      */
     public static function after_feature(FeatureEvent $event) {
         if (!defined('BEHAT_FEATURE_TIMING_FILE')) {
-            return;
+            $file = $event->getFeature()->getFile();
+            self::$timings[$file] = microtime(true) - self::$timings[$file];
+            // Probably didn't actually run this, don't output it.
+            if (self::$timings[$file] < 1) {
+                unset(self::$timings[$file]);
+            }
         }
-        $file = $event->getFeature()->getFile();
-        self::$timings[$file] = microtime(true) - self::$timings[$file];
-        // Probably didn't actually run this, don't output it.
-        if (self::$timings[$file] < 1) {
-            unset(self::$timings[$file]);
+
+        if (defined('PERF_CREATE_JMX')) {
+            // Store har file for conversion.
+            $filename = "/tmp/".$event->getFeature()->getTitle().".har";
+            if (file_exists($filename)) {
+                unlink($filename);
+            }
+            file_put_contents($filename, var_export(self::$browsermob->har, true));
         }
     }
 
