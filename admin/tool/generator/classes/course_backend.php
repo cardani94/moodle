@@ -89,14 +89,9 @@ class tool_generator_course_backend extends tool_generator_backend {
     private $fullname = "";
 
     /**
-     * @var string Course summary.
+     * @var string Course content to be generated.
      */
-    private $summary = "";
-
-    /**
-     * @var string Course summary format, defaults to FORMAT_HTML.
-     */
-    private $summaryformat = FORMAT_HTML;
+    private $coursecontenttogenerate = "";
 
     /**
      * @var testing_data_generator Data generator
@@ -106,7 +101,7 @@ class tool_generator_course_backend extends tool_generator_backend {
     /**
      * @var stdClass Course object
      */
-    private $course;
+    private $courses;
 
     /**
      * @var array Array from test user number (1...N) to userid in database
@@ -129,8 +124,7 @@ class tool_generator_course_backend extends tool_generator_backend {
         $filesizelimit = false,
         $progress = true,
         $fullname = null,
-        $summary = null,
-        $summaryformat = FORMAT_HTML) {
+        $coursecontenttogenerate = null) {
 
         // Set parameters.
         $this->shortname = $shortname;
@@ -149,9 +143,10 @@ class tool_generator_course_backend extends tool_generator_backend {
         }
 
         // Summary, on the other hand, should be empty-able.
-        if (!is_null($summary)) {
-            $this->summary = $summary;
-            $this->summaryformat = $summaryformat;
+        if (!is_null($coursecontenttogenerate)) {
+            $this->coursecontenttogenerate = $coursecontenttogenerate;
+        } else {
+            $this->coursecontenttogenerate = file_get_contents(self::get_course_content_featurefile($size));
         }
 
         parent::__construct($size, $fixeddataset, $filesizelimit, $progress);
@@ -180,6 +175,16 @@ class tool_generator_course_backend extends tool_generator_backend {
     }
 
     /**
+     * Return feature file, containing resources to be created in course.
+     *
+     * @param int $size size of course.
+     * @return string
+     */
+    public static function get_course_content_featurefile($size) {
+        return __DIR__ . '/../tests/fixtures/testcourse_' . self::name_for_size($size) . '.feature';
+    }
+
+    /**
      * Checks that a shortname is available (unused).
      *
      * @param string $shortname Proposed course shortname
@@ -199,6 +204,14 @@ class tool_generator_course_backend extends tool_generator_backend {
         return '';
     }
 
+    public function is_behat_installed() {
+        // enusre test environment is enabled, else we won't be able to generate data.
+        behat_command::behat_setup_problem();
+
+        // The loaded steps depends on the component specified.
+        behat_config_manager::update_config_file();
+    }
+
     /**
      * Runs the entire 'make' process.
      *
@@ -216,20 +229,35 @@ class tool_generator_course_backend extends tool_generator_backend {
 
         $entirestart = microtime(true);
 
-        // Start transaction.
-        $transaction = $DB->start_delegated_transaction();
-
         // Get generator.
         $this->generator = phpunit_util::get_data_generator();
 
         // Make course.
-        $this->course = $this->create_course();
-        $this->create_users();
-        $this->create_assignments();
-        $this->create_pages();
-        $this->create_small_files();
-        $this->create_big_files();
-        $this->create_forum();
+        $this->courses = $this->create_courses();
+        $courses = implode(',', $this->courses);
+        // Replace course with the coursename.
+        $this->coursecontenttogenerate = str_replace('{courseshortname}', $courses, $this->coursecontenttogenerate);
+
+        $perfdir = make_temp_directory('performance');
+        $perffeaturefile = $perfdir . DIRECTORY_SEPARATOR . 'perf_site_generator.feature';
+
+        if (file_exists($perffeaturefile)) {
+            unlink($perffeaturefile);
+        }
+
+        // Create feature file for creating resources in each course.
+        $data = file_get_contents(__DIR__ . '/../tests/fixtures/testcourse.template.feature');
+        $data .= $this->coursecontenttogenerate;
+        $data .= "    Examples:\n    | course |";
+        foreach ($this->course as $coursename) {
+            $data .= "\n    | ".$coursename." |";
+        }
+
+        file_put_contents($perffeaturefile, $data);
+
+        /*// Get steps definitions from Behat.
+        $options = ' --config="'.behat_config_manager::get_steps_list_config_filepath(). '" ';
+        list($steps, $code) = behat_command::run($options);
 
         // Log total time.
         $this->log('coursecompleted', round(microtime(true) - $entirestart, 1));
@@ -238,9 +266,7 @@ class tool_generator_course_backend extends tool_generator_backend {
             echo html_writer::end_tag('ul');
         }
 
-        // Commit transaction and finish.
-        $transaction->allow_commit();
-        return $this->course->id;
+        return $this->course->id;*/
     }
 
     /**
@@ -248,19 +274,22 @@ class tool_generator_course_backend extends tool_generator_backend {
      *
      * @return stdClass Course record
      */
-    private function create_course() {
-        $this->log('createcourse', $this->shortname);
-        $courserecord = array(
-            'shortname' => $this->shortname,
-            'fullname' => $this->fullname,
-            'numsections' => self::$paramsections[$this->size]
-        );
-        if (strlen($this->summary) > 0) {
-            $courserecord['summary'] = $this->summary;
-            $courserecord['summary_format'] = $this->summaryformat;
-        }
+    private function create_courses() {
+        global $DB;
+        $courses = array();
+        $nextnumber = 1;
+        $existingcourses = $DB->get_records_select('course', $DB->sql_like('shortname', '?'),
+            array($this->shortname.'%'), 'shortname', 'shortname');
 
-        return $this->generator->create_course($courserecord, array('createsections' => true));
+        for ($i = 1; $i <= $this->fullname; $i++) {
+            $courseshortname = $this->shortname.$i;
+            if (!array_key_exists($courseshortname, $existingcourses)) {
+                $courserecord = array('shortname' => $courseshortname, 'fullname' => $this->shortname . " " . $i, 'numsections' => self::$paramsections[$this->size]);
+                $this->generator->create_course($courserecord, array('createsections' => true));
+            }
+            $courses[] = $courseshortname;
+        }
+        return $courses;
     }
 
     /**

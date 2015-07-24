@@ -102,7 +102,7 @@ class behat_hooks extends behat_base {
      * @param SuiteEvent $event event before suite.
      * @static
      * @throws Exception
-     * @BeforeSuite
+     * @BeforeSuite ~@performance
      */
     public static function before_suite(SuiteEvent $event) {
         global $CFG;
@@ -223,7 +223,7 @@ class behat_hooks extends behat_base {
      *
      * @param OutlineExampleEvent|ScenarioEvent $event event fired before scenario.
      * @throws coding_exception If here we are not using the test database it should be because of a coding error
-     * @BeforeScenario
+     * @BeforeScenario ~@performance
      */
     public function before_scenario($event) {
         global $DB, $SESSION, $CFG;

@@ -41,6 +41,7 @@ filesystem space (tens of gigabytes). You will need to delete the courses
 (To avoid accidental use, this feature is disabled unless you have also selected
 DEVELOPER debugging level.)';
 
+$string['coursecontent'] = 'Course contents';
 $string['coursesize_0'] = 'XS (~10KB; create in ~1 second)';
 $string['coursesize_1'] = 'S (~10MB; create in ~30 seconds)';
 $string['coursesize_2'] = 'M (~100MB; create in ~5 minutes)';

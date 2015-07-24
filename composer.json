@@ -2,12 +2,13 @@
     "repositories" : [
         {
             "type": "vcs",
-            "url": "https://github.com/moodlehq/moodle-behat-extension"
+            "url": "https://github.com/rajeshtaneja/moodle-performance-toolkit"
         }
     ],
     "require-dev": {
         "phpunit/phpunit": "3.7.*",
         "phpunit/dbUnit": "1.2.*",
-        "moodlehq/behat-extension": "1.30.0"
+        "moodlehq/behat-extension": "1.30.0",
+	"moodlehq/moodle-performance-toolkit": "dev-master"
     }
 }

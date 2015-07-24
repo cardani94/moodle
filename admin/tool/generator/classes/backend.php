@@ -82,6 +82,11 @@ abstract class tool_generator_backend {
     protected $size;
 
     /**
+     * @var array list of test plan sizes.
+     */
+    protected static $sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+
+    /**
      * Generic generator class
      *
      * @param int $size Size as numeric index
@@ -118,6 +123,20 @@ abstract class tool_generator_backend {
             }
         }
         throw new coding_exception("Unknown size name '$sizename'");
+    }
+
+    /**
+     * Converts a size into the size name.
+     *
+     * @param int $size Numeric version of size.
+     * @return string size name e.g. 'L'
+     * @throws coding_exception If the size name is not known
+     */
+    public static function name_for_size($size) {
+        if ($size >= self::MIN_SIZE && $size <= self::MAX_SIZE) {
+            return self::$sizes[$size];
+        }
+        throw new coding_exception("Unknown size '$size'");
     }
 
     /**

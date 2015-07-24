@@ -30,6 +30,9 @@ require('../../../config.php');
 
 require_once($CFG->libdir . '/adminlib.php');
 
+$size = optional_param('size', tool_generator_course_backend::DEFAULT_SIZE, PARAM_INT);
+$coursecontent = optional_param('coursecontent', '', PARAM_RAW_TRIMMED);
+
 // Initialise page and check permissions.
 admin_externalpage_setup('toolgeneratorcourse');
 
@@ -50,19 +53,28 @@ if (!debugging('', DEBUG_DEVELOPER)) {
 }
 
 // Set up the form.
-$mform = new tool_generator_make_course_form('maketestcourse.php');
+echo $OUTPUT->box_start('generalbox');
+$select = new single_select(new moodle_url(''), 'size', tool_generator_course_backend::get_size_choices(), $size, null);
+$select->set_label(get_string('size', 'tool_generator'), array('style' => 'font-weight:bold; display:inline-block; float:left'));
+echo $OUTPUT->render($select);
+echo $OUTPUT->box_end();
+
+if (empty($coursecontent)) {
+    $coursecontent = file_get_contents(tool_generator_course_backend::get_course_content_featurefile($size));
+}
+
+$mform = new tool_generator_make_course_form('maketestcourse.php', array('coursesize' => $size, 'coursecontent' => $coursecontent));
 if ($data = $mform->get_data()) {
     // Do actual work.
     echo $OUTPUT->heading(get_string('creating', 'tool_generator'));
     $backend = new tool_generator_course_backend(
         $data->shortname,
-        $data->size,
+        $data->coursesize,
         false,
         false,
         true,
         $data->fullname,
-        $data->summary['text'],
-        $data->summary['format']
+        $data->coursecontent
     );
     $id = $backend->make();
 
