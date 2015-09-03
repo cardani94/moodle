@@ -54,4 +54,4 @@ Feature: Teachers can override the grade for any question
     And I should see "That is not a valid number."
     And I set the field "Mark" to "10.0"
     And I press "Save"
-    And I should see "Changes saved"
+    And I switch to the main window
