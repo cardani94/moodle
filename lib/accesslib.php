@@ -238,23 +238,25 @@ function get_role_access($roleid) {
 }
 
 /**
- * Fetch raw "site wide" role definitions.
+ * Fetch raw role capabilities by context.
  *
- * @param array $roleids List of role ids to fetch definitions for.
- * @return array Complete definition for each requested role.
+ * @param array $contextids List of context ids to fetch capabilities for.
+ * @return array Complete definition for each requested context.
  */
-function get_roles_defs(array $roleids) {
+function get_contexts_defs(array $contextids) {
     global $DB;
 
-    if (empty($roleids)) {
+    if (empty($contextids)) {
         return array();
     }
 
-    $cache = cache::make('core', 'roledefs');
-    $cached = array_filter($cache->get_many($roleids));
+    $cache = cache::make('core', 'context_role_caps');
+    $cached = array_filter($cache->get_many($contextids), function($v) {
+        return ($v !== false); // We only filter out cache misses (=== false), not empty arrays.
+    });
 
-    if ($uncached = array_diff($roleids, array_keys($cached))) {
-        $uncached = get_roles_defs_uncached($uncached);
+    if ($uncached = array_diff($contextids, array_keys($cached))) {
+        $uncached = get_contexts_defs_uncached($uncached);
         $cache->set_many($uncached);
     }
 
@@ -262,38 +264,41 @@ function get_roles_defs(array $roleids) {
 }
 
 /**
- * Query raw "site wide" role definitions.
+ * Query raw role capabilities by context.
  *
- * @param array $roleids List of role ids to fetch definitions for.
- * @return array Complete definition for each requested role.
+ * @param array $contextids List of context ids to query definitions for.
+ * @return array Complete definition for each requested context.
  */
-function get_roles_defs_uncached(array $roleids) {
+function get_contexts_defs_uncached(array $contextids) {
     global $DB;
 
-    if (empty($roleids)) {
+    if (empty($contextids)) {
         return array();
     }
 
-    list($sql, $params) = $DB->get_in_or_equal($roleids);
-    $rdefs = array();
+    list($sql, $params) = $DB->get_in_or_equal($contextids);
+    $cdefs = array();
 
-    $sql = "SELECT ctx.path, rc.roleid, rc.capability, rc.permission
-            FROM {role_capabilities} rc
-            JOIN {context} ctx ON rc.contextid = ctx.id
-            WHERE rc.roleid $sql
-            ORDER BY ctx.path, rc.roleid, rc.capability";
+    $sql = "SELECT ctx.id AS contextid, rc.roleid, rc.capability, rc.permission
+              FROM {context} ctx
+         LEFT JOIN {role_capabilities} rc ON rc.contextid = ctx.id
+             WHERE ctx.id $sql";
 
-    foreach ($DB->get_recordset_sql($sql, $params) as $rd) {
-        if (!isset($rdefs[$rd->roleid][$rd->path])) {
-            if (!isset($rdefs[$rd->roleid])) {
-                $rdefs[$rd->roleid] = array();
-            }
-            $rdefs[$rd->roleid][$rd->path] = array();
+    $rs = $DB->get_recordset_sql($sql, $params);
+    foreach ($rs as $cd) {
+        if (!isset($cdefs[$cd->contextid])) {
+            $cdefs[$cd->contextid] = array();
         }
-        $rdefs[$rd->roleid][$rd->path][$rd->capability] = (int) $rd->permission;
+        if ($cd->roleid) {
+            if (!isset($cdefs[$cd->contextid][$cd->roleid])) {
+                $cdefs[$cd->contextid][$cd->roleid] = array();
+            }
+            $cdefs[$cd->contextid][$cd->roleid][$cd->capability] = (int) $cd->permission;
+        }
     }
+    $rs->close();
 
-    return $rdefs;
+    return $cdefs;
 }
 
 /**
@@ -676,15 +681,14 @@ function has_coursecontact_role($userid) {
 function has_capability_in_accessdata($capability, context $context, array &$accessdata) {
     global $CFG;
 
-    // Build $paths as a list of current + all parent "paths" with order bottom-to-top
-    $path = $context->path;
-    $paths = array($path);
-    while($path = rtrim($path, '0123456789')) {
-        $path = rtrim($path, '/');
-        if ($path === '') {
-            break;
-        }
-        $paths[] = $path;
+    // Get all the contexts involved in the request.
+    $contextids = explode('/', trim($context->path, '/'));
+    $contextidscount = count($contextids);
+
+    // Build $paths as a list of current + all parent "paths" with order bottom-to-top.
+    $paths = array($context->path);
+    for ($depth = $contextidscount; $depth > 0; $depth--) {
+        $paths[] = '/' . implode('/', array_slice($contextids, 0, $depth));
     }
 
     $roles = array();
@@ -715,13 +719,13 @@ function has_capability_in_accessdata($capability, context $context, array &$acc
     }
 
     // Now find out what access is given to each role, going bottom-->up direction
-    $rdefs = get_roles_defs(array_keys($roles));
+    $cdefs = get_contexts_defs($contextids);
     $allowed = false;
 
     foreach ($roles as $roleid => $ignored) {
-        foreach ($paths as $path) {
-            if (isset($rdefs[$roleid][$path][$capability])) {
-                $perm = (int)$rdefs[$roleid][$path][$capability];
+        foreach (array_reverse($contextids) as $contextid) {
+            if (isset($cdefs[$contextid][$roleid][$capability])) {
+                $perm = (int)$cdefs[$contextid][$roleid][$capability];
                 if ($perm === CAP_PROHIBIT) {
                     // any CAP_PROHIBIT found means no permission for the user
                     return false;
@@ -769,7 +773,6 @@ function require_capability($capability, context $context, $userid = null, $doan
  * all relevant role capabilities for the user.
  *
  * [ra]   => [/path][roleid]=roleid
- * [rdef] => [/path][roleid][capability]=permission
  *
  * @access private
  * @param int $userid - the id of the user
@@ -1211,8 +1214,8 @@ function delete_role($roleid) {
     $event->add_record_snapshot('role', $role);
     $event->trigger();
 
-    $cache = cache::make('core', 'roledefs');
-    $cache->delete($roleid);
+    $cache = cache::make('core', 'context_role_caps');
+    $cache->purge();
 
     return true;
 }
@@ -1266,8 +1269,8 @@ function assign_capability($capability, $permission, $roleid, $contextid, $overw
         }
     }
 
-    $cache = cache::make('core', 'roledefs');
-    $cache->delete($roleid);
+    $cache = cache::make('core', 'context_role_caps');
+    $cache->delete($context->id);
 
     return true;
 }
@@ -1293,12 +1296,16 @@ function unassign_capability($capability, $roleid, $contextid = null) {
         }
         // delete from context rel, if this is the last override in this context
         $DB->delete_records('role_capabilities', array('capability'=>$capability, 'roleid'=>$roleid, 'contextid'=>$context->id));
+
+        $cache = cache::make('core', 'context_role_caps');
+        $cache->delete($context->id);
     } else {
         $DB->delete_records('role_capabilities', array('capability'=>$capability, 'roleid'=>$roleid));
+
+        $cache = cache::make('core', 'context_role_caps');
+        $cache->purge();
     }
 
-    $cache = cache::make('core', 'roledefs');
-    $cache->delete($roleid);
 
     return true;
 }
@@ -2366,8 +2373,8 @@ function reset_role_capabilities($roleid) {
         assign_capability($cap, $permission, $roleid, $systemcontext->id);
     }
 
-    $cache = cache::make('core', 'roledefs');
-    $cache->delete($roleid);
+    $cache = cache::make('core', 'context_role_caps');
+    $cache->delete($systemcontext->id);
 
     // Mark the system context dirty.
     context_system::instance()->mark_dirty();
@@ -4484,8 +4491,8 @@ function role_cap_duplicate($sourcerole, $targetrole) {
         $DB->insert_record('role_capabilities', $cap);
     }
 
-    $cache = cache::make('core', 'roledefs');
-    $cache->delete($targetrole);
+    $cache = cache::make('core', '$systemcontext->id');
+    $cache->delete($systemcontext->id);
 }
 
 /**
@@ -5220,19 +5227,14 @@ abstract class context extends stdClass implements IteratorAggregate {
         require_once($CFG->dirroot.'/grade/grading/lib.php');
         grading_manager::delete_all_for_context($this->_id);
 
-        $ids = $DB->get_fieldset_select('role_capabilities', 'DISTINCT roleid', 'contextid = ?', array($this->_id));
-
         // now delete stuff from role related tables, role_unassign_all
         // and unenrol should be called earlier to do proper cleanup
         $DB->delete_records('role_assignments', array('contextid'=>$this->_id));
         $DB->delete_records('role_capabilities', array('contextid'=>$this->_id));
         $DB->delete_records('role_names', array('contextid'=>$this->_id));
 
-        if ($ids) {
-            $cache = cache::make('core', 'roledefs');
-            $cache->delete_many($ids);
-        }
-
+        $cache = cache::make('core', 'context_role_caps');
+        $cache->delete($this->_id);
     }
 
     /**
