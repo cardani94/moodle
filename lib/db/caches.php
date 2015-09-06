@@ -253,8 +253,8 @@ $definitions = array(
         'staticaccelerationsize' => 5
     ),
 
-    // Cache system-wide role definitions.
-    'roledefs' => array(
+    // Cache role_capabilities by context
+    'context_role_caps' => array(
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,
         'simpledata' => true,
