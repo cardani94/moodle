@@ -51,6 +51,11 @@ class behat_context_helper {
     protected static $mink = false;
 
     /**
+     * @var int unique session id.
+     */
+    protected static $sessionuniqid = 0;
+
+    /**
      * Sets the browser session.
      *
      * @param Session $session
@@ -61,6 +66,7 @@ class behat_context_helper {
         // Set mink to be able to init a context.
         self::$mink = new Mink(array('mink' => $session));
         self::$mink->setDefaultSessionName('mink');
+        self::$sessionuniqid = uniqid();
     }
 
     /**
@@ -106,6 +112,15 @@ class behat_context_helper {
         self::$contexts[$classname] = $instance;
 
         return true;
+    }
+
+    /**
+     * Returns session unique id, it is different for every scenario.
+     *
+     * @return int
+     */
+    public static function get_session_unique_id() {
+        return self::$sessionuniqid;
     }
 
 }
