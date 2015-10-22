@@ -192,8 +192,9 @@ class behat_general extends behat_base {
         // unnamed window (presumably the main window) to some other named
         // window, then we first set the main window name to a conventional
         // value that we can later use this name to switch back.
+        $mainwindowname = self::MAIN_WINDOW_NAME . behat_context_helper::get_session_unique_id();
         $this->getSession()->evaluateScript(
-                'if (window.name == "") window.name = "' . self::MAIN_WINDOW_NAME . '"');
+                'if (window.name == "") window.name = "' . $mainwindowname . '"');
 
         $this->getSession()->switchToWindow($windowname);
     }
@@ -204,7 +205,8 @@ class behat_general extends behat_base {
      * @Given /^I switch to the main window$/
      */
     public function switch_to_the_main_window() {
-        $this->getSession()->switchToWindow(self::MAIN_WINDOW_NAME);
+        $mainwindowname = self::MAIN_WINDOW_NAME . behat_context_helper::get_session_unique_id();
+        $this->getSession()->switchToWindow($mainwindowname);
     }
 
     /**
