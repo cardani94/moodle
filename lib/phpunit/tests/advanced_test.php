@@ -41,7 +41,6 @@ class core_phpunit_advanced_testcase extends advanced_testcase {
         $this->resetAfterTest();
 
         debugging('hokus');
-        $this->assertDebuggingCalled();
         debugging('pokus');
         $this->assertDebuggingCalled('pokus');
         debugging('pokus', DEBUG_MINIMAL);
