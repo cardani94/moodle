@@ -132,7 +132,8 @@ Feature: Atto tables
     And I follow "Edit"
     And I click on "Show more buttons" "button"
     And I click on "HTML" "button"
-    Then I should see "style=\"background-color:rgb(255,255,255);width:100%;\""
+    Then I should see "background-color:rgb(255,255,255);"
+    And I should see "width:100%;"
 
   @javascript
   Scenario: Edit a table with background colour and width with border settings off
@@ -167,7 +168,8 @@ Feature: Atto tables
     And I follow "Edit"
     And I click on "Show more buttons" "button"
     And I click on "HTML" "button"
-    Then I should see "style=\"background-color:rgb(255,255,255);width:100%;\""
+    Then I should see "background-color:rgb(255,255,255);"
+    And I should see "width:100%;"
 
   @javascript
   Scenario: Create a table with background colour and width with borders on
@@ -202,7 +204,8 @@ Feature: Atto tables
     And I follow "Edit"
     And I click on "Show more buttons" "button"
     And I click on "HTML" "button"
-    Then I should see "style=\"background-color:rgb(255,255,255);width:100%;\""
+    Then I should see "background-color:rgb(255,255,255);"
+    And I should see "width:100%;"
 
   @javascript
   Scenario: Edit a table with background colour and width with borders on
@@ -238,7 +241,8 @@ Feature: Atto tables
     And I follow "Edit"
     And I click on "Show more buttons" "button"
     And I click on "HTML" "button"
-    Then I should see "style=\"background-color:rgb(255,255,255);width:100%;\""
+    Then I should see "background-color:rgb(255,255,255);"
+    And I should see "width:100%;"
 
   @javascript
   Scenario: Create a table with background colour and width with borders and border styling on
@@ -274,7 +278,9 @@ Feature: Atto tables
     And I follow "Edit"
     And I click on "Show more buttons" "button"
     And I click on "HTML" "button"
-    Then I should see "style=\"border-style:dashed;background-color:rgb(255,255,255);width:100%;\""
+    Then I should see "background-color:rgb(255,255,255);"
+    And I should see "width:100%;"
+    And I should see "border-style:dashed;"
 
   @javascript
   Scenario: Edit a table with background colour and width with borders and border styling on
@@ -311,7 +317,9 @@ Feature: Atto tables
     And I follow "Edit"
     And I click on "Show more buttons" "button"
     And I click on "HTML" "button"
-    Then I should see "style=\"border-style:dashed;background-color:rgb(255,255,255);width:100%;\""
+    Then I should see "background-color:rgb(255,255,255);"
+    And I should see "width:100%;"
+    And I should see "border-style:dashed;"
 
   @javascript
   Scenario: Create a table with background colour and width with borders, border styling, and border size on
@@ -348,7 +356,10 @@ Feature: Atto tables
     And I follow "Edit"
     And I click on "Show more buttons" "button"
     And I click on "HTML" "button"
-    Then I should see "border-width:2px;border-style:dashed;background-color:rgb(255,255,255);width:100%;"
+    Then I should see "background-color:rgb(255,255,255);"
+    And I should see "width:100%;"
+    And I should see "border-style:dashed;"
+    And I should see "border-width:2px;"
 
   @javascript
   Scenario: Edit a table with background colour and width with borders, border styling, and border size on
@@ -386,7 +397,10 @@ Feature: Atto tables
     And I follow "Edit"
     And I click on "Show more buttons" "button"
     And I click on "HTML" "button"
-    Then I should see "border-width:2px;border-style:dashed;background-color:rgb(255,255,255);width:100%;"
+    Then I should see "background-color:rgb(255,255,255);"
+    And I should see "width:100%;"
+    And I should see "border-style:dashed;"
+    And I should see "border-width:2px;"
 
   @javascript
   Scenario: Create a table with all settings on
@@ -424,7 +438,11 @@ Feature: Atto tables
     And I follow "Edit"
     And I click on "Show more buttons" "button"
     And I click on "HTML" "button"
-    Then I should see "border-width:2px;border-style:dashed;border-color:rgb(255,255,255);background-color:rgb(255,255,255);width:100%;"
+    Then I should see "background-color:rgb(255,255,255);"
+    And I should see "width:100%;"
+    And I should see "dashed"
+    And I should see "2px"
+    And I should see "rgb(255,255,255)"
 
   @javascript
   Scenario: Edit a table with background colour and width with borders, border styling, and border size on
@@ -463,4 +481,8 @@ Feature: Atto tables
     And I follow "Edit"
     And I click on "Show more buttons" "button"
     And I click on "HTML" "button"
-    Then I should see "border-width:2px;border-style:dashed;border-color:rgb(255,255,255);background-color:rgb(255,255,255);width:100%;"
+    Then I should see "background-color:rgb(255,255,255);"
+    And I should see "width:100%;"
+    And I should see "dashed"
+    And I should see "2px"
+    And I should see "rgb(255,255,255)"
