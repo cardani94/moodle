@@ -8,6 +8,7 @@ Feature: List the system steps definitions
     Given I am on homepage
     And I log in as "admin"
     And I navigate to "Acceptance testing" node in "Site administration > Development"
+    And I wait until the page is ready
 
   @javascript
   Scenario: Accessing the list
@@ -18,6 +19,7 @@ Feature: List the system steps definitions
   Scenario: Filtering by type
     Given I set the field "Type" to "Then. Checkings to ensure the outcomes are the expected ones"
     When I press "Filter"
+    And I wait until the page is ready
     Then I should see "Checks, that page contains specified text."
     And I should not see "Opens Moodle homepage."
 
@@ -25,5 +27,5 @@ Feature: List the system steps definitions
   Scenario: Filtering by keyword
     Given I set the field "Contains" to "homepage"
     When I press "Filter"
+    And I wait until the page is ready
     Then I should see "Opens Moodle homepage."
-
