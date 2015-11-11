@@ -98,9 +98,10 @@ class phpunit_util extends testing_util {
      *      true  - changes in global state and database are reported as errors
      *      false - no errors reported
      *      null  - only critical problems are reported as errors
+     * @param bool $initreset true if initial reset, set when called first time test suite
      * @return void
      */
-    public static function reset_all_data($detectchanges = false) {
+    public static function reset_all_data($detectchanges = false, $initreset = false) {
         global $DB, $CFG, $USER, $SITE, $COURSE, $PAGE, $OUTPUT, $SESSION;
 
         // Stop any message redirection.
@@ -130,7 +131,7 @@ class phpunit_util extends testing_util {
             $DB->force_transaction_rollback();
         }
 
-        $resetdb = self::reset_database();
+        $resetdb = self::reset_database($initreset);
         $warnings = array();
 
         if ($detectchanges === true) {
@@ -283,16 +284,17 @@ class phpunit_util extends testing_util {
     /**
      * Reset all database tables to default values.
      * @static
+     * @param bool $initreset true if initial reset, set when called first time test suite
      * @return bool true if reset done, false if skipped
      */
-    public static function reset_database() {
+    public static function reset_database($initreset = false) {
         global $DB;
 
         if (!is_null(self::$lastdbwrites) and self::$lastdbwrites == $DB->perf_get_writes()) {
             return false;
         }
 
-        if (!parent::reset_database()) {
+        if (!parent::reset_database($initreset)) {
             return false;
         }
 
@@ -317,7 +319,7 @@ class phpunit_util extends testing_util {
         self::$globals['DB'] = $DB;
 
         // refresh data in all tables, clear caches, etc.
-        self::reset_all_data();
+        self::reset_all_data(true);
     }
 
     /**
@@ -444,6 +446,12 @@ class phpunit_util extends testing_util {
 
         // Disable all logging for performance and sanity reasons.
         set_config('enabled_stores', '', 'tool_log');
+
+        // If all starting Id's are the same, it's difficult to detect coding and testing
+        // errors that use the incorrect id in tests.  The classic case is cmid vs instance id.
+        // To reduce the chance of the coding error, we start sequences at different values where possible.
+        // In a attempt to avoid tables with existing id's we start at a high number.
+        self::reset_all_database_sequences(true);
 
         // We need to keep the installed dataroot filedir files.
         // So each time we reset the dataroot before running a test, the default files are still installed.

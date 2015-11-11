@@ -60,6 +60,16 @@ abstract class testing_util {
     protected static $tablestructure = null;
 
     /**
+     * @var array original sequences of all database tables
+     */
+    protected static $tablesequences = null;
+
+    /**
+     * @var array list of updated tables.
+     */
+    protected static $tableupdated = array();
+
+    /**
      * @var array original structure of all database tables
      */
     protected static $sequencenames = null;
@@ -78,11 +88,6 @@ abstract class testing_util {
      * @var int next sequence value for a single test cycle.
      */
     protected static $sequencenextstartingid = null;
-
-    /**
-     * @var array keep list of sequenceid used in a table.
-     */
-    private static $sequencetable = array();
 
     /**
      * Return the name of the JSON file containing the init filenames.
@@ -186,7 +191,9 @@ abstract class testing_util {
         $framework = self::get_framework();
 
         $datarootpath = self::get_dataroot() . '/' . $framework;
-        if (!file_exists($datarootpath . '/tabledata.ser') or !file_exists($datarootpath . '/tablestructure.ser')) {
+        if (!file_exists($datarootpath . '/tabledata.ser') or !file_exists($datarootpath . '/tablestructure.ser') or
+            !file_exists($datarootpath . '/tablesequences.ser')) {
+
             return false;
         }
 
@@ -243,6 +250,15 @@ abstract class testing_util {
         $structurefile = self::get_dataroot() . '/' . $framework . '/tablestructure.ser';
         file_put_contents($structurefile, $structure);
         testing_fix_file_permissions($structurefile);
+
+        // If no randmon sequence set,then just set this as empty array.
+        if (!self::$tablesequences) {
+            self::$tablesequences = array();
+        }
+        $sequences = serialize(self::$tablesequences);
+        $sequencesfile = self::get_dataroot() . '/' . $framework . '/tablesequences.ser';
+        file_put_contents($sequencesfile, $sequences);
+        testing_fix_file_permissions($sequencesfile);
     }
 
     /**
@@ -316,6 +332,33 @@ abstract class testing_util {
     }
 
     /**
+     * Returns sequences of all tables right after installation.
+     *
+     * @return array $table=>$records
+     */
+    public static function get_tablesequences() {
+        if (!isset(self::$tablesequences)) {
+            $framework = self::get_framework();
+
+            $sequencesfile = self::get_dataroot() . '/' . $framework . '/tablesequences.ser';
+            if (!file_exists($sequencesfile)) {
+                // Not initialised yet.
+                return array();
+            }
+
+            $data = file_get_contents($sequencesfile);
+            self::$tablesequences = unserialize($data);
+        }
+
+        if (!is_array(self::$tablesequences)) {
+            testing_error(1, 'Can not read dataroot/' . $framework .
+                '/tablesequences.ser or invalid format, reinitialize test database.');
+        }
+
+        return self::$tablesequences;
+    }
+
+    /**
      * Returns the names of sequences for each autoincrementing id field in all standard tables.
      * @static
      * @return array $table=>$sequencename
@@ -343,80 +386,6 @@ abstract class testing_util {
     }
 
     /**
-     * Returns list of tables that are unmodified and empty.
-     *
-     * @static
-     * @return array of table names, empty if unknown
-     */
-    protected static function guess_unmodified_empty_tables() {
-        global $DB;
-
-        $dbfamily = $DB->get_dbfamily();
-
-        if ($dbfamily === 'mysql') {
-            $empties = array();
-            $prefix = $DB->get_prefix();
-            $rs = $DB->get_recordset_sql("SHOW TABLE STATUS LIKE ?", array($prefix.'%'));
-            foreach ($rs as $info) {
-                $table = strtolower($info->name);
-                if (strpos($table, $prefix) !== 0) {
-                    // incorrect table match caused by _
-                    continue;
-                }
-
-                if (!is_null($info->auto_increment)) {
-                    $table = preg_replace('/^'.preg_quote($prefix, '/').'/', '', $table);
-                    if (isset(self::$sequencetable[$table]) && ($info->auto_increment == self::$sequencetable[$table])) {
-                        $empties[$table] = $table;
-                    }
-                }
-            }
-            $rs->close();
-            return $empties;
-
-        } else if ($dbfamily === 'mssql') {
-            $empties = array();
-            $prefix = $DB->get_prefix();
-            $sql = "SELECT t.name
-                      FROM sys.identity_columns i
-                      JOIN sys.tables t ON t.object_id = i.object_id
-                     WHERE t.name LIKE ?
-                       AND i.name = 'id'
-                       AND i.last_value IS NULL";
-            $rs = $DB->get_recordset_sql($sql, array($prefix.'%'));
-            foreach ($rs as $info) {
-                $table = strtolower($info->name);
-                if (strpos($table, $prefix) !== 0) {
-                    // incorrect table match caused by _
-                    continue;
-                }
-                $table = preg_replace('/^'.preg_quote($prefix, '/').'/', '', $table);
-                $empties[$table] = $table;
-            }
-            $rs->close();
-            return $empties;
-
-        } else if ($dbfamily === 'oracle') {
-            $sequences = self::get_sequencenames();
-            $sequences = array_map('strtoupper', $sequences);
-            $lookup = array_flip($sequences);
-            $empties = array();
-            list($seqs, $params) = $DB->get_in_or_equal($sequences);
-            $sql = "SELECT sequence_name FROM user_sequences WHERE last_number = 1 AND sequence_name $seqs";
-            $rs = $DB->get_recordset_sql($sql, $params);
-            foreach ($rs as $seq) {
-                $table = $lookup[$seq->sequence_name];
-                $empties[$table] = $table;
-            }
-            $rs->close();
-            return $empties;
-
-        } else {
-            return array();
-        }
-    }
-
-    /**
      * Determine the next unique starting id sequences.
      *
      * @static
@@ -425,19 +394,8 @@ abstract class testing_util {
      * @return int The value the sequence should be set to.
      */
     private static function get_next_sequence_starting_value($records, $table) {
-        if (isset(self::$sequencetable[$table])) {
-            return self::$sequencetable[$table];
-        }
-
-        // If all starting Id's are the same, it's difficult to detect coding and testing
-        // errors that use the incorrect id in tests.  The classic case is cmid vs instance id.
-        // To reduce the chance of the coding error, we start sequences at different values where possible.
-        // In a attempt to avoid tables with existing id's we start at a high number.
-        // Reset the value each time all database sequences are reset.
-        if (defined('PHPUNIT_SEQUENCE_START') and PHPUNIT_SEQUENCE_START) {
-            self::$sequencenextstartingid = PHPUNIT_SEQUENCE_START;
-        } else {
-            self::$sequencenextstartingid = 100000;
+        if (isset(self::$tablesequences[$table])) {
+            return self::$tablesequences[$table];
         }
 
         $id = self::$sequencenextstartingid;
@@ -451,7 +409,7 @@ abstract class testing_util {
 
         self::$sequencenextstartingid = $id + 1000;
 
-        self::$sequencetable[$table] = $id;
+        self::$tablesequences[$table] = $id;
 
         return $id;
     }
@@ -460,125 +418,142 @@ abstract class testing_util {
      * Reset all database sequences to initial values.
      *
      * @static
-     * @param array $empties tables that are known to be unmodified and empty
+     * @param bool $initreset Inital reset will reset all tables.
      * @return void
      */
-    public static function reset_all_database_sequences(array $empties = null) {
+    public static function reset_all_database_sequences($initreset = false) {
         global $DB;
 
-        if (!$data = self::get_tabledata()) {
+        if ((!$data = self::get_tabledata()) && !$initreset) {
             // Not initialised yet.
             return;
         }
-        if (!$structure = self::get_tablestructure()) {
+        if ((!$structure = self::get_tablestructure()) && !$initreset) {
             // Not initialised yet.
+            return;
+        }
+
+        $tablesequences = null;
+
+        // If data or structure is not set, then it's because of forcereset.
+        // Get data and structure form database and reset the sequence.
+        if (!$data || !$structure) {
+            // Get data for all tables.
+            $data = array();
+            $structure = array();
+            $tables = $DB->get_tables();
+            foreach ($tables as $table) {
+                $columns = $DB->get_columns($table);
+                $structure[$table] = $columns;
+                if (isset($columns['id']) and $columns['id']->auto_increment) {
+                    $data[$table] = $DB->get_records($table, array(), 'id ASC');
+                } else {
+                    // There should not be many of these.
+                    $data[$table] = $DB->get_records($table, array());
+                }
+            }
+        } else {
+            // Get table sequences for original database.
+            $tablesequences = self::get_tablesequences();
+        }
+
+        // This should never reach, as this should be called after database is created.
+        if (!$data || !$structure) {
+            return;
+        }
+
+        // If all starting Id's are the same, it's difficult to detect coding and testing
+        // errors that use the incorrect id in tests.  The classic case is cmid vs instance id.
+        // To reduce the chance of the coding error, we start sequences at different values where possible.
+        // In a attempt to avoid tables with existing id's we start at a high number.
+        // Reset the value each time all database sequences are reset.
+        if (defined('PHPUNIT_SEQUENCE_START') and PHPUNIT_SEQUENCE_START) {
+            self::$sequencenextstartingid = PHPUNIT_SEQUENCE_START;
+        } else {
+            self::$sequencenextstartingid = 1000;
+        }
+
+        $queries = array();
+        $prefix = $DB->get_prefix();
+
+        // Filter data records which are not modified, as we don't want to reset sequence on unmodified tables.
+        $datamodifed = array();
+        foreach ($data as $table => $records) {
+            if (self::is_table_updated($table) || $initreset) {
+                // Sequence is only updated for tables with id.
+                if (isset($structure[$table]['id']) and $structure[$table]['id']->auto_increment) {
+                    $datamodifed[$table] = $records;
+                }
+            }
+        }
+
+        // If no data modified then nothing to do.
+        if (empty($datamodifed)) {
             return;
         }
 
         $dbfamily = $DB->get_dbfamily();
         if ($dbfamily === 'postgres') {
-            $queries = array();
-            $prefix = $DB->get_prefix();
-            foreach ($data as $table => $records) {
-                if (isset($structure[$table]['id']) and $structure[$table]['id']->auto_increment) {
-                    $nextid = self::get_next_sequence_starting_value($records, $table);
-                    $queries[] = "ALTER SEQUENCE {$prefix}{$table}_id_seq RESTART WITH $nextid";
-                }
-            }
-            if ($queries) {
-                $DB->change_database_structure(implode(';', $queries));
+            foreach ($datamodifed as $table => $records) {
+                $nextid = $tablesequences ? $tablesequences[$table] : self::get_next_sequence_starting_value($records, $table);
+                $queries[] = "ALTER SEQUENCE {$prefix}{$table}_id_seq RESTART WITH $nextid";
             }
 
         } else if ($dbfamily === 'mysql') {
-            $sequences = array();
-            $prefix = $DB->get_prefix();
-            $rs = $DB->get_recordset_sql("SHOW TABLE STATUS LIKE ?", array($prefix.'%'));
-            foreach ($rs as $info) {
-                $table = strtolower($info->name);
-                if (strpos($table, $prefix) !== 0) {
-                    // incorrect table match caused by _
-                    continue;
-                }
-                if (!is_null($info->auto_increment)) {
-                    $table = preg_replace('/^'.preg_quote($prefix, '/').'/', '', $table);
-                    $sequences[$table] = $info->auto_increment;
-                }
-            }
-            $rs->close();
-            $prefix = $DB->get_prefix();
-            foreach ($data as $table => $records) {
-                if (isset($structure[$table]['id']) and $structure[$table]['id']->auto_increment) {
-                    if (isset($sequences[$table])) {
-                        $nextid = self::get_next_sequence_starting_value($records, $table);
-                        if ($sequences[$table] != $nextid) {
-                            $DB->change_database_structure("ALTER TABLE {$prefix}{$table} AUTO_INCREMENT = $nextid");
-                        }
-                    } else {
-                        // some problem exists, fallback to standard code
-                        $DB->get_manager()->reset_sequence($table);
-                    }
-                }
+            foreach ($datamodifed as $table => $records) {
+                    $nextid = $tablesequences ? $tablesequences[$table] : self::get_next_sequence_starting_value($records, $table);
+                    $queries[] = "ALTER TABLE {$prefix}{$table} AUTO_INCREMENT = $nextid";
             }
 
         } else if ($dbfamily === 'oracle') {
+            // Don't support full reset of sequence here.
+            if ($initreset) {
+                return;
+            }
             $sequences = self::get_sequencenames();
             $sequences = array_map('strtoupper', $sequences);
-            $lookup = array_flip($sequences);
 
-            $current = array();
-            list($seqs, $params) = $DB->get_in_or_equal($sequences);
-            $sql = "SELECT sequence_name, last_number FROM user_sequences WHERE sequence_name $seqs";
-            $rs = $DB->get_recordset_sql($sql, $params);
-            foreach ($rs as $seq) {
-                $table = $lookup[$seq->sequence_name];
-                $current[$table] = $seq->last_number;
-            }
-            $rs->close();
-
-            foreach ($data as $table => $records) {
-                if (isset($structure[$table]['id']) and $structure[$table]['id']->auto_increment) {
-                    $lastrecord = end($records);
-                    if ($lastrecord) {
-                        $nextid = $lastrecord->id + 1;
-                    } else {
-                        $nextid = 1;
-                    }
-                    if (!isset($current[$table])) {
-                        $DB->get_manager()->reset_sequence($table);
-                    } else if ($nextid == $current[$table]) {
-                        continue;
-                    }
-                    // reset as fast as possible - alternatively we could use http://stackoverflow.com/questions/51470/how-do-i-reset-a-sequence-in-oracle
-                    $seqname = $sequences[$table];
-                    $cachesize = $DB->get_manager()->generator->sequence_cache_size;
-                    $DB->change_database_structure("DROP SEQUENCE $seqname");
-                    $DB->change_database_structure("CREATE SEQUENCE $seqname START WITH $nextid INCREMENT BY 1 NOMAXVALUE CACHE $cachesize");
+            foreach ($datamodifed as $table => $records) {
+                $lastrecord = end($records);
+                if ($lastrecord) {
+                    $nextid = $lastrecord->id + 1;
+                } else {
+                    $nextid = 1;
                 }
+                // Reset as fast as possible - alternatively we could use.
+                // http://stackoverflow.com/questions/51470/how-do-i-reset-a-sequence-in-oracle.
+                $seqname = $sequences[$table];
+                $DB->get_manager()->reset_sequence($table);
+                $cachesize = $DB->get_manager()->generator->sequence_cache_size;
+                $DB->change_database_structure("DROP SEQUENCE $seqname");
+                $DB->change_database_structure("CREATE SEQUENCE $seqname START WITH $nextid INCREMENT BY 1 NOMAXVALUE CACHE $cachesize");
             }
 
         } else {
-            // note: does mssql support any kind of faster reset?
+            // Don't support full reset of sequence here.
+            if ($initreset) {
+                return;
+            }
+            // Note: does mssql support any kind of faster reset?
             // This also implies mssql will not use unique sequence values.
-            if (is_null($empties)) {
-                $empties = self::guess_unmodified_empty_tables();
+            foreach ($datamodifed as $table => $records) {
+                $DB->get_manager()->reset_sequence($table);
             }
-            foreach ($data as $table => $records) {
-                if (isset($empties[$table])) {
-                    continue;
-                }
-                if (isset($structure[$table]['id']) and $structure[$table]['id']->auto_increment) {
-                    $DB->get_manager()->reset_sequence($table);
-                }
-            }
+        }
+
+        // Change database structure if any query exists.
+        if ($queries) {
+            $DB->change_database_structure(implode(';', $queries));
         }
     }
 
     /**
      * Reset all database tables to default values.
      * @static
+     * @param bool $initreset true if initial reset, set when called first time test suite
      * @return bool true if reset done, false if skipped
      */
-    public static function reset_database() {
+    public static function reset_database($initreset = false) {
         global $DB;
 
         $tables = $DB->get_tables(false);
@@ -595,8 +570,6 @@ abstract class testing_util {
             // not initialised yet
             return false;
         }
-
-        $empties = self::guess_unmodified_empty_tables();
 
         $borkedmysql = false;
         if ($DB->get_dbfamily() === 'mysql') {
@@ -638,7 +611,7 @@ abstract class testing_util {
 
         foreach ($data as $table => $records) {
             if ($borkedmysql) {
-                if (empty($records) and isset($empties[$table])) {
+                if (empty($records) and !self::is_table_updated($table)) {
                     continue;
                 }
 
@@ -660,8 +633,8 @@ abstract class testing_util {
             }
 
             if (empty($records)) {
-                if (isset($empties[$table])) {
-                    // table was not modified and is empty
+                if (!self::is_table_updated($table)) {
+                    // Table was not modified and is empty.
                 } else {
                     $DB->delete_records($table, array());
                 }
@@ -699,15 +672,17 @@ abstract class testing_util {
             }
         }
 
-        // reset all next record ids - aka sequences
-        self::reset_all_database_sequences($empties);
+        // Reset all next record ids - aka sequences
+        self::reset_all_database_sequences($initreset);
 
-        // remove extra tables
+        // Remove extra tables.
         foreach ($tables as $table) {
             if (!isset($data[$table])) {
                 $DB->get_manager()->drop_table(new xmldb_table($table));
             }
         }
+
+        self::reset_updated_table_list();
 
         return true;
     }
@@ -844,6 +819,25 @@ abstract class testing_util {
     }
 
     /**
+     * Set state of modified tables.
+     *
+     * @param string $sql sql which is updating the table.
+     */
+    public static function set_table_modified_by_sql($sql) {
+        global $DB;
+
+        $prefix = $DB->get_prefix();
+
+        preg_match('/( ' . $prefix . '\w*)(.*)/', $sql, $matches);
+        // Ignore random sql for testing like "XXUPDATE SET XSSD".
+        if (!empty($matches[1])) {
+            $table = trim($matches[1]);
+            $table = preg_replace('/^' . preg_quote($prefix, '/') . '/', '', $table);
+            self::$tableupdated[$table] = true;
+        }
+    }
+
+    /**
      * Drop the whole test database
      * @static
      * @param bool $displayprogress
@@ -971,5 +965,23 @@ abstract class testing_util {
             fwrite($fp, json_encode(array_values($listfiles)));
             fclose($fp);
         }
+    }
+
+    /**
+     * Return if table has been updated. List is updated by moodle_database::query_start()
+     *
+     * @param string $tablename table name to check.
+     * @return bool true if table has been updated.
+     */
+    protected static function is_table_updated($tablename) {
+        return isset(self::$tableupdated[$tablename]);
+    }
+
+    /**
+     * Reset updated table list. This should be done after every reset.
+     */
+    protected static function reset_updated_table_list() {
+        self::$tableupdated = null;
+        self::$tableupdated = array();
     }
 }

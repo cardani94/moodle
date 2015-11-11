@@ -135,7 +135,7 @@ class behat_hooks extends behat_base {
 
         // Reset all data, before checking for is_server_running.
         // If not done, then it can return apache error, while running tests.
-        behat_util::reset_all_data();
+        behat_util::reset_all_data(true);
 
         if (!behat_util::is_server_running()) {
             throw new Exception($CFG->behat_wwwroot .

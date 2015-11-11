@@ -621,7 +621,7 @@ if (PHPUNIT_TEST and !PHPUNIT_UTIL) {
     try {
         if ($dbhash = $DB->get_field('config', 'value', array('name'=>'phpunittest'))) {
             // reset DB tables
-            phpunit_util::reset_database();
+            phpunit_util::reset_database(true);
         }
     } catch (Exception $e) {
         if ($dbhash) {

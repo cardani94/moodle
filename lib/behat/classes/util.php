@@ -85,6 +85,12 @@ class behat_util extends testing_util {
 
         install_cli_database($options, false);
 
+        // If all starting Id's are the same, it's difficult to detect coding and testing
+        // errors that use the incorrect id in tests.  The classic case is cmid vs instance id.
+        // To reduce the chance of the coding error, we start sequences at different values where possible.
+        // In a attempt to avoid tables with existing id's we start at a high number.
+        self::reset_all_database_sequences(true);
+
         // We need to keep the installed dataroot filedir files.
         // So each time we reset the dataroot before running a test, the default files are still installed.
         self::save_original_data_files();
@@ -113,6 +119,12 @@ class behat_util extends testing_util {
 
         // Enable web cron.
         set_config('cronclionly', 0);
+
+        // If all starting Id's are the same, it's difficult to detect coding and testing
+        // errors that use the incorrect id in tests.  The classic case is cmid vs instance id.
+        // To reduce the chance of the coding error, we start sequences at different values where possible.
+        // In a attempt to avoid tables with existing id's we start at a high number.
+        self::reset_all_database_sequences(true);
 
         // Keeps the current version of database and dataroot.
         self::store_versions_hash();
@@ -295,10 +307,11 @@ class behat_util extends testing_util {
 
     /**
      * Reset contents of all database tables to initial values, reset caches, etc.
+     * @param bool $initreset true if initial reset, set when called first time test suite
      */
-    public static function reset_all_data() {
+    public static function reset_all_data($initreset = false) {
         // Reset database.
-        self::reset_database();
+        self::reset_database($initreset);
 
         // Purge dataroot directory.
         self::reset_dataroot();
