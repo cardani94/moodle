@@ -67,7 +67,7 @@ abstract class testing_util {
     /**
      * @var array list of updated tables.
      */
-    protected static $tableupdated = array();
+    public static $tableupdated = array();
 
     /**
      * @var array original structure of all database tables
@@ -571,6 +571,15 @@ abstract class testing_util {
             return false;
         }
 
+        // Crazy way to reset :(
+        if (defined('BEHAT_SITE_RUNNING')) {
+            $tablesupdatedfile = self::get_tables_updated_by_scenario_list_path();
+            if ($tablesupdated = @json_decode(file_get_contents($tablesupdatedfile), true)) {
+                self::$tableupdated = array_merge(self::$tableupdated, $tablesupdated);
+                unlink($tablesupdatedfile);
+            }
+        }
+
         $borkedmysql = false;
         if ($DB->get_dbfamily() === 'mysql') {
             $version = $DB->get_server_info();
@@ -611,7 +620,7 @@ abstract class testing_util {
 
         foreach ($data as $table => $records) {
             if ($borkedmysql) {
-                if (empty($records) and !self::is_table_updated($table)) {
+                if (empty($records) and !self::is_table_updated($table) and !$initreset) {
                     continue;
                 }
 
@@ -633,7 +642,7 @@ abstract class testing_util {
             }
 
             if (empty($records)) {
-                if (!self::is_table_updated($table)) {
+                if (!self::is_table_updated($table) && !$initreset) {
                     // Table was not modified and is empty.
                 } else {
                     $DB->delete_records($table, array());
@@ -834,6 +843,16 @@ abstract class testing_util {
             $table = trim($matches[1]);
             $table = preg_replace('/^' . preg_quote($prefix, '/') . '/', '', $table);
             self::$tableupdated[$table] = true;
+
+            if (defined('BEHAT_SITE_RUNNING')) {
+                $tablesupdatedfile = $dir = self::get_tables_updated_by_scenario_list_path();
+                if ($tablesupdated = @json_decode(file_get_contents($tablesupdatedfile), true)) {
+                    $tablesupdated[$table] = true;
+                } else {
+                    $tablesupdated[$table] = true;
+                }
+                @file_put_contents($tablesupdatedfile, json_encode($tablesupdated, JSON_PRETTY_PRINT));
+            }
         }
     }
 
@@ -983,5 +1002,13 @@ abstract class testing_util {
     protected static function reset_updated_table_list() {
         self::$tableupdated = null;
         self::$tableupdated = array();
+    }
+
+    /**
+     * Returns the path to the file which holds list of tables updated in scenario.
+     * @return string
+     */
+    protected final static function get_tables_updated_by_scenario_list_path() {
+        return self::get_dataroot() . '/tablesupdatedbyscenario.txt';
     }
 }
