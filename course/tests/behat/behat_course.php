@@ -222,7 +222,6 @@ class behat_course extends behat_base {
         $exception = new ExpectationException('Section "' . $sectionnumber . '" was not found', $this->getSession());
         $menu = $this->find('xpath', $xpath, $exception);
         $menu->click();
-        $this->i_wait_until_section_is_available($sectionnumber);
     }
 
     /**
