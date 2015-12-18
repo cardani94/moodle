@@ -1,4 +1,4 @@
-@editor @editor_atto @atto @atto_media @_file_upload
+@editor @editor_atto @atto @atto_media @_file_upload @_bug_phantomjs
 Feature: Add media to Atto
   To write rich text - I need to add media.
 
