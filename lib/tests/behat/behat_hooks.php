@@ -619,6 +619,12 @@ class behat_hooks extends behat_base {
                 }
             }
 
+            // We should not reach here, driver should have caught exception by now.
+            // Throw a generic exception to ensure failures are detected.
+            $msg = "Moodle exception: Exeception was thrown on page but not caught by selenium driver.\n";
+            $msg .= "Please upgrade your selenium driver.";
+            throw new \Exception($msg);
+
         } catch (NoSuchWindow $e) {
             // If we were interacting with a popup window it will not exists after closing it.
         }
