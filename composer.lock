@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "41df6dfdc9bbd1b15fcc822663823918",
-    "content-hash": "4ff7a81bbdcee555fd2b1ede523a8232",
+    "hash": "c9e426592498243cd700488b64c44892",
+    "content-hash": "5ba72660f8d26e9cf4e628181dd1620d",
     "packages": [],
     "packages-dev": [
         {
@@ -610,16 +610,16 @@
         },
         {
             "name": "doctrine/common",
-            "version": "v2.5.0",
+            "version": "v2.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/common.git",
-                "reference": "cd8daf2501e10c63dced7b8b9b905844316ae9d3"
+                "reference": "a579557bc689580c19fee4e27487a67fe60defc0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/common/zipball/cd8daf2501e10c63dced7b8b9b905844316ae9d3",
-                "reference": "cd8daf2501e10c63dced7b8b9b905844316ae9d3",
+                "url": "https://api.github.com/repos/doctrine/common/zipball/a579557bc689580c19fee4e27487a67fe60defc0",
+                "reference": "a579557bc689580c19fee4e27487a67fe60defc0",
                 "shasum": ""
             },
             "require": {
@@ -628,20 +628,20 @@
                 "doctrine/collections": "1.*",
                 "doctrine/inflector": "1.*",
                 "doctrine/lexer": "1.*",
-                "php": ">=5.3.2"
+                "php": "~5.5|~7.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~3.7"
+                "phpunit/phpunit": "~4.8|~5.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.6.x-dev"
+                    "dev-master": "2.7.x-dev"
                 }
             },
             "autoload": {
-                "psr-0": {
-                    "Doctrine\\Common\\": "lib/"
+                "psr-4": {
+                    "Doctrine\\Common\\": "lib/Doctrine/Common"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -679,7 +679,7 @@
                 "persistence",
                 "spl"
             ],
-            "time": "2015-04-02 19:55:44"
+            "time": "2015-12-25 13:18:31"
         },
         {
             "name": "doctrine/inflector",
@@ -1010,16 +1010,16 @@
         },
         {
             "name": "moodlehq/behat-extension",
-            "version": "v1.29.6",
+            "version": "dev-mdl-52685",
             "source": {
                 "type": "git",
-                "url": "https://github.com/moodlehq/moodle-behat-extension.git",
-                "reference": "c048249ac59fea11174c658e8fb35f11ef2aa763"
+                "url": "https://github.com/rajeshtaneja/moodle-behat-extension.git",
+                "reference": "6ef5b81ae37fac382c81bc4488a085bf2cb4e0ff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/moodlehq/moodle-behat-extension/zipball/c048249ac59fea11174c658e8fb35f11ef2aa763",
-                "reference": "c048249ac59fea11174c658e8fb35f11ef2aa763",
+                "url": "https://api.github.com/repos/rajeshtaneja/moodle-behat-extension/zipball/6ef5b81ae37fac382c81bc4488a085bf2cb4e0ff",
+                "reference": "6ef5b81ae37fac382c81bc4488a085bf2cb4e0ff",
                 "shasum": ""
             },
             "require": {
@@ -1028,7 +1028,6 @@
                 "behat/mink-extension": "1.2.0",
                 "behat/mink-goutte-driver": "1.0.9",
                 "behat/mink-selenium2-driver": "1.1.1",
-                "doctrine/common": "2.5.0",
                 "guzzlehttp/guzzle": "~3.1",
                 "php": ">=5.4.4",
                 "symfony/symfony": "2.4.10"
@@ -1057,9 +1056,9 @@
                 "Moodle"
             ],
             "support": {
-                "source": "https://github.com/moodlehq/moodle-behat-extension/tree/v1.29.6"
+                "source": "https://github.com/rajeshtaneja/moodle-behat-extension/tree/52685"
             },
-            "time": "2016-01-05 02:26:57"
+            "time": "2016-01-08 00:15:49"
         },
         {
             "name": "phpunit/dbunit",
@@ -1521,20 +1520,22 @@
         },
         {
             "name": "symfony/icu",
-            "version": "v1.0.1",
+            "version": "v1.2.2",
             "target-dir": "Symfony/Component/Icu",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/icu.git",
-                "reference": "fdba214b1e087c149843bde976263c53ac10c975"
+                "reference": "d4d85d6055b87f394d941b45ddd3a9173e1e3d2a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/icu/zipball/fdba214b1e087c149843bde976263c53ac10c975",
-                "reference": "fdba214b1e087c149843bde976263c53ac10c975",
+                "url": "https://api.github.com/repos/symfony/icu/zipball/d4d85d6055b87f394d941b45ddd3a9173e1e3d2a",
+                "reference": "d4d85d6055b87f394d941b45ddd3a9173e1e3d2a",
                 "shasum": ""
             },
             "require": {
+                "ext-intl": "*",
+                "lib-icu": ">=4.4",
                 "php": ">=5.3.3",
                 "symfony/intl": "~2.3"
             },
@@ -1564,7 +1565,7 @@
                 "icu",
                 "intl"
             ],
-            "time": "2013-10-04 09:12:07"
+            "time": "2014-07-25 09:58:17"
         },
         {
             "name": "symfony/symfony",
@@ -1743,7 +1744,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "moodlehq/behat-extension": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
