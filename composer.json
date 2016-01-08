@@ -3,5 +3,10 @@
         "phpunit/phpunit": "4.8.*",
         "phpunit/dbUnit": "1.4.*",
         "moodlehq/behat-extension": "1.30.2"
+    },
+    "config": {
+        "platform": {
+            "php": "5.4.4"
+        }
     }
 }
