@@ -117,6 +117,38 @@ class tests_finder {
     }
 
     /**
+     * Callback for RecursiveCallbackFilterIterator to exclude unwanted directories.
+     *
+     * @param $current   Current item's value
+     * @param $key       Current item's key
+     * @param $iterator  Iterator being filtered
+     * @return boolean   true to accept the current item, false otherwise
+     */
+    public static function moodle_test_dir_filter_callback($current, $key, $iterator) {
+        // List of directory names to skip when recursing.
+        $blacklist = array(
+            'node_module',
+            'vendor',
+        );
+
+        $filename = $current->getFilename();
+        $filepath = $current->getPathname();
+
+        // Skip hidden files and directories, like .git.
+        if ($filename[0] === '.') {
+            return false;
+        }
+
+        foreach ($blacklist as $bl) {
+            if (strpos($filepath, $bl) !== false) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Returns all the directories having tests
      *
      * @param string $testtype The kind of test we are looking for
@@ -127,6 +159,7 @@ class tests_finder {
 
         $dirs = array();
         $dirite = new RecursiveDirectoryIterator($CFG->dirroot);
+        $dirite = new RecursiveCallbackFilterIterator($dirite, array(__CLASS__, 'moodle_test_dir_filter_callback'));
         $iteite = new RecursiveIteratorIterator($dirite);
         $regexp = self::get_regexp($testtype);
         $regite = new RegexIterator($iteite, $regexp);
