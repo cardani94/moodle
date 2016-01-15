@@ -418,7 +418,8 @@ class behat_config_manager {
                         'formatters' => array(
                             'moodle_progress' => 'Moodle\BehatExtension\Formatter\MoodleProgressFormatter',
                             'moodle_list' => 'Moodle\BehatExtension\Formatter\MoodleListFormatter',
-                            'moodle_step_count' => 'Moodle\BehatExtension\Formatter\MoodleStepCountFormatter'
+                            'moodle_step_count' => 'Moodle\BehatExtension\Formatter\MoodleStepCountFormatter',
+                            'moodle_screenshot' => 'Moodle\BehatExtension\Formatter\MoodleScreenshotFormatter'
                         ),
                         'features' => $features,
                         'steps_definitions' => $stepsdefinitions
