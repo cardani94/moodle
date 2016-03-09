@@ -55,6 +55,7 @@ Feature: Marking guides can be created and edited
     And I click on "Delete criterion" "button" in the "Guide criterion B" "table_row"
     And I press "Yes"
     And I press "Save"
+    And I wait until the page is ready
     Then I should see "Guide criterion A"
     And I should see "Guide criterion C"
     And I should see "WARNING: Your marking guide has a maximum grade of 70 points"
