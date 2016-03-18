@@ -27,8 +27,7 @@
 
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
-use Behat\Behat\Context\Step\Given as Given,
-    Behat\Gherkin\Node\TableNode as TableNode,
+use Behat\Gherkin\Node\TableNode as TableNode,
     Behat\Mink\Exception\ExpectationException as ExpectationException;
 
 /**
@@ -49,10 +48,12 @@ class behat_mod_feedback extends behat_base {
      * @param TableNode $questiondata with data for filling the add question form
      */
     public function i_add_question_to_the_feedback_with($questiontype, TableNode $questiondata) {
-        $rv = array();
+
         $questiontype = $this->escape($questiontype);
         $additem = $this->escape(get_string('add_item', 'feedback'));
-        $rv[] = new Given("I select \"{$questiontype}\" from the \"{$additem}\" singleselect");
+
+        $this->execute_step('behat_forms::i_select_from_the_singleselect', array($questiontype, $additem),
+            true, true);
 
         $rows = $questiondata->getRows();
         $modifiedrows = array();
@@ -64,11 +65,11 @@ class behat_mod_feedback extends behat_base {
         }
         $newdata = new TableNode($modifiedrows);
 
-        $rv[] = new Given('I set the following fields to these values:', $newdata);
+        $this->execute_step("behat_forms::i_set_the_following_fields_to_these_values", $newdata,
+            true, true);
 
         $saveitem = $this->escape(get_string('save_item', 'feedback'));
-        $rv[] = new Given("I press \"{$saveitem}\"");
-
-        return $rv;
+        $this->execute_step("behat_forms::press_button", $saveitem,
+            false, false);
     }
 }

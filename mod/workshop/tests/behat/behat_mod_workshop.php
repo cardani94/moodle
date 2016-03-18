@@ -27,8 +27,7 @@
 
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
-use Moodle\BehatExtension\Context\Step\Given as Given,
-    Behat\Gherkin\Node\TableNode as TableNode;
+use Behat\Gherkin\Node\TableNode as TableNode;
 
 /**
  * Steps definitions related to mod_workshop.
@@ -54,11 +53,14 @@ class behat_mod_workshop extends behat_base {
         $xpath = "//*[@class='userplan']/descendant::div[./span[contains(.,$phaseliteral)]]/".
                 "descendant-or-self::a[./img[@alt=$switchphase]]";
         $continue = $this->escape(get_string('continue'));
-        return array(
-            new Given("I follow \"$workshopname\""),
-            new Given("I click on \"$xpath\" \"xpath_element\""),
-            new Given("I press \"$continue\""),
-        );
+
+        $this->execute_step('behat_general::click_link', $workshopname, true, true);
+
+        $this->execute_step("behat_general::i_click_on", array($xpath, "xpath_element"),
+            true, true);
+
+        $this->execute_step("behat_forms::press_button", $continue,
+            false, false);
     }
 
     /**
@@ -72,12 +74,17 @@ class behat_mod_workshop extends behat_base {
         $workshopname = $this->escape($workshopname);
         $savechanges = $this->escape(get_string('savechanges'));
         $xpath = "//div[contains(concat(' ', normalize-space(@class), ' '), ' ownsubmission ')]/descendant::input[@type='submit']";
-        return array(
-            new Given("I follow \"$workshopname\""),
-            new Given("I click on \"$xpath\" \"xpath_element\""),
-            new Given("I set the following fields to these values:", $table),
-            new Given("I press \"$savechanges\""),
-        );
+
+        $this->execute_step('behat_general::click_link', $workshopname, true, true);
+
+        $this->execute_step("behat_general::i_click_on", array($xpath, "xpath_element"),
+            true, true);
+
+        $this->execute_step("behat_forms::i_set_the_following_fields_to_these_values", $table,
+            true, true);
+
+        $this->execute_step("behat_forms::press_button", $savechanges,
+            false, false);
     }
 
     /**
@@ -91,12 +98,16 @@ class behat_mod_workshop extends behat_base {
         $workshopname = $this->escape($workshopname);
         $editassessmentform = $this->escape(get_string('editassessmentform', 'workshop'));
         $saveandclose = $this->escape(get_string('saveandclose', 'workshop'));
-        return array(
-            new Given("I follow \"$workshopname\""),
-            new Given("I follow \"$editassessmentform\""),
-            new Given("I set the following fields to these values:", $table),
-            new Given("I press \"$saveandclose\""),
-        );
+
+        $this->execute_step('behat_general::click_link', $workshopname, true, true);
+
+        $this->execute_step('behat_general::click_link', $editassessmentform, true, true);
+
+        $this->execute_step("behat_forms::i_set_the_following_fields_to_these_values", $table,
+            true, true);
+
+        $this->execute_step("behat_forms::press_button", $saveandclose,
+            false, false);
     }
 
     /**
@@ -114,12 +125,19 @@ class behat_mod_workshop extends behat_base {
                 "and contains(.,$submissionliteral)]";
         $assess = $this->escape(get_string('assess', 'workshop'));
         $saveandclose = $this->escape(get_string('saveandclose', 'workshop'));
-        return array(
-            new Given("I follow \"$workshopname\""),
-            new Given("I click on \"$assess\" \"button\" in the \"$xpath\" \"xpath_element\""),
-            new Given("I set the following fields to these values:", $table),
-            new Given("I press \"$saveandclose\""),
+
+        $this->execute_step('behat_general::click_link', $workshopname, true, true);
+
+        $this->execute_step('behat_general::i_click_on_in_the',
+            array($assess, "button", $xpath, "xpath_element"),
+            true, true
         );
+
+        $this->execute_step("behat_forms::i_set_the_following_fields_to_these_values", $table,
+            true, true);
+
+        $this->execute_step("behat_forms::press_button", $saveandclose,
+            false, false);
     }
 
     /**

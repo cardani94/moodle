@@ -713,4 +713,122 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
         throw new \Exception('Javascript code and/or AJAX requests are not ready after ' . self::EXTENDED_TIMEOUT .
             ' seconds. There is a Javascript error or the code is extremely slow.');
     }
+
+    /**
+     * Internal step definition to find exceptions, debugging() messages and PHP debug messages.
+     *
+     * Part of behat_hooks class as is part of the testing framework, is auto-executed
+     * after each step so no features will splicitly use it.
+     *
+     * @throw Exception Unknown type, depending on what we caught in the hook or basic \Exception.
+     * @see Moodle\BehatExtension\Tester\MoodleStepTester
+     */
+    public function look_for_exceptions() {
+        // Wrap in try in case we were interacting with a closed window.
+        try {
+
+            // Exceptions.
+            $exceptionsxpath = "//div[@data-rel='fatalerror']";
+            // Debugging messages.
+            $debuggingxpath = "//div[@data-rel='debugging']";
+            // PHP debug messages.
+            $phperrorxpath = "//div[@data-rel='phpdebugmessage']";
+            // Any other backtrace.
+            $othersxpath = "(//*[contains(., ': call to ')])[1]";
+
+            $xpaths = array($exceptionsxpath, $debuggingxpath, $phperrorxpath, $othersxpath);
+            $joinedxpath = implode(' | ', $xpaths);
+
+            // Joined xpath expression. Most of the time there will be no exceptions, so this pre-check
+            // is faster than to send the 4 xpath queries for each step.
+            if (!$this->getSession()->getDriver()->find($joinedxpath)) {
+                return;
+            }
+
+            // Exceptions.
+            if ($errormsg = $this->getSession()->getPage()->find('xpath', $exceptionsxpath)) {
+
+                // Getting the debugging info and the backtrace.
+                $errorinfoboxes = $this->getSession()->getPage()->findAll('css', 'div.alert-error');
+                // If errorinfoboxes is empty, try find notifytiny (original) class.
+                if (empty($errorinfoboxes)) {
+                    $errorinfoboxes = $this->getSession()->getPage()->findAll('css', 'div.notifytiny');
+                }
+                $errorinfo = $this->get_debug_text($errorinfoboxes[0]->getHtml()) . "\n" .
+                    $this->get_debug_text($errorinfoboxes[1]->getHtml());
+
+                $msg = "Moodle exception: " . $errormsg->getText() . "\n" . $errorinfo;
+                throw new \Exception(html_entity_decode($msg));
+            }
+
+            // Debugging messages.
+            if ($debuggingmessages = $this->getSession()->getPage()->findAll('xpath', $debuggingxpath)) {
+                $msgs = array();
+                foreach ($debuggingmessages as $debuggingmessage) {
+                    $msgs[] = $this->get_debug_text($debuggingmessage->getHtml());
+                }
+                $msg = "debugging() message/s found:\n" . implode("\n", $msgs);
+                throw new \Exception(html_entity_decode($msg));
+            }
+
+            // PHP debug messages.
+            if ($phpmessages = $this->getSession()->getPage()->findAll('xpath', $phperrorxpath)) {
+
+                $msgs = array();
+                foreach ($phpmessages as $phpmessage) {
+                    $msgs[] = $this->get_debug_text($phpmessage->getHtml());
+                }
+                $msg = "PHP debug message/s found:\n" . implode("\n", $msgs);
+                throw new \Exception(html_entity_decode($msg));
+            }
+
+            // Any other backtrace.
+            // First looking through xpath as it is faster than get and parse the whole page contents,
+            // we get the contents and look for matches once we found something to suspect that there is a backtrace.
+            if ($this->getSession()->getDriver()->find($othersxpath)) {
+                $backtracespattern = '/(line [0-9]* of [^:]*: call to [\->&;:a-zA-Z_\x7f-\xff][\->&;:a-zA-Z0-9_\x7f-\xff]*)/';
+                if (preg_match_all($backtracespattern, $this->getSession()->getPage()->getContent(), $backtraces)) {
+                    $msgs = array();
+                    foreach ($backtraces[0] as $backtrace) {
+                        $msgs[] = $backtrace . '()';
+                    }
+                    $msg = "Other backtraces found:\n" . implode("\n", $msgs);
+                    throw new \Exception(htmlentities($msg));
+                }
+            }
+
+        } catch (NoSuchWindow $e) {
+            // If we were interacting with a popup window it will not exists after closing it.
+        }
+    }
+
+    /**
+     * Helper function to execute api in a given context.
+     *
+     * @param string $contextapi context in which api is defined.
+     * @param array $params list of params to pass.
+     * @param bool $waitafterstep wait after executing the step.
+     * @param bool $lookforexceptions look for exception after executing the api.
+     * @throws Exception
+     */
+    protected function execute_step($contextapi, $params = array(), $waitafterstep = true, $lookforexceptions = true) {
+        if (!is_array($params)) {
+            $params = array($params);
+        }
+
+        // Get required context and execute the api.
+        $contextapi = explode("::", $contextapi);
+        $context = behat_context_helper::get($contextapi[0]);
+        call_user_func_array(array($context, $contextapi[1]), $params);
+
+        // If required wait for pending js.
+        if ($waitafterstep) {
+            $this->wait_for_pending_js();
+        }
+
+        // If required look for exceptions
+        if ($lookforexceptions) {
+            $this->look_for_exceptions();
+        }
+    }
 }

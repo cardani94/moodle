@@ -32,8 +32,7 @@ use Behat\Mink\Exception\ExpectationException as ExpectationException,
     Behat\Mink\Exception\DriverException as DriverException,
     WebDriver\Exception\NoSuchElement as NoSuchElement,
     WebDriver\Exception\StaleElementReference as StaleElementReference,
-    Behat\Gherkin\Node\TableNode as TableNode,
-    Moodle\BehatExtension\Context\Step\Given as Given;
+    Behat\Gherkin\Node\TableNode as TableNode;
 
 /**
  * Cross component steps definitions.
