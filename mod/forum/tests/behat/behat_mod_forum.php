@@ -71,16 +71,15 @@ class behat_mod_forum extends behat_base {
      */
     public function i_reply_post_from_forum_with($postsubject, $forumname, TableNode $table) {
 
-        // Navigate to forum.
-        $this->execute_step('behat_general::click_link', $this->escape($forumname));
-        $this->execute_step('behat_general::click_link', $this->escape($postsubject));
-        $this->execute_step('behat_general::click_link', get_string('reply', 'forum'));
+        return array(
+            new Given('I follow "' . $this->escape($forumname) . '"'),
+            new Given('I follow "' . $this->escape($postsubject) . '"'),
+            new Given('I follow "' . get_string('reply', 'forum') . '"'),
+            new Given('I set the following fields to these values:', $table),
+            new Given('I press "' . get_string('posttoforum', 'forum') . '"'),
+            new Given('I wait to be redirected')
+        );
 
-        // Fill form and post.
-        $this->execute_step('behat_forms::i_set_the_following_fields_to_these_values', $table);
-
-        $this->execute_step('behat_forms::press_button', get_string('posttoforum', 'forum'));
-        $this->execute_step('behat_general::i_wait_to_be_redirected', false);
     }
 
     /**
@@ -92,17 +91,19 @@ class behat_mod_forum extends behat_base {
      * @param string $forumname
      * @param TableNode $table
      * @param string $buttonstr
+     * @return Given[]
      */
     protected function add_new_discussion($forumname, TableNode $table, $buttonstr) {
 
-        // Navigate to forum.
-        $this->execute_step('behat_general::click_link', $this->escape($forumname));
-        $this->execute_step('behat_forms::press_button', $buttonstr);
+        // Escaping $forumname as it has been stripped automatically by the transformer.
+        return array(
+            new Given('I follow "' . $this->escape($forumname) . '"'),
+            new Given('I press "' . $buttonstr . '"'),
+            new Given('I set the following fields to these values:', $table),
+            new Given('I press "' . get_string('posttoforum', 'forum') . '"'),
+            new Given('I wait to be redirected')
+        );
 
-        // Fill form and post.
-        $this->execute_step('behat_forms::i_set_the_following_fields_to_these_values', $table);
-        $this->execute_step('behat_forms::press_button', get_string('posttoforum', 'forum'));
-        $this->execute_step('behat_general::i_wait_to_be_redirected', false);
     }
 
 }
