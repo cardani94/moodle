@@ -464,8 +464,7 @@ class behat_forms extends behat_base {
      */
     public function i_select_from_the_singleselect($option, $singleselect) {
 
-        $this->execute('behat_forms::i_set_the_field_to', array($this->escape($singleselect), $this->escape($option)),
-            false, false);
+        $this->execute('behat_forms::i_set_the_field_to', array($this->escape($singleselect), $this->escape($option)));
 
         if (!$this->running_javascript()) {
             // Press button in the specified select container.
@@ -478,8 +477,7 @@ class behat_forms extends behat_base {
                 ")]";
 
             $this->execute('behat_general::i_click_on_in_the',
-                array(get_string('go'), "button", $containerxpath, "xpath_element"),
-                false, false
+                array(get_string('go'), "button", $containerxpath, "xpath_element")
             );
         }
     }

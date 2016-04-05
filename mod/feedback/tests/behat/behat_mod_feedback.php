@@ -52,8 +52,7 @@ class behat_mod_feedback extends behat_base {
         $questiontype = $this->escape($questiontype);
         $additem = $this->escape(get_string('add_item', 'feedback'));
 
-        $this->execute('behat_forms::i_select_from_the_singleselect', array($questiontype, $additem),
-            true, true);
+        $this->execute('behat_forms::i_select_from_the_singleselect', array($questiontype, $additem));
 
         $rows = $questiondata->getRows();
         $modifiedrows = array();
@@ -65,11 +64,9 @@ class behat_mod_feedback extends behat_base {
         }
         $newdata = new TableNode($modifiedrows);
 
-        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $newdata,
-            true, true);
+        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $newdata);
 
         $saveitem = $this->escape(get_string('save_item', 'feedback'));
-        $this->execute("behat_forms::press_button", $saveitem,
-            false, false);
+        $this->execute("behat_forms::press_button", $saveitem);
     }
 }

@@ -151,8 +151,7 @@ class behat_navigation extends behat_base {
         if ($this->running_javascript()) {
             // The user menu must be expanded when JS is enabled.
             $xpath = "//div[@class='usermenu']//a[contains(concat(' ', @class, ' '), ' toggle-display ')]";
-            $this->execute("behat_general::i_click_on", array($this->escape($xpath), "xpath_element"),
-                true, false);
+            $this->execute("behat_general::i_click_on", array($this->escape($xpath), "xpath_element"));
         }
 
         // Now select the link.
@@ -160,8 +159,7 @@ class behat_navigation extends behat_base {
         $csspath = ".usermenu [data-rel='menu-content']";
 
         $this->execute('behat_general::i_click_on_in_the',
-            array($nodetext, "link", $csspath, "css_element"),
-            false, false
+            array($nodetext, "link", $csspath, "css_element")
         );
     }
 
@@ -182,8 +180,7 @@ class behat_navigation extends behat_base {
             if ($nodetext === get_string('administrationsite')) {
                 // Administration menu is not loaded by default any more. Click the link to expand.
                 $this->execute('behat_general::i_click_on_in_the',
-                    array($nodetext, "link", get_string('administration'), "block"),
-                    true, true
+                    array($nodetext, "link", get_string('administration'), "block")
                 );
                 return true;
             }
@@ -416,7 +413,6 @@ class behat_navigation extends behat_base {
             return false;
         }
 
-        $this->execute('behat_general::i_click_on', array(".btn-navbar", "css_element"),
-            false, false);
+        $this->execute('behat_general::i_click_on', array(".btn-navbar", "css_element"));
     }
 }

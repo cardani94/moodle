@@ -48,14 +48,11 @@ class behat_auth extends behat_base {
         $this->getSession()->visit($this->locate_path('login/index.php'));
 
         // Enter username and password.
-        $this->execute('behat_forms::i_set_the_field_to', array('Username', $this->escape($username)),
-            false, false);
-        $this->execute('behat_forms::i_set_the_field_to', array('Password', $this->escape($username)),
-            false, false);
+        $this->execute('behat_forms::i_set_the_field_to', array('Username', $this->escape($username)));
+        $this->execute('behat_forms::i_set_the_field_to', array('Password', $this->escape($username)));
 
         // Press log in button, no need to check for exceptions as it will checked after this step execution.
-        $this->execute('behat_forms::press_button', get_string('login'),
-            false, false);
+        $this->execute('behat_forms::press_button', get_string('login'));
     }
 
     /**
@@ -72,12 +69,10 @@ class behat_auth extends behat_base {
         if ($this->running_javascript()) {
             $xpath = "//div[@class='usermenu']//a[contains(concat(' ', @class, ' '), ' toggle-display ')]";
 
-            $this->execute('behat_general::i_click_on', array($xpath, "xpath_element"),
-                false, false);
+            $this->execute('behat_general::i_click_on', array($xpath, "xpath_element"));
         }
 
         // No need to check for exceptions as it will checked after this step execution.
-        $this->execute('behat_general::click_link', get_string('logout'),
-            false, false);
+        $this->execute('behat_general::click_link', get_string('logout'));
     }
 }

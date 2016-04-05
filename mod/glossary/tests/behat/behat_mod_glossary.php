@@ -46,14 +46,11 @@ class behat_mod_glossary extends behat_base {
      * @param TableNode $data
      */
     public function i_add_a_glossary_entry_with_the_following_data(TableNode $data) {
-        $this->execute("behat_forms::press_button", get_string('addentry', 'mod_glossary'),
-            true, true);
+        $this->execute("behat_forms::press_button", get_string('addentry', 'mod_glossary'));
 
-        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $data,
-            true, true);
+        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $data);
 
-        $this->execute("behat_forms::press_button", get_string('savechanges'),
-            false, false);
+        $this->execute("behat_forms::press_button", get_string('savechanges'));
     }
 
     /**
@@ -64,21 +61,15 @@ class behat_mod_glossary extends behat_base {
      */
     public function i_add_a_glossary_entries_category_named($categoryname) {
 
-        $this->execute("behat_general::click_link", get_string('categoryview', 'mod_glossary'),
-            true, true);
+        $this->execute("behat_general::click_link", get_string('categoryview', 'mod_glossary'));
 
-        $this->execute("behat_forms::press_button", get_string('editcategories', 'mod_glossary'),
-            true, true);
+        $this->execute("behat_forms::press_button", get_string('editcategories', 'mod_glossary'));
 
-        $this->execute("behat_forms::press_button", get_string('add').' '.get_string('category', 'glossary'),
-            true, true);
+        $this->execute("behat_forms::press_button", get_string('add').' '.get_string('category', 'glossary'));
 
-        $this->execute('behat_forms::i_set_the_field_to', array('name', $this->escape($categoryname)),
-            false, false);
+        $this->execute('behat_forms::i_set_the_field_to', array('name', $this->escape($categoryname)));
 
-        $this->execute("behat_forms::press_button", get_string('savechanges'),
-            true, true);
-        $this->execute("behat_forms::press_button", get_string('back', 'mod_glossary'),
-            false, false);
+        $this->execute("behat_forms::press_button", get_string('savechanges'));
+        $this->execute("behat_forms::press_button", get_string('back', 'mod_glossary'));
     }
 }

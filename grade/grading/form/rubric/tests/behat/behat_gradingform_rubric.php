@@ -306,8 +306,7 @@ class behat_gradingform_rubric extends behat_base {
                 // Using in_array() as there are only a few elements.
                 if (!in_array('checked', explode(' ', $levelnode->getAttribute('class')))) {
                     $this->execute('behat_general::i_click_on_in_the',
-                        array($selectedlevelxpath, "xpath_element", $this->escape($name), "table_row"),
-                        true, true
+                        array($selectedlevelxpath, "xpath_element", $this->escape($name), "table_row")
                     );
                 }
 
@@ -325,8 +324,7 @@ class behat_gradingform_rubric extends behat_base {
 
             // First we need to get the textarea name, then we can set the value.
             $textarea = $this->get_node_in_container('css_element', 'textarea', 'table_row', $name);
-            $this->execute('behat_forms::i_set_the_field_to', array($textarea->getAttribute('name'), $criterion[1]),
-                true, true);
+            $this->execute('behat_forms::i_set_the_field_to', array($textarea->getAttribute('name'), $criterion[1]));
         }
     }
 

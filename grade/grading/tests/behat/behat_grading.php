@@ -47,11 +47,9 @@ class behat_grading extends behat_base {
      */
     public function i_go_to_advanced_grading_page($activityname) {
 
-        $this->execute('behat_general::click_link', $this->escape($activityname),
-            true, true);
+        $this->execute('behat_general::click_link', $this->escape($activityname));
 
-        $this->execute('behat_general::click_link', get_string('gradingmanagement', 'grading'),
-            false, false);
+        $this->execute('behat_general::click_link', get_string('gradingmanagement', 'grading'));
     }
 
     /**
@@ -70,11 +68,9 @@ class behat_grading extends behat_base {
         $definitionxpath = "//a[@class='action']" .
             "[./descendant::*[contains(., $newactionliteral) or contains(., $editactionliteral)]]";
 
-        $this->execute('behat_grading::i_go_to_advanced_grading_page', $this->escape($activityname),
-            true, true);
+        $this->execute('behat_grading::i_go_to_advanced_grading_page', $this->escape($activityname));
 
-        $this->execute("behat_general::i_click_on", array($this->escape($definitionxpath), "xpath_element"),
-            false, false);
+        $this->execute("behat_general::i_click_on", array($this->escape($definitionxpath), "xpath_element"));
     }
     /**
      * Goes to the student's advanced grading page.
@@ -91,19 +87,16 @@ class behat_grading extends behat_base {
         // Shortcut in case we already are in the grading page.
         $usergradetextliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($usergradetext);
         if ($this->getSession()->getPage()->find('named_partial', array('link', $usergradetextliteral))) {
-            $this->execute('behat_general::click_link', $this->escape($usergradetext),
-                false, false);
+            $this->execute('behat_general::click_link', $this->escape($usergradetext));
+
             return true;
         }
 
-        $this->execute('behat_general::click_link', $this->escape($activityname),
-            true, true);
+        $this->execute('behat_general::click_link', $this->escape($activityname));
 
-        $this->execute('behat_general::click_link', $this->escape(get_string('viewgrading', 'assign')),
-            true, true);
+        $this->execute('behat_general::click_link', $this->escape(get_string('viewgrading', 'assign')));
 
-        $this->execute('behat_general::click_link', $this->escape($usergradetext),
-            false, false);
+        $this->execute('behat_general::click_link', $this->escape($usergradetext));
     }
 
     /**
@@ -114,14 +107,11 @@ class behat_grading extends behat_base {
      */
     public function i_publish_grading_form_definition_as_a_public_template($activityname) {
 
-        $this->execute('behat_grading::i_go_to_advanced_grading_page', $this->escape($activityname),
-            true, true);
+        $this->execute('behat_grading::i_go_to_advanced_grading_page', $this->escape($activityname));
 
-        $this->execute("behat_general::i_click_on", array($this->escape(get_string("manageactionshare", "grading")), "link"),
-            true, true);
+        $this->execute("behat_general::i_click_on", array($this->escape(get_string("manageactionshare", "grading")), "link"));
 
-        $this->execute('behat_forms::press_button', get_string('continue'),
-            false, false);
+        $this->execute('behat_forms::press_button', get_string('continue'));
     }
 
     /**
@@ -144,23 +134,17 @@ class behat_grading extends behat_base {
         $usetemplatexpath = "/a[./descendant::div[text()=$literaltemplate]]|" .
             "/a[./descendant::div[text()=$literalownform]]";
 
-        $this->execute('behat_grading::i_go_to_advanced_grading_page', $this->escape($activityname),
-            true, true);
+        $this->execute('behat_grading::i_go_to_advanced_grading_page', $this->escape($activityname));
 
-        $this->execute('behat_general::click_link', $this->escape(get_string('manageactionclone', 'grading')),
-            true, true);
-        $this->execute('behat_forms::i_set_the_field_to', array(get_string('searchownforms', 'grading'), 1),
-            true, true);
+        $this->execute('behat_general::click_link', $this->escape(get_string('manageactionclone', 'grading')));
+        $this->execute('behat_forms::i_set_the_field_to', array(get_string('searchownforms', 'grading'), 1));
         $this->execute('behat_general::i_click_on_in_the',
-            array(get_string('search'), "button", "region-main", "region"),
-            true, true
+            array(get_string('search'), "button", "region-main", "region")
         );
         $this->execute('behat_general::i_click_on_in_the',
-            array($this->escape($usetemplatexpath), "xpath_element", $this->escape($templatexpath), "xpath_element"),
-            true, true
+            array($this->escape($usetemplatexpath), "xpath_element", $this->escape($templatexpath), "xpath_element")
         );
-        $this->execute('behat_forms::press_button', get_string('continue'),
-            false, false);
+        $this->execute('behat_forms::press_button', get_string('continue'));
 
     }
 
@@ -171,10 +155,8 @@ class behat_grading extends behat_base {
      */
     public function i_save_the_advanced_grading_form() {
 
-        $this->execute('behat_forms::press_button', get_string('savechanges'),
-            true, true);
-        $this->execute('behat_forms::press_button', get_string('continue'),
-            false, false);
+        $this->execute('behat_forms::press_button', get_string('savechanges'));
+        $this->execute('behat_forms::press_button', get_string('continue'));
     }
 
     /**
@@ -184,8 +166,7 @@ class behat_grading extends behat_base {
      * @param TableNode $data
      */
     public function i_complete_the_advanced_grading_form_with_these_values(TableNode $data) {
-        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $data,
-            true, true);
-        $this->execute('behat_grading::i_save_the_advanced_grading_form', false, false);
+        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $data);
+        $this->execute('behat_grading::i_save_the_advanced_grading_form');
     }
 }

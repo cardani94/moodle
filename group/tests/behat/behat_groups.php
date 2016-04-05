@@ -105,7 +105,7 @@ class behat_groups extends behat_base {
             $xpath = "//h3[normalize-space(.) = '{$grouping}']/following-sibling::table//tr//".
                 "td[contains(concat(' ', normalize-space(@class), ' '), ' c0 ')][normalize-space(.) = '{$groupname}' ]";
 
-            $this->execute('behat_general::should_exist', array($xpath, 'xpath_element'), false, false);
+            $this->execute('behat_general::should_exist', array($xpath, 'xpath_element'));
         }
     }
 }

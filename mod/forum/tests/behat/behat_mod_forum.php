@@ -79,7 +79,7 @@ class behat_mod_forum extends behat_base {
         $this->execute('behat_forms::i_set_the_following_fields_to_these_values', $table);
 
         $this->execute('behat_forms::press_button', get_string('posttoforum', 'forum'));
-        $this->execute('behat_general::i_wait_to_be_redirected', false);
+        $this->execute('behat_general::i_wait_to_be_redirected');
     }
 
     /**
@@ -101,7 +101,7 @@ class behat_mod_forum extends behat_base {
         // Fill form and post.
         $this->execute('behat_forms::i_set_the_following_fields_to_these_values', $table);
         $this->execute('behat_forms::press_button', get_string('posttoforum', 'forum'));
-        $this->execute('behat_general::i_wait_to_be_redirected', false);
+        $this->execute('behat_general::i_wait_to_be_redirected');
     }
 
 }

@@ -48,8 +48,7 @@ class behat_course extends behat_base {
      */
     public function i_turn_editing_mode_on() {
 
-        $this->execute("behat_forms::press_button", get_string('turneditingon'),
-            false, false);
+        $this->execute("behat_forms::press_button", get_string('turneditingon'));
     }
 
     /**
@@ -58,8 +57,7 @@ class behat_course extends behat_base {
      */
     public function i_turn_editing_mode_off() {
 
-        $this->execute("behat_forms::press_button", get_string('turneditingoff'),
-            false, false);
+        $this->execute("behat_forms::press_button", get_string('turneditingoff'));
     }
 
     /**
@@ -73,18 +71,15 @@ class behat_course extends behat_base {
         // Go to course management page.
         $this->i_go_to_the_courses_management_page();
         // Ensure you are on course management page.
-        $this->execute("behat_course::i_should_see_the_courses_management_page", get_string('categories'),
-            true, true);
+        $this->execute("behat_course::i_should_see_the_courses_management_page", get_string('categories'));
 
         // Select Miscellaneous category.
         $this->i_click_on_category_in_the_management_interface(get_string('miscellaneous'));
-        $this->execute("behat_course::i_should_see_the_courses_management_page", get_string('categoriesandcoures'),
-            true, true);
+        $this->execute("behat_course::i_should_see_the_courses_management_page", get_string('categoriesandcoures'));
 
         // Click create new course.
         $this->execute('behat_general::i_click_on_in_the',
-            array(get_string('createnewcourse'), "link", "#course-listing", "css_element"),
-            true, true
+            array(get_string('createnewcourse'), "link", "#course-listing", "css_element")
         );
 
         // If the course format is one of the fields we change how we
@@ -114,18 +109,14 @@ class behat_course extends behat_base {
             // format field when the editor is being rendered and the click misses the field coordinates.
             $this->execute("behat_forms::i_expand_all_fieldsets");
 
-            $this->execute("behat_forms::i_set_the_field_to",
-                array($formatfield, $formatvalue),
-                false, false);
+            $this->execute("behat_forms::i_set_the_field_to", array($formatfield, $formatvalue));
         }
 
         // Set form fields.
-        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $table,
-            true, true);
+        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $table);
 
         // Save course settings.
-        $this->execute("behat_forms::press_button", get_string('savechangesanddisplay'),
-            false, false);
+        $this->execute("behat_forms::press_button", get_string('savechangesanddisplay'));
 
     }
 
@@ -143,8 +134,8 @@ class behat_course extends behat_base {
 
         // Navigate to course management page via navigation block.
         $this->execute("behat_navigation::i_navigate_to_node_in",
-            array(get_string('coursemgmt', 'admin'), $parentnodes),
-            false, false);
+            array(get_string('coursemgmt', 'admin'), $parentnodes)
+        );
 
     }
 
@@ -160,19 +151,17 @@ class behat_course extends behat_base {
 
         // Add activity to section.
         $this->execute("behat_course::i_add_to_section",
-            array($this->escape($activity), $this->escape($section)),
-            false, true);
+            array($this->escape($activity), $this->escape($section))
+        );
 
         // Wait to be redirected.
         $this->execute('behat_general::wait_until_the_page_is_ready');
 
         // Set form fields.
-        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $data,
-            false, true);
+        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $data);
 
         // Save course settings.
-        $this->execute("behat_forms::press_button", get_string('savechangesandreturntocourse'),
-            false, false);
+        $this->execute("behat_forms::press_button", get_string('savechangesandreturntocourse'));
     }
 
     /**
@@ -284,8 +273,7 @@ class behat_course extends behat_base {
 
         // Click on delete link.
         $this->execute('behat_general::i_click_on_in_the',
-            array($strdelete, "link", $this->escape($xpath), "xpath_element"),
-            false, false
+            array($strdelete, "link", $this->escape($xpath), "xpath_element")
         );
 
     }
@@ -308,8 +296,7 @@ class behat_course extends behat_base {
 
         // Click on highlight topic link.
         $this->execute('behat_general::i_click_on_in_the',
-            array(get_string('markthistopic'), "link", $this->escape($xpath), "xpath_element"),
-            false, false
+            array(get_string('markthistopic'), "link", $this->escape($xpath), "xpath_element")
         );
     }
 
@@ -331,8 +318,7 @@ class behat_course extends behat_base {
 
         // Click on un-highlight topic link.
         $this->execute('behat_general::i_click_on_in_the',
-            array(get_string('markedthistopic'), "link", $this->escape($xpath), "xpath_element"),
-            false, false
+            array(get_string('markedthistopic'), "link", $this->escape($xpath), "xpath_element")
         );
     }
 
@@ -400,8 +386,7 @@ class behat_course extends behat_base {
 
         // Click on un-highlight topic link.
         $this->execute('behat_general::i_click_on_in_the',
-            array($stredit, "link", "#section-" . $sectionnumber, "css_element"),
-            false, false
+            array($stredit, "link", "#section-" . $sectionnumber, "css_element")
         );
 
     }
@@ -419,12 +404,10 @@ class behat_course extends behat_base {
         $this->execute("behat_course::i_edit_the_section");
 
         // Set form fields.
-        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $data,
-            true, true);
+        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $data);
 
         // Save section settings.
-        $this->execute("behat_forms::press_button", get_string('savechanges'),
-            false, false);
+        $this->execute("behat_forms::press_button", get_string('savechanges'));
     }
 
     /**
@@ -696,8 +679,7 @@ class behat_course extends behat_base {
 
             $this->execute("behat_general::i_drag_and_i_drop_it_in",
                 array($this->escape($activitynode->getXpath()), "xpath_element",
-                    $this->escape($destinationxpath), "xpath_element"),
-                false, false
+                    $this->escape($destinationxpath), "xpath_element")
             );
 
         } else {
@@ -705,13 +687,11 @@ class behat_course extends behat_base {
 
             // Moving to the fist spot of the section (before all other section's activities).
             $this->execute('behat_course::i_click_on_in_the_activity',
-                array("a.editing_move", "css_element", $this->escape($activityname)),
-                true, true
+                array("a.editing_move", "css_element", $this->escape($activityname))
             );
 
             $this->execute('behat_general::i_click_on_in_the',
-                array("li.movehere a", "css_element", $this->escape($sectionxpath), "xpath_element"),
-                false, false
+                array("li.movehere a", "css_element", $this->escape($sectionxpath), "xpath_element")
             );
         }
     }
@@ -733,13 +713,13 @@ class behat_course extends behat_base {
         $activity = $this->escape($activityname);
 
         $this->execute('behat_course::i_click_on_in_the_activity',
-            array(get_string('edittitle'), "link", $activity),
-            true, true
+            array(get_string('edittitle'), "link", $activity)
         );
 
         // Adding chr(10) to save changes.
-        $this->execute('behat_forms::i_set_the_field_to', array('title', $this->escape($newactivityname) . chr(10)),
-            false, false);
+        $this->execute('behat_forms::i_set_the_field_to',
+            array('title', $this->escape($newactivityname) . chr(10))
+        );
 
     }
 
@@ -764,8 +744,7 @@ class behat_course extends behat_base {
         }
 
         $this->execute('behat_course::i_click_on_in_the_activity',
-            array("a[role='menuitem']", "css_element", $this->escape($activityname)),
-            true, false
+            array("a[role='menuitem']", "css_element", $this->escape($activityname))
         );
 
     }
@@ -791,8 +770,7 @@ class behat_course extends behat_base {
         }
 
         $this->execute('behat_course::i_click_on_in_the_activity',
-            array("a[role='menuitem']", "css_element", $this->escape($activityname)),
-            false, false
+            array("a[role='menuitem']", "css_element", $this->escape($activityname))
         );
     }
 
@@ -831,8 +809,7 @@ class behat_course extends behat_base {
         }
 
         $this->execute('behat_course::i_click_on_in_the_activity',
-            array(get_string('moveright'), "link", $this->escape($activity)),
-            false, false
+            array(get_string('moveright'), "link", $this->escape($activity))
         );
 
     }
@@ -851,8 +828,7 @@ class behat_course extends behat_base {
         }
 
         $this->execute('behat_course::i_click_on_in_the_activity',
-            array(get_string('moveleft'), "link", $this->escape($activity)),
-            false, false
+            array(get_string('moveleft'), "link", $this->escape($activity))
         );
 
     }
@@ -871,8 +847,7 @@ class behat_course extends behat_base {
         }
 
         $this->execute('behat_course::i_click_on_in_the_activity',
-            array(get_string('delete'), "link", $this->escape($activity)),
-            true, true
+            array(get_string('delete'), "link", $this->escape($activity))
         );
 
         // JS enabled.
@@ -880,12 +855,10 @@ class behat_course extends behat_base {
         // JS modal windows and avoiding interacting them at the same time.
         if ($this->running_javascript()) {
             $this->execute('behat_general::i_click_on_in_the',
-                array(get_string('yes'), "button", "Confirm", "dialogue"),
-                false, false
+                array(get_string('yes'), "button", "Confirm", "dialogue")
             );
         } else {
-            $this->execute("behat_forms::press_button", get_string('yes'),
-                false, false);
+            $this->execute("behat_forms::press_button", get_string('yes'));
         }
 
         return $steps;
@@ -904,8 +877,7 @@ class behat_course extends behat_base {
             $this->i_open_actions_menu($activity);
         }
         $this->execute('behat_course::i_click_on_in_the_activity',
-            array(get_string('duplicate'), "link", $activity),
-            false, false
+            array(get_string('duplicate'), "link", $activity)
         );
 
     }
@@ -922,8 +894,7 @@ class behat_course extends behat_base {
         $activity = $this->escape($activityname);
         $activityliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($activityname);
 
-        $this->execute("behat_course::i_duplicate_activity", $activity,
-            true, true);
+        $this->execute("behat_course::i_duplicate_activity", $activity);
 
         // Determine the future new activity xpath from the former one.
         $duplicatedxpath = "//li[contains(concat(' ', normalize-space(@class), ' '), ' activity ')]" .
@@ -938,8 +909,8 @@ class behat_course extends behat_base {
                 "/descendant::div[contains(concat(' ', @class, ' '), ' lightbox ')][contains(@style, 'display: none')]";
 
             $this->execute("behat_general::wait_until_exists",
-                array($this->escape($hiddenlightboxxpath), "xpath_element"),
-                false, false);
+                array($this->escape($hiddenlightboxxpath), "xpath_element")
+            );
 
             // Close the original activity actions menu.
             $this->i_close_actions_menu($activity);
@@ -947,20 +918,17 @@ class behat_course extends behat_base {
             // The next sibling of the former activity will be the duplicated one, so we click on it from it's xpath as, at
             // this point, it don't even exists in the DOM (the steps are executed when we return them).
             $this->execute('behat_general::i_click_on',
-                array($this->escape($duplicatedactionsmenuxpath), "xpath_element"),
-                true, true);
+                array($this->escape($duplicatedactionsmenuxpath), "xpath_element")
+            );
         }
 
         // We force the xpath as otherwise mink tries to interact with the former one.
         $this->execute('behat_general::i_click_on_in_the',
-            array(get_string('editsettings'), "link", $this->escape($duplicatedxpath), "xpath_element"),
-            true, true
+            array(get_string('editsettings'), "link", $this->escape($duplicatedxpath), "xpath_element")
         );
 
-        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $data,
-            false, false);
-        $this->execute("behat_forms::press_button", get_string('savechangesandreturntocourse'),
-            true, true);
+        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $data);
+        $this->execute("behat_forms::press_button", get_string('savechangesandreturntocourse'));
 
     }
 
@@ -1361,12 +1329,11 @@ class behat_course extends behat_base {
         $this->i_select_category_in_the_management_interface($name);
 
         $this->execute('behat_forms::i_set_the_field_to',
-            array('menumovecategoriesto', coursecat::get(0)->get_formatted_name()),
-            false, false);
+            array('menumovecategoriesto', coursecat::get(0)->get_formatted_name())
+        );
 
         // Save event.
-        $this->execute("behat_forms::press_button", "bulkmovecategories",
-            false, false);
+        $this->execute("behat_forms::press_button", "bulkmovecategories");
     }
 
     /**
@@ -1614,32 +1581,28 @@ class behat_course extends behat_base {
      */
     public function i_should_see_the_courses_management_page($mode) {
         $this->execute("behat_general::assert_element_contains_text",
-            array("Course and category management", "h2", "css_element"),
-            false, false);
+            array("Course and category management", "h2", "css_element")
+        );
 
         switch ($mode) {
             case "Courses":
-                $this->execute("behat_general::should_not_exist", array("#category-listing", "css_element"),
-                    false, false);
-                $this->execute("behat_general::should_exist", array("#course-listing", "css_element"),
-                    false, false);
+                $this->execute("behat_general::should_not_exist", array("#category-listing", "css_element"));
+                $this->execute("behat_general::should_exist", array("#course-listing", "css_element"));
                 break;
+
             case "Course categories":
-                $this->execute("behat_general::should_exist", array("#category-listing", "css_element"),
-                    false, false);
-                $this->execute("behat_general::should_exist", array("#course-listing", "css_element"),
-                    false, false);
+                $this->execute("behat_general::should_exist", array("#category-listing", "css_element"));
+                $this->execute("behat_general::should_exist", array("#course-listing", "css_element"));
                 break;
+
             case "Courses categories and courses":
             default:
-                $this->execute("behat_general::should_exist", array("#category-listing", "css_element"),
-                    false, false);
-                $this->execute("behat_general::should_exist", array("#course-listing", "css_element"),
-                    false, false);
+                $this->execute("behat_general::should_exist", array("#category-listing", "css_element"));
+                $this->execute("behat_general::should_exist", array("#course-listing", "css_element"));
                 break;
         }
-        $this->execute("behat_general::should_not_exist", array("#course-detail", "css_element"),
-            false, false);
+
+        $this->execute("behat_general::should_not_exist", array("#course-detail", "css_element"));
     }
 
     /**
@@ -1650,32 +1613,27 @@ class behat_course extends behat_base {
      */
     public function i_should_see_the_courses_management_page_with_a_course_selected($mode) {
         $this->execute("behat_general::assert_element_contains_text",
-            array("Course and category management", "h2", "css_element"),
-            false, false);
+            array("Course and category management", "h2", "css_element"));
 
         switch ($mode) {
             case "Courses":
-                $this->execute("behat_general::should_not_exist", array("#category-listing", "css_element"),
-                    false, false);
-                $this->execute("behat_general::should_exist", array("#course-listing", "css_element"),
-                    false, false);
+                $this->execute("behat_general::should_not_exist", array("#category-listing", "css_element"));
+                $this->execute("behat_general::should_exist", array("#course-listing", "css_element"));
                 break;
+
             case "Course categories":
-                $this->execute("behat_general::should_exist", array("#category-listing", "css_element"),
-                    false, false);
-                $this->execute("behat_general::should_exist", array("#course-listing", "css_element"),
-                    false, false);
+                $this->execute("behat_general::should_exist", array("#category-listing", "css_element"));
+                $this->execute("behat_general::should_exist", array("#course-listing", "css_element"));
                 break;
+
             case "Courses categories and courses":
             default:
-                $this->execute("behat_general::should_exist", array("#category-listing", "css_element"),
-                    false, false);
-                $this->execute("behat_general::should_exist", array("#course-listing", "css_element"),
-                    false, false);
+                $this->execute("behat_general::should_exist", array("#category-listing", "css_element"));
+                $this->execute("behat_general::should_exist", array("#course-listing", "css_element"));
                 break;
         }
-        $this->execute("behat_general::should_exist", array("#course-detail", "css_element"),
-            false, false);
+
+        $this->execute("behat_general::should_exist", array("#course-detail", "css_element"));
     }
 
     /**

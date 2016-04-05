@@ -43,8 +43,7 @@ class behat_grade extends behat_base {
         $gradelabel = $userfullname . ' ' . $itemname;
         $fieldstr = get_string('useractivitygrade', 'gradereport_grader', $gradelabel);
 
-        $this->execute('behat_forms::i_set_the_field_to', array($this->escape($fieldstr), $grade),
-            false, false);
+        $this->execute('behat_forms::i_set_the_field_to', array($this->escape($fieldstr), $grade));
     }
 
     /**
@@ -60,8 +59,7 @@ class behat_grade extends behat_base {
         $gradelabel = $userfullname . ' ' . $itemname;
         $fieldstr = get_string('useractivityfeedback', 'gradereport_grader', $gradelabel);
 
-        $this->execute('behat_forms::i_set_the_field_to', array($this->escape($fieldstr), $this->escape($feedback)),
-            false, false);
+        $this->execute('behat_forms::i_set_the_field_to', array($this->escape($fieldstr), $this->escape($feedback)));
     }
 
     /**
@@ -80,8 +78,7 @@ class behat_grade extends behat_base {
         if ($this->running_javascript()) {
             $xpath = "//tr[contains(.,$gradeitem)]//*[contains(@class,'moodle-actionmenu')]//a[contains(@class,'toggle-display')]";
             if ($this->getSession()->getPage()->findAll('xpath', $xpath)) {
-                $this->execute("behat_general::i_click_on", array($this->escape($xpath), "xpath_element"),
-                    true, true);
+                $this->execute("behat_general::i_click_on", array($this->escape($xpath), "xpath_element"));
             }
         }
 
@@ -89,12 +86,9 @@ class behat_grade extends behat_base {
         $edit = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string('edit') . '  ');
         $linkxpath = "//a[./img[starts-with(@title,$edit) and contains(@title,$gradeitem)]]";
 
-        $this->execute("behat_general::i_click_on", array($this->escape($linkxpath), "xpath_element"),
-            true, true);
-        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $data,
-            true, true);
-        $this->execute('behat_forms::press_button', $this->escape($savechanges),
-            false, false);
+        $this->execute("behat_general::i_click_on", array($this->escape($linkxpath), "xpath_element"));
+        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $data);
+        $this->execute('behat_forms::press_button', $this->escape($savechanges));
     }
 
     /**
@@ -113,8 +107,7 @@ class behat_grade extends behat_base {
         if ($this->running_javascript()) {
             $xpath = "//tr[contains(.,$gradeitem)]//*[contains(@class,'moodle-actionmenu')]//a[contains(@class,'toggle-display')]";
             if ($this->getSession()->getPage()->findAll('xpath', $xpath)) {
-                $this->execute("behat_general::i_click_on", array($this->escape($xpath), "xpath_element"),
-                    true, true);
+                $this->execute("behat_general::i_click_on", array($this->escape($xpath), "xpath_element"));
             }
         }
 
@@ -122,8 +115,7 @@ class behat_grade extends behat_base {
         $savechanges = get_string('savechanges', 'grades');
         $edit = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string('editcalculation', 'grades'));
         $linkxpath = "//a[./img[starts-with(@title,$edit) and contains(@title,$gradeitem)]]";
-        $this->execute("behat_general::i_click_on", array($this->escape($linkxpath), "xpath_element"),
-            true, true);
+        $this->execute("behat_general::i_click_on", array($this->escape($linkxpath), "xpath_element"));
 
         // Mapping names to idnumbers.
         $datahash = $data->getRowsHash();
@@ -135,16 +127,12 @@ class behat_grade extends behat_base {
                 " or " .
                 "parent::li[@class='categoryitem' or @class='courseitem']/parent::ul/parent::li[starts-with(text(),'" . $gradeitem . "')]" .
             "]";
-            $this->execute('behat_forms::i_set_the_field_with_xpath_to', array($inputxpath, $idnumber),
-                true, true);
+            $this->execute('behat_forms::i_set_the_field_with_xpath_to', array($inputxpath, $idnumber));
         }
 
-        $this->execute('behat_forms::press_button', get_string('addidnumbers', 'grades'),
-            true, true);
-        $this->execute('behat_forms::i_set_the_field_to', array(get_string('calculation', 'grades'), $calculation),
-            true, true);
-        $this->execute('behat_forms::press_button', $savechanges,
-            false, false);
+        $this->execute('behat_forms::press_button', get_string('addidnumbers', 'grades'));
+        $this->execute('behat_forms::i_set_the_field_to', array(get_string('calculation', 'grades'), $calculation));
+        $this->execute('behat_forms::press_button', $savechanges);
 
     }
 
@@ -166,8 +154,7 @@ class behat_grade extends behat_base {
             $xpath = "//tr[contains(.,$gradecategorytotal)]//*[contains(@class,'moodle-actionmenu')]" .
                 "//a[contains(@class,'toggle-display')]";
             if ($this->getSession()->getPage()->findAll('xpath', $xpath)) {
-                $this->execute("behat_general::i_click_on", array($this->escape($xpath), "xpath_element"),
-                    true, true);
+                $this->execute("behat_general::i_click_on", array($this->escape($xpath), "xpath_element"));
             }
         }
 
@@ -175,8 +162,7 @@ class behat_grade extends behat_base {
         $savechanges = get_string('savechanges', 'grades');
         $edit = $this->getSession()->getSelectorsHandler()->xpathLiteral(get_string('editcalculation', 'grades'));
         $linkxpath = "//a[./img[starts-with(@title,$edit) and contains(@title,$gradeitem)]]";
-        $this->execute("behat_general::i_click_on", array($this->escape($linkxpath), "xpath_element"),
-            true, true);
+        $this->execute("behat_general::i_click_on", array($this->escape($linkxpath), "xpath_element"));
 
         // Mapping names to idnumbers.
         $datahash = $data->getRowsHash();
@@ -189,17 +175,13 @@ class behat_grade extends behat_base {
                 "parent::li[@class='categoryitem' | @class='courseitem']" .
                 "/parent::ul/parent::li[starts-with(text(),'" . $gradeitem . "')]" .
             "]";
-            $this->execute('behat_forms::i_set_the_field_with_xpath_to', array($inputxpath, $idnumber),
-                true, true);
+            $this->execute('behat_forms::i_set_the_field_with_xpath_to', array($inputxpath, $idnumber));
         }
 
-        $this->execute('behat_forms::press_button', get_string('addidnumbers', 'grades'),
-            true, true);
+        $this->execute('behat_forms::press_button', get_string('addidnumbers', 'grades'));
 
-        $this->execute('behat_forms::i_set_the_field_to', array(get_string('calculation', 'grades'), $calculation),
-            true, true);
-        $this->execute('behat_forms::press_button', $savechanges,
-            false, false);
+        $this->execute('behat_forms::i_set_the_field_to', array(get_string('calculation', 'grades'), $calculation));
+        $this->execute('behat_forms::press_button', $savechanges);
     }
 
     /**
@@ -218,14 +200,12 @@ class behat_grade extends behat_base {
             $gradeitemliteral = $this->getSession()->getSelectorsHandler()->xpathLiteral($gradeitem);
             $xpath = "//tr[contains(.,$gradeitemliteral)]//*[contains(@class,'moodle-actionmenu')]//a[contains(@class,'toggle-display')]";
             if ($this->getSession()->getPage()->findAll('xpath', $xpath)) {
-                $this->execute("behat_general::i_click_on", array($this->escape($xpath), "xpath_element"),
-                    true, true);
+                $this->execute("behat_general::i_click_on", array($this->escape($xpath), "xpath_element"));
             }
         }
 
         $linktext = get_string('resetweights', 'grades', (object)array('itemname' => $gradeitem));
-        $this->execute("behat_general::i_click_on", array($this->escape($linktext), "link"),
-            false, false);
+        $this->execute("behat_general::i_click_on", array($this->escape($linktext), "link"));
     }
 
     /**

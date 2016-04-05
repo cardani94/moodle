@@ -56,23 +56,20 @@ class behat_cohort extends behat_base {
 
             $this->execute("behat_general::i_am_on_homepage");
             $this->execute("behat_navigation::i_navigate_to_node_in",
-                array(get_string('cohorts', 'cohort'), $parentnodes),
-                true, true);
+                array(get_string('cohorts', 'cohort'), $parentnodes)
+            );
         }
 
         $this->execute('behat_general::i_click_on_in_the',
-            array(get_string('assign', 'cohort'), "link", $this->escape($cohortidnumber), "table_row"),
-            true, true
+            array(get_string('assign', 'cohort'), "link", $this->escape($cohortidnumber), "table_row")
         );
 
         $this->execute("behat_forms::i_set_the_field_to",
-            array(get_string('potusers', 'cohort'), $this->escape($user)),
-            false, false);
+            array(get_string('potusers', 'cohort'), $this->escape($user))
+        );
 
-        $this->execute("behat_forms::press_button", get_string('add'),
-            true, true);
-        $this->execute("behat_forms::press_button", get_string('backtocohorts', 'cohort'),
-            false, false);
+        $this->execute("behat_forms::press_button", get_string('add'));
+        $this->execute("behat_forms::press_button", get_string('backtocohorts', 'cohort'));
 
     }
 }

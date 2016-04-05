@@ -49,11 +49,9 @@ class behat_mod_choice extends behat_base {
 
         $this->execute("behat_general::click_link", $this->escape($choiceactivity));
 
-        $this->execute('behat_forms::i_set_the_field_to', array( $this->escape($option), 1),
-            false, false);
+        $this->execute('behat_forms::i_set_the_field_to', array( $this->escape($option), 1));
 
-        $this->execute("behat_forms::press_button", get_string('savemychoice', 'choice'),
-            true, true);
+        $this->execute("behat_forms::press_button", get_string('savemychoice', 'choice'));
     }
 
     /**

@@ -186,10 +186,9 @@ class behat_gradingform_guide extends behat_base {
             if ($criterionid) {
                 $criterionroot = 'advancedgrading[criteria]' . '[' . $criterionid . ']';
 
-                $this->execute('behat_forms::i_set_the_field_to', array($criterionroot . '[score]', $points),
-                    true, true);
-                $this->execute('behat_forms::i_set_the_field_to', array($criterionroot . '[remark]', $criterion[1]),
-                    true, true);
+                $this->execute('behat_forms::i_set_the_field_to', array($criterionroot . '[score]', $points));
+
+                $this->execute('behat_forms::i_set_the_field_to', array($criterionroot . '[remark]', $criterion[1]));
             }
         }
     }

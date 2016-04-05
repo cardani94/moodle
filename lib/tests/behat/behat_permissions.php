@@ -57,16 +57,13 @@ class behat_permissions extends behat_base {
 
         // Navigate to course management page via navigation block.
         $this->execute("behat_navigation::i_navigate_to_node_in",
-            array(get_string('defineroles', 'role'), $parentnodes),
-            true, true);
+            array(get_string('defineroles', 'role'), $parentnodes)
+        );
 
-        $this->execute("behat_general::click_link", "Edit " . $this->escape($rolename) . " role",
-            true, true);
-        $this->execute("behat_permissions::i_fill_the_capabilities_form_with_the_following_permissions", $table,
-            false, false);
+        $this->execute("behat_general::click_link", "Edit " . $this->escape($rolename) . " role");
+        $this->execute("behat_permissions::i_fill_the_capabilities_form_with_the_following_permissions", $table);
 
-        $this->execute('behat_forms::press_button', get_string('savechanges'),
-            false, false);
+        $this->execute('behat_forms::press_button', get_string('savechanges'));
     }
 
     /**
@@ -81,18 +78,16 @@ class behat_permissions extends behat_base {
         $roleoption = $this->find('xpath', '//select[@name="roleid"]/option[contains(.,"' . $this->escape($rolename) . '")]');
 
         $this->execute('behat_forms::i_set_the_field_to',
-            array(get_string('advancedoverride', 'role'), $this->escape($roleoption->getText())),
-            false, false);
+            array(get_string('advancedoverride', 'role'), $this->escape($roleoption->getText()))
+        );
 
         if (!$this->running_javascript()) {
-            $this->execute("behat_forms::press_button", get_string('go'),
-                true, true);
+            $this->execute("behat_forms::press_button", get_string('go'));
         }
-        $this->execute("behat_permissions::i_fill_the_capabilities_form_with_the_following_permissions", $table,
-            false, false);
 
-        $this->execute('behat_forms::press_button', get_string('savechanges'),
-            false, false);
+        $this->execute("behat_permissions::i_fill_the_capabilities_form_with_the_following_permissions", $table);
+
+        $this->execute('behat_forms::press_button', get_string('savechanges'));
     }
 
     /**
@@ -208,17 +203,15 @@ class behat_permissions extends behat_base {
 
         // Navigate to course management page via navigation block.
         $this->execute("behat_navigation::i_navigate_to_node_in",
-            array(get_string('defineroles', 'role'), $parentnodes),
-            true, true);
+            array(get_string('defineroles', 'role'), $parentnodes)
+        );
 
-        $this->execute("behat_general::click_link", "Allow role assignments",
-            true, true);
+        $this->execute("behat_general::click_link", "Allow role assignments");
         $this->execute("behat_permissions::i_fill_in_the_allowed_role_assignments_form_for_a_role_with",
-            array($rolename, $table),
-            false, false);
+            array($rolename, $table)
+        );
 
-        $this->execute('behat_forms::press_button', get_string('savechanges'),
-            false, false);
+        $this->execute('behat_forms::press_button', get_string('savechanges'));
     }
 
     /**

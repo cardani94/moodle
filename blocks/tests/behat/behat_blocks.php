@@ -45,13 +45,13 @@ class behat_blocks extends behat_base {
      */
     public function i_add_the_block($blockname) {
         $this->execute('behat_forms::i_set_the_field_to',
-            array("bui_addblock", $this->escape($blockname)), false, false);
+            array("bui_addblock", $this->escape($blockname))
+        );
 
         // If we are running without javascript we need to submit the form.
         if (!$this->running_javascript()) {
             $this->execute('behat_general::i_click_on_in_the',
-                array(get_string('go'), "button", "#add_block", "css_element"),
-                false, false
+                array(get_string('go'), "button", "#add_block", "css_element")
             );
         }
     }
@@ -67,8 +67,7 @@ class behat_blocks extends behat_base {
         // Looking for both title and alt.
         $xpath = "//input[@type='image'][@title='" . get_string('dockblock', 'block', $blockname) . "' or @alt='" . get_string('addtodock', 'block') . "']";
         $this->execute('behat_general::i_click_on_in_the',
-            array($xpath, "xpath_element", $this->escape($blockname), "block"),
-            false, false
+            array($xpath, "xpath_element", $this->escape($blockname), "block")
         );
     }
 
@@ -93,8 +92,7 @@ class behat_blocks extends behat_base {
         }
 
         $this->execute('behat_general::i_click_on_in_the',
-            array("a[role='menuitem']", "css_element", $this->escape($blockname), "block"),
-            false, false
+            array("a[role='menuitem']", "css_element", $this->escape($blockname), "block")
         );
     }
 
@@ -109,12 +107,10 @@ class behat_blocks extends behat_base {
     public function i_configure_the_block($blockname) {
         // Note that since $blockname may be either block name or CSS class, we can not use the exact label of "Configure" link.
 
-        $this->execute("behat_blocks::i_open_the_blocks_action_menu", $this->escape($blockname),
-            true, false);
+        $this->execute("behat_blocks::i_open_the_blocks_action_menu", $this->escape($blockname));
 
         $this->execute('behat_general::i_click_on_in_the',
-            array("Configure", "link", $this->escape($blockname), "block"),
-            false, false
+            array("Configure", "link", $this->escape($blockname), "block")
         );
     }
 }

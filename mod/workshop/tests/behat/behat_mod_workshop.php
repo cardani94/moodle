@@ -54,13 +54,11 @@ class behat_mod_workshop extends behat_base {
                 "descendant-or-self::a[./img[@alt=$switchphase]]";
         $continue = $this->escape(get_string('continue'));
 
-        $this->execute('behat_general::click_link', $workshopname, true, true);
+        $this->execute('behat_general::click_link', $workshopname);
 
-        $this->execute("behat_general::i_click_on", array($xpath, "xpath_element"),
-            true, true);
+        $this->execute("behat_general::i_click_on", array($xpath, "xpath_element"));
 
-        $this->execute("behat_forms::press_button", $continue,
-            false, false);
+        $this->execute("behat_forms::press_button", $continue);
     }
 
     /**
@@ -75,16 +73,13 @@ class behat_mod_workshop extends behat_base {
         $savechanges = $this->escape(get_string('savechanges'));
         $xpath = "//div[contains(concat(' ', normalize-space(@class), ' '), ' ownsubmission ')]/descendant::input[@type='submit']";
 
-        $this->execute('behat_general::click_link', $workshopname, true, true);
+        $this->execute('behat_general::click_link', $workshopname);
 
-        $this->execute("behat_general::i_click_on", array($xpath, "xpath_element"),
-            true, true);
+        $this->execute("behat_general::i_click_on", array($xpath, "xpath_element"));
 
-        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $table,
-            true, true);
+        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $table);
 
-        $this->execute("behat_forms::press_button", $savechanges,
-            false, false);
+        $this->execute("behat_forms::press_button", $savechanges);
     }
 
     /**
@@ -99,15 +94,13 @@ class behat_mod_workshop extends behat_base {
         $editassessmentform = $this->escape(get_string('editassessmentform', 'workshop'));
         $saveandclose = $this->escape(get_string('saveandclose', 'workshop'));
 
-        $this->execute('behat_general::click_link', $workshopname, true, true);
+        $this->execute('behat_general::click_link', $workshopname);
 
-        $this->execute('behat_general::click_link', $editassessmentform, true, true);
+        $this->execute('behat_general::click_link', $editassessmentform);
 
-        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $table,
-            true, true);
+        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $table);
 
-        $this->execute("behat_forms::press_button", $saveandclose,
-            false, false);
+        $this->execute("behat_forms::press_button", $saveandclose);
     }
 
     /**
@@ -126,18 +119,15 @@ class behat_mod_workshop extends behat_base {
         $assess = $this->escape(get_string('assess', 'workshop'));
         $saveandclose = $this->escape(get_string('saveandclose', 'workshop'));
 
-        $this->execute('behat_general::click_link', $workshopname, true, true);
+        $this->execute('behat_general::click_link', $workshopname);
 
         $this->execute('behat_general::i_click_on_in_the',
-            array($assess, "button", $xpath, "xpath_element"),
-            true, true
+            array($assess, "button", $xpath, "xpath_element")
         );
 
-        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $table,
-            true, true);
+        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $table);
 
-        $this->execute("behat_forms::press_button", $saveandclose,
-            false, false);
+        $this->execute("behat_forms::press_button", $saveandclose);
     }
 
     /**

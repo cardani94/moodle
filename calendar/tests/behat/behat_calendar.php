@@ -46,8 +46,7 @@ class behat_calendar extends behat_base {
      */
     public function i_create_a_calendar_event_with_form_data($data) {
         // Go to current month page.
-        $this->execute("behat_general::click_link", get_string('monththis', 'calendar'),
-            true, true);
+        $this->execute("behat_general::click_link", get_string('monththis', 'calendar'));
 
         // Create event.
         $this->i_create_a_calendar_event($data);
@@ -65,20 +64,16 @@ class behat_calendar extends behat_base {
         $eventname = $eventname[1];
 
         // Click to create new event.
-        $this->execute("behat_general::i_click_on", array(get_string('newevent', 'calendar'), "button"),
-            true, true);
+        $this->execute("behat_general::i_click_on", array(get_string('newevent', 'calendar'), "button"));
 
         // Set form fields.
-        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $data,
-            true, true);
+        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $data);
 
         // Save event.
-        $this->execute("behat_forms::press_button", get_string('savechanges'),
-            true, true);
+        $this->execute("behat_forms::press_button", get_string('savechanges'));
 
         // Check if event is created. Being last step, don't need to wait or check for exceptions.
-        $this->execute("behat_general::assert_page_contains_text", $eventname,
-            false, false);
+        $this->execute("behat_general::assert_page_contains_text", $eventname);
 
     }
 
@@ -100,8 +95,7 @@ class behat_calendar extends behat_base {
         $dayofmonth   = "a[{$daycontains}]";
 
         $xpath = '//' . $currentmonth . '/descendant::' . $daycell . '/' . $dayofmonth;
-        $this->execute("behat_general::i_hover", array($xpath, "xpath_element"),
-            false, false);
+        $this->execute("behat_general::i_hover", array($xpath, "xpath_element"));
 
     }
 

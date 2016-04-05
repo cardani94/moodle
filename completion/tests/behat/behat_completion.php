@@ -55,8 +55,8 @@ class behat_completion extends behat_base {
 
         $this->execute("behat_completion::go_to_the_current_course_activity_completion_report");
         $this->execute("behat_general::should_exist",
-            array($this->escape($xpath), "xpath_element"),
-            false, false);
+            array($this->escape($xpath), "xpath_element")
+        );
     }
 
     /**
@@ -74,9 +74,7 @@ class behat_completion extends behat_base {
             "/descendant::img[contains(@title, $titleliteral)]";
 
         $this->execute("behat_completion::go_to_the_current_course_activity_completion_report");
-        $this->execute("behat_general::should_exist",
-            array($this->escape($xpath), "xpath_element"),
-            false, false);
+        $this->execute("behat_general::should_exist", array($this->escape($xpath), "xpath_element"));
     }
 
     /**
@@ -88,9 +86,7 @@ class behat_completion extends behat_base {
         $completionnode = get_string('pluginname', 'report_progress');
         $reportsnode = get_string('courseadministration') . ' > ' . get_string('reports');
 
-        $this->execute("behat_navigation::i_navigate_to_node_in",
-            array($completionnode, $reportsnode),
-            false, false);
+        $this->execute("behat_navigation::i_navigate_to_node_in", array($completionnode, $reportsnode));
     }
 
     /**
@@ -104,17 +100,14 @@ class behat_completion extends behat_base {
         $toggle = strtolower($completionstatus) == 'enabled' ? get_string('yes') : get_string('no');
 
         // Go to course editing.
-        $this->execute("behat_general::click_link", get_string('editsettings'),
-            true, true);
+        $this->execute("behat_general::click_link", get_string('editsettings'));
 
         // Enable completion.
         $this->execute("behat_forms::i_set_the_field_to",
-            array(get_string('enablecompletion', 'completion'), $toggle),
-            false, false);
+            array(get_string('enablecompletion', 'completion'), $toggle));
 
         // Save course settings.
-        $this->execute("behat_forms::press_button", get_string('savechangesanddisplay'),
-            false, false);
+        $this->execute("behat_forms::press_button", get_string('savechangesanddisplay'));
     }
 
     /**
@@ -132,8 +125,8 @@ class behat_completion extends behat_base {
 
         $xpathtocheck = "//img[contains(@alt, '$imgalttext')]";
         $this->execute("behat_general::should_exist_in_the",
-            array($xpathtocheck, "xpath_element", $csselementforactivitytype, "css_element"),
-            false, false);
+            array($xpathtocheck, "xpath_element", $csselementforactivitytype, "css_element")
+        );
 
     }
 
@@ -152,8 +145,8 @@ class behat_completion extends behat_base {
 
         $xpathtocheck = "//img[contains(@alt, '$imgalttext')]";
         $this->execute("behat_general::should_exist_in_the",
-            array($xpathtocheck, "xpath_element", $csselementforactivitytype, "css_element"),
-            false, false);
+            array($xpathtocheck, "xpath_element", $csselementforactivitytype, "css_element")
+        );
 
     }
 }

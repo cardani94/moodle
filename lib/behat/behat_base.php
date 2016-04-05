@@ -74,7 +74,7 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
     /**
      * The JS code to check that the page is ready.
      */
-    const PAGE_READY_JS = '(typeof M !== "undefined" && M.util && M.util.pending_js && !Boolean(M.util.pending_js.length)) && (document.readyState === "complete")';
+    const PAGE_READY_JS = '(typeof M !== "undefined" && M.util !== "undefined" && M.util.pending_js && !Boolean(M.util.pending_js.length)) && (document.readyState === "complete")';
 
     /**
      * Locates url, based on provided path.
@@ -807,11 +807,9 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
      *
      * @param string $contextapi context in which api is defined.
      * @param array $params list of params to pass.
-     * @param bool $waitafterstep wait after executing the step.
-     * @param bool $lookforexceptions look for exception after executing the api.
      * @throws Exception
      */
-    protected function execute($contextapi, $params = array(), $waitafterstep = true, $lookforexceptions = true) {
+    protected function execute($contextapi, $params = array()) {
         if (!is_array($params)) {
             $params = array($params);
         }
@@ -822,13 +820,9 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
         call_user_func_array(array($context, $contextapi[1]), $params);
 
         // If required wait for pending js.
-        if ($waitafterstep) {
-            $this->wait_for_pending_js();
-        }
+        $this->wait_for_pending_js();
 
         // If required look for exceptions.
-        if ($lookforexceptions) {
-            $this->look_for_exceptions();
-        }
+        $this->look_for_exceptions();
     }
 }
