@@ -40,7 +40,7 @@ Feature: Allow teachers to manually mark users as complete when configured
     # Running cron just after clicking sometimes fail, as record
     # should be created before the cron runs.
     And I wait "1" seconds
-    And I trigger cron
+    And I run the scheduled task "core\task\completion_regular_task"
     And I am on site homepage
     And I log out
     Then I log in as "student1"
