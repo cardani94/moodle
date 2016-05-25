@@ -17,7 +17,7 @@ Feature: Atto align text
     And I set the field "Text editor" to "Plain text area"
     And I press "Save changes"
     And I follow "Edit profile"
-    Then I should see "style=\"text-align:right;\""
+    Then I should see either "style=\"text-align:right;\"" or "align=\"right\""
 
   @javascript
   Scenario: Left align some text
@@ -35,7 +35,7 @@ Feature: Atto align text
     And I set the field "Text editor" to "Plain text area"
     And I press "Save changes"
     And I follow "Edit profile"
-    Then I should see "style=\"text-align:left;\""
+    Then I should see either "style=\"text-align:left;\"" or "align=\"left\""
 
   @javascript
   Scenario: Center align some text
@@ -52,5 +52,4 @@ Feature: Atto align text
     And I set the field "Text editor" to "Plain text area"
     And I press "Save changes"
     And I follow "Edit profile"
-    Then I should see "style=\"text-align:center;\""
-
+    Then I should see either "style=\"text-align:center;\"" or "align=\"center\""
