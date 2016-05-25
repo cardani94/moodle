@@ -132,7 +132,8 @@ class behat_hooks extends behat_base {
         // before each scenario (accidental user deletes) in the BeforeScenario hook.
 
         if (!behat_util::is_test_mode_enabled()) {
-            throw new Exception('Behat only can run if test mode is enabled. More info in ' . behat_command::DOCS_URL . '#Running_tests');
+            $errmsg = 'Behat only can run if test mode is enabled. More info in ' . behat_command::DOCS_URL . '#Running_tests';
+            self::stop_execution($errmsg);
         }
 
         // Reset all data, before checking for check_server_status.
@@ -145,8 +146,9 @@ class behat_hooks extends behat_base {
         // Prevents using outdated data, upgrade script would start and tests would fail.
         if (!behat_util::is_test_data_updated()) {
             $commandpath = 'php admin/tool/behat/cli/init.php';
-            throw new Exception("Your behat test site is outdated, please run\n\n    " .
-                    $commandpath . "\n\nfrom your moodle dirroot to drop and install the behat test site again.");
+            $errmsg = "Your behat test site is outdated, please run\n\n    " .
+                $commandpath . "\n\nfrom your moodle dirroot to drop and install the behat test site again.";
+            self::stop_execution($errmsg);
         }
         // Avoid parallel tests execution, it continues when the previous lock is released.
         test_lock::acquire('behat');
@@ -233,7 +235,7 @@ class behat_hooks extends behat_base {
                php_sapi_name() != 'cli' ||
                !behat_util::is_test_mode_enabled() ||
                !behat_util::is_test_site()) {
-            throw new coding_exception('Behat only can modify the test database and the test dataroot!');
+            self::stop_execution('Behat only can modify the test database and the test dataroot!');
         }
 
         $moreinfo = 'More info in ' . behat_command::DOCS_URL . '#Running_tests';
@@ -243,12 +245,12 @@ class behat_hooks extends behat_base {
         } catch (CurlExec $e) {
             // Exception thrown by WebDriver, so only @javascript tests will be caugth; in
             // behat_util::check_server_status() we already checked that the server is running.
-            $this->stop_execution($driverexceptionmsg);
+            self::stop_execution($driverexceptionmsg);
         } catch (DriverException $e) {
-            $this->stop_execution($driverexceptionmsg);
+            self::stop_execution($e->getMessage());
         } catch (UnknownError $e) {
             // Generic 'I have no idea' Selenium error. Custom exception to provide more feedback about possible solutions.
-            $this->stop_execution($e->getMessage());
+            self::stop_execution($e->getMessage());
         }
 
         // We need the Mink session to do it and we do it only before the first scenario.
@@ -283,7 +285,7 @@ class behat_hooks extends behat_base {
             // Let's be conservative as we never know when new upstream issues will affect us.
             $session->visit($this->locate_path('/'));
         } catch (UnknownError $e) {
-            $this->stop_execution($e->getMessage());
+            self::stop_execution($e->getMessage());
         }
 
 
@@ -519,7 +521,7 @@ class behat_hooks extends behat_base {
      * @param string $exception
      * @return void
      */
-    protected function stop_execution($exception) {
+    protected static function stop_execution($exception) {
         $text = get_string('unknownexceptioninfo', 'tool_behat');
         echo $text . PHP_EOL . $exception . PHP_EOL;
         exit(1);
