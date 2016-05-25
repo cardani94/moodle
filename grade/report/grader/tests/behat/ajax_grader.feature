@@ -72,7 +72,6 @@ Feature: Using the AJAX grading feature of Grader report to update grades and fe
     And I press key "13" in the field "ajaxgrade"
     And I click on student "Student 3" for grade item "Item SU"
     And I set the field "ajaxgrade" to "Very good"
-    And I press key "13" in the field "ajaxgrade"
     And the following should exist in the "user-grades" table:
       | -1-                | -6-      | -7-      | -13-      | -16-         |
       | Student 2          | -        | 33.00    | -         | 33.00        |
@@ -125,6 +124,7 @@ Feature: Using the AJAX grading feature of Grader report to update grades and fe
     And I press key "13" in the field "ajaxfeedback"
     And I click on student "Student 2" for grade item "Item SU"
     And I set the field "ajaxgrade" to "Very good"
+    And I click on student "Student 2" for grade item "Item SU"
     And I set the field "ajaxfeedback" to "Student 2 SU feedback"
     And I press key "13" in the field "ajaxfeedback"
     And I navigate to "Grader report" node in "Grade administration"
@@ -196,11 +196,12 @@ Feature: Using the AJAX grading feature of Grader report to update grades and fe
     And I follow "Course 1"
     And I navigate to "Grades" node in "Course administration"
     And I turn editing mode on
-    And I change window size to "large"
+    And I select "Gradebook setup" from the "Grade report" singleselect
     And I set "=[[i1]] + [[i3]] + [[gsc]]" calculation for grade item "Calc Item" with idnumbers:
       | Item 1        | i1  |
       | Item 3        | i3  |
       | Grade Sub Cat | gsc |
+    And I select "Grader report" from the "Grade report" singleselect
     Then I should not see a grade field for "Student 2" and grade item "Course total"
     And I should not see a feedback field for "Student 2" and grade item "Course total"
     And I give the grade "20.00" to the user "Student 2" for the grade item "Item VU"

@@ -283,6 +283,23 @@ class behat_general extends behat_base {
     }
 
     /**
+     * Waits until the provided element selector is visible in the DOM
+     *
+     * Using the protected method as this method will be usually
+     * called by other methods which are not returning a set of
+     * steps and performs the actions directly, so it would not
+     * be executed if it returns another step.
+
+     * @Given /^I wait until "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)" is visible$/
+     * @param string $element
+     * @param string $selector
+     * @return void
+     */
+    public function wait_until_visible($element, $selectortype) {
+        $this->ensure_element_is_visible($element, $selectortype);
+    }
+
+    /**
      * Waits until the provided element does not exist in the DOM
      *
      * Using the protected method as this method will be usually

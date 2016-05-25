@@ -35,7 +35,7 @@ Feature: In order to create a quiz that awards marks the way I want
     And I should see "Total of marks: 10.00"
 
     When I follow "Edit maximum mark"
-    And I wait until "li input[name=maxmark]" "css_element" exists
+    And I wait until "li input[name=maxmark]" "css_element" is visible
     And I take focus off "li input[name=maxmark]" "css_element"
     Then I should see "7.00"
     And I should see "3.00"
