@@ -16,7 +16,7 @@ Feature: Atto bold button
     And I set the field "Text editor" to "Plain text area"
     And I press "Save changes"
     And I follow "Edit profile"
-    Then I should see "<b>Badger</b>"
+    Then I should see either "<b>Badger</b>" or "<strong>Badger</strong>"
 
   @javascript
   Scenario: Unbold some text
@@ -34,4 +34,5 @@ Feature: Atto bold button
     And I press "Save changes"
     And I follow "Edit profile"
     Then I should not see "<b>Mouse</b>"
+    And I should not see "<strong>Mouse</strong>"
     And I should see "Mouse"
