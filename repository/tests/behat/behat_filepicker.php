@@ -288,6 +288,9 @@ class behat_filepicker extends behat_files {
             $field->set_value($value);
         }
 
+        // This is required for chrome, as it shits the dialog window.
+        $this->execute('behat_general::i_change_window_size_to', 'small');
+        $this->execute('behat_general::i_change_window_size_to', 'medium');
         $selectfilebutton = $this->find_button(get_string('getfile', 'repository'));
         $this->ensure_node_is_visible($selectfilebutton);
         $selectfilebutton->click();

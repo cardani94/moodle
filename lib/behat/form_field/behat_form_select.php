@@ -64,7 +64,18 @@ class behat_form_select extends behat_form_field {
                 $afterfirstoption = true;
             }
         } else {
-           // By default, assume the passed value is a non-multiple option.
+            // If value is already set then don't set it again.
+            if ($this->field->getValue() == $value) {
+                return;
+            } else {
+                $opt = $this->field->find('named', array(
+                    'option', behat_context_helper::escape($value)
+                ));
+                if ($opt && ($this->field->getValue() == $opt->getValue())) {
+                    return;
+                }
+            }
+            // By default, assume the passed value is a non-multiple option.
             $this->field->selectOption(trim($value));
        }
 
@@ -73,11 +84,12 @@ class behat_form_select extends behat_form_field {
         if ($this->running_javascript()) {
             // Trigger change event as this is needed by some drivers (Phantomjs). Don't do it for
             // Singleselect as this will cause multiple event fire and lead to race-around condition.
-            $browser = \Moodle\BehatExtension\Driver\MoodleSelenium2Driver::getBrowser();
-            if (!$singleselect && ($browser == 'phantomjs')) {
+            if (!$singleselect && !$multiple) {
                 $script = "Syn.trigger('change', {}, {{ELEMENT}})";
                 try {
                     $this->session->getDriver()->triggerSynScript($this->field->getXpath(), $script);
+                    // This is required for ajax fields which rely on enter key.
+                    $this->key_press(13);
                 } catch (Exception $e) {
                     // No need to do anything if element has been removed by JS.
                     // This is possible when inline editing element is used.
