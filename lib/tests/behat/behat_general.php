@@ -346,6 +346,27 @@ class behat_general extends behat_base {
     }
 
     /**
+     * Move to and the click on the element of the specified type.
+     *
+     * @When /^I move to and click on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)"$/
+     * @param string $element Element we look for
+     * @param string $selectortype The type of what we look for
+     * @param string $nodeelement Element we look in
+     * @param string $nodeselectortype The type of selector where we look in
+     */
+    public function i_move_to_and_click_on($element, $selectortype) {
+
+        // Gets the node based on the requested selector type and locator.
+        $node = $this->get_selected_node($selectortype, $element);
+        $this->ensure_node_is_visible($node);
+        if ($this->running_javascript()) {
+            $this->getSession()->getDriver()->focusAndClickOnElement($node->getXpath());
+        } else {
+            $node->click();
+        }
+    }
+
+    /**
      * Sets the focus and takes away the focus from an element, generating blur JS event.
      *
      * @When /^I take focus off "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)"$/
@@ -405,6 +426,26 @@ class behat_general extends behat_base {
         $node = $this->get_node_in_container($selectortype, $element, $nodeselectortype, $nodeelement);
         $this->ensure_node_is_visible($node);
         $node->click();
+    }
+
+    /**
+     * Move to and click on the element of the specified type which is located inside the second element.
+     *
+     * @When /^I move to and click on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)" in the "(?P<element_container_string>(?:[^"]|\\")*)" "(?P<text_selector_string>[^"]*)"$/
+     * @param string $element Element we look for
+     * @param string $selectortype The type of what we look for
+     * @param string $nodeelement Element we look in
+     * @param string $nodeselectortype The type of selector where we look in
+     */
+    public function i_move_to_and_click_on_in_the($element, $selectortype, $nodeelement, $nodeselectortype) {
+
+        $node = $this->get_node_in_container($selectortype, $element, $nodeselectortype, $nodeelement);
+        $this->ensure_node_is_visible($node);
+        if ($this->running_javascript()) {
+            $this->getSession()->getDriver()->focusAndClickOnElement($node->getXpath());
+        } else {
+            $node->click();
+        }
     }
 
     /**
