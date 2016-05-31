@@ -44,7 +44,8 @@ use Behat\Gherkin\Node\TableNode as TableNode,
 class behat_forms extends behat_base {
 
     /**
-     * Presses button with specified id|name|title|alt|value.
+     * Moves to and presses button with specified id|name|title|alt|value.
+     * NOTE: Don't use it to press buttons in dialogue. Use I click on "xvy" "button" instead.
      *
      * @When /^I press "(?P<button_string>(?:[^"]|\\")*)"$/
      * @throws ElementNotFoundException Thrown by behat_base::find
@@ -54,7 +55,14 @@ class behat_forms extends behat_base {
 
         // Ensures the button is present.
         $buttonnode = $this->find_button($button);
-        $buttonnode->press();
+        // Use JS to move to button before clicking.
+        // Some browsers may fail because of jsonWireProtocol moveto
+        // Which is used by Selenium2Driver driver->click().
+        if ($this->running_javascript()) {
+            $this->getSession()->getDriver()->moodle_move_to_and_click_on_element($buttonnode->getXpath());
+        } else {
+            $buttonnode->press();
+        }
     }
 
     /**

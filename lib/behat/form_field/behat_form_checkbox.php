@@ -48,31 +48,11 @@ class behat_form_checkbox extends behat_form_field {
     public function set_value($value) {
 
         if (!empty($value) && !$this->field->isChecked()) {
-
-            if (!$this->running_javascript()) {
-                $this->field->check();
-                return;
-            }
-
-            // Check it if it should be checked and it is not.
-            $this->field->click();
-
-            // Trigger the onchange event as triggered when 'checking' the checkbox.
-            $this->trigger_on_change();
-
+            $this->field->check();
         } else if (empty($value) && $this->field->isChecked()) {
-
-            if (!$this->running_javascript()) {
-                $this->field->uncheck();
-                return;
-            }
-
-            // Uncheck if it is checked and shouldn't.
-            $this->field->click();
-
-            // Trigger the onchange event as triggered when 'checking' the checkbox.
-            $this->trigger_on_change();
+            $this->field->uncheck();
         }
+
     }
 
     /**

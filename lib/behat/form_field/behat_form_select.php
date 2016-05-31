@@ -71,18 +71,32 @@ class behat_form_select extends behat_form_field {
         // Wait for all the possible AJAX requests that have been
         // already triggered by selectOption() to be finished.
         if ($this->running_javascript()) {
-            // Trigger change event as this is needed by some drivers (Phantomjs). Don't do it for
-            // Singleselect as this will cause multiple event fire and lead to race-around condition.
-            $browser = \Moodle\BehatExtension\Driver\MoodleSelenium2Driver::getBrowser();
-            if (!$singleselect && ($browser == 'phantomjs')) {
-                $script = "Syn.trigger('change', {}, {{ELEMENT}})";
+            // On some browsers (Mac/FF or phantomjs) selectOption fails to set option and next step is
+            // not executed. To ensure select option is set properly following code is a hack to click
+            // on field twice to ensure option is set. Don't need to do it for Singleselect as this will
+            // cause multiple event fire and lead to race-around condition.
+            if (!$singleselect && !$multiple) {
                 try {
-                    $this->session->getDriver()->triggerSynScript($this->field->getXpath(), $script);
+                    $this->session->getDriver()->moodle_move_to_and_click_on_element($this->field->getXpath());
+                    $this->field->click();
+                    $this->session->getDriver()->moodle_move_to_element($this->field->getXpath());
                 } catch (Exception $e) {
                     // No need to do anything if element has been removed by JS.
                     // This is possible when inline editing element is used.
                 }
             }
+
+            // For multiple select box, just fire change event, this is needed for some browsers like phantomjs
+            $browser = \Moodle\BehatExtension\Driver\MoodleSelenium2Driver::getBrowser();
+            if ($multiple && ($browser == 'phantomjs')) {
+                $script = "Syn.trigger('change', {}, {{ELEMENT}})";
+                try {
+                    $this->session->getDriver()->triggerSynScript($this->field->getXpath(), $script);
+                } catch (Exception $e) {
+                    // No need to do anything if element has been removed by JS.
+                }
+            }
+
             $this->session->wait(behat_base::TIMEOUT * 1000, behat_base::PAGE_READY_JS);
         }
     }

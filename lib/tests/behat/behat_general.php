@@ -344,8 +344,14 @@ class behat_general extends behat_base {
         $this->ensure_node_is_visible($node);
 
         // Ensure element is focused before taking it off.
-        $node->focus();
-        $node->blur();
+        try {
+            $node->focus();
+            $node->blur();
+        } catch (\Exception $e) {
+            // Above might fail on some browsers, as move to field might remove the element.
+            // As we have already checked for element visiblity above, we don't have to worry
+            // if above throw exception.
+        }
     }
 
     /**
