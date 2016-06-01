@@ -55,6 +55,7 @@ class behat_forms extends behat_base {
 
         // Ensures the button is present.
         $buttonnode = $this->find_button($button);
+
         // Use JS to move to button before clicking.
         // Some browsers may fail because of jsonWireProtocol moveto
         // Which is used by Selenium2Driver driver->click().

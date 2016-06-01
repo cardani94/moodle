@@ -838,7 +838,11 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
         // Don't make them optional for performance reasons.
 
         // Wait for pending js.
-        $this->wait_for_pending_js();
+        try {
+            $this->wait_for_pending_js();
+        } catch (\Exception $e) {
+            // Don't die with JS waiting exception page might have loaded by now.
+        };
 
         // Look for exceptions.
         $this->look_for_exceptions();
