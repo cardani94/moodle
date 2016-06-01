@@ -53,7 +53,9 @@ class behat_form_select extends behat_form_field {
         $multiple = $this->field->hasAttribute('multiple');
         $singleselect = ($this->field->hasClass('singleselect') || $this->field->hasClass('urlselect'));
 
-        $currentelementid = $this->get_internal_field_id();
+        if ($this->running_javascript()) {
+            $currentelementid = $this->get_internal_field_id();
+        }
 
         // Here we select the option(s).
         if ($multiple) {

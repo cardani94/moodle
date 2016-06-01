@@ -45,17 +45,25 @@ class behat_form_text extends behat_form_field {
      */
     public function set_value($value) {
         $this->field->setValue($value);
-
         if ($this->running_javascript()) {
-            $script = "Syn.trigger('change', {}, {{ELEMENT}})";
-            try {
-                $this->session->getDriver()->triggerSynScript($this->field->getXpath(), $script);
-                $this->field->keyPress(9);
-            } catch (Exception $e) {
-                // No need to do anything if element has been removed by JS.
-                // This is possible when inline editing element is used.
+            // Click on body to trigger change/blur event.
+            if (!$this->session->getDriver()->find('//div[contains(concat(\' \', normalize-space(@class), \' \'), \' moodle-dialogue \')]')) {
+                try {
+                    $this->session->getDriver()->moodle_click_on_element('//div[contains(concat(\' \', normalize-space(@class), \' \'), \' moodle-dialogue \')]');
+                } catch (\Exception $e) {
+                    return;
+                }
+            } else {
+                $script = "Syn.trigger('change', {}, {{ELEMENT}}); Syn.trigger('blur', {}, {{ELEMENT}});";
+                try {
+                    $this->session->getDriver()->triggerSynScript($this->field->getXpath(), $script);
+                } catch (Exception $e) {
+                    // No need to do anything if element has been removed by JS.
+                    // This is possible when inline editing element is used.
+                }
             }
         }
+
     }
 
     /**
