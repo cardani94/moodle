@@ -53,6 +53,8 @@ class behat_form_select extends behat_form_field {
         $multiple = $this->field->hasAttribute('multiple');
         $singleselect = ($this->field->hasClass('singleselect') || $this->field->hasClass('urlselect'));
 
+        $currentelementid = $this->get_internal_field_id();
+
         // Here we select the option(s).
         if ($multiple) {
             // Split and decode values. Comma separated list of values allowed. With valuable commas escaped with backslash.
@@ -64,29 +66,38 @@ class behat_form_select extends behat_form_field {
                 $afterfirstoption = true;
             }
         } else {
-           // By default, assume the passed value is a non-multiple option.
+            // By default, assume the passed value is a non-multiple option.
             $this->field->selectOption(trim($value));
-       }
+        }
 
         // Wait for all the possible AJAX requests that have been
         // already triggered by selectOption() to be finished.
         if ($this->running_javascript()) {
-            // On some browsers (Mac/FF or phantomjs) selectOption fails to set option and next step is
-            // not executed. To ensure select option is set properly following code is a hack to click
-            // on field twice to ensure option is set. Don't need to do it for Singleselect as this will
-            // cause multiple event fire and lead to race-around condition.
+            // Ensure element still exists, before we go ahead with this.
+            $selectxpath = $this->field->getXpath();
+            if (!$this->session->getDriver()->find($selectxpath)) {
+                return;
+            }
+            if ($currentelementid != $this->get_internal_field_id()) {
+                return;
+            }
+
+            // Trigger change event as this is needed by some drivers (Phantomjs). Don't do it for
+            // Singleselect as this will cause multiple event fire and lead to race-around condition.
             if (!$singleselect && !$multiple) {
-                try {
-                    $this->session->getDriver()->moodle_move_to_and_click_on_element($this->field->getXpath());
-                    $this->field->click();
-                    $this->session->getDriver()->moodle_move_to_element($this->field->getXpath());
-                } catch (Exception $e) {
-                    // No need to do anything if element has been removed by JS.
-                    // This is possible when inline editing element is used.
+                $optionxpath = $this->get_option_xpath($value, $selectxpath);
+                if ($this->session->getDriver()->find($optionxpath)) {
+                    try {
+                        $this->session->getDriver()->moodle_click_on_element($optionxpath);
+                        $this->session->getDriver()->moodle_click_on_element($selectxpath);
+
+                    } catch (\Exception $e) {
+                        return;
+                    }
                 }
             }
 
-            // For multiple select box, just fire change event, this is needed for some browsers like phantomjs
+            // Specific to Phantomjs.
             $browser = \Moodle\BehatExtension\Driver\MoodleSelenium2Driver::getBrowser();
             if ($multiple && ($browser == 'phantomjs')) {
                 $script = "Syn.trigger('change', {}, {{ELEMENT}})";
@@ -94,9 +105,9 @@ class behat_form_select extends behat_form_field {
                     $this->session->getDriver()->triggerSynScript($this->field->getXpath(), $script);
                 } catch (Exception $e) {
                     // No need to do anything if element has been removed by JS.
+                    // This is possible when inline editing element is used.
                 }
             }
-
             $this->session->wait(behat_base::TIMEOUT * 1000, behat_base::PAGE_READY_JS);
         }
     }
@@ -172,7 +183,7 @@ class behat_form_select extends behat_form_field {
             'trim',
             preg_replace('/\\\,/', ',',
                 preg_split('/(?<!\\\),/', $value)
-           )
+            )
         );
 
         // Sort by value (keeping the keys is irrelevant).

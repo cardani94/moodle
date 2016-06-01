@@ -45,6 +45,17 @@ class behat_form_text extends behat_form_field {
      */
     public function set_value($value) {
         $this->field->setValue($value);
+
+        if ($this->running_javascript()) {
+            $script = "Syn.trigger('change', {}, {{ELEMENT}})";
+            try {
+                $this->session->getDriver()->triggerSynScript($this->field->getXpath(), $script);
+                $this->field->keyPress(9);
+            } catch (Exception $e) {
+                // No need to do anything if element has been removed by JS.
+                // This is possible when inline editing element is used.
+            }
+        }
     }
 
     /**

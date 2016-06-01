@@ -22,11 +22,11 @@ Feature: View subfolders in a course in-line
       | Display folder contents | On a separate page |
     And I should see "Test folder"
     And I follow "Test folder"
-    And I press "Edit"
-    And I press "Create folder"
+    And I click on "Edit" "button"
+    And I click on "Create folder" "button"
     And I set the field "New folder name" to "Test subfolder 1"
     And I click on "button.fp-dlg-butcreate" "css_element" in the "div.fp-mkdir-dlg" "css_element"
-    And I press "Save changes"
+    And I click on "Save changes" "button"
 
     @javascript
     Scenario: Add a folder with two subfolders - view on separate page
@@ -34,11 +34,11 @@ Feature: View subfolders in a course in-line
       And I should not see "Test subfolder 1"
       And I follow "Test folder"
       And I should see "Test subfolder 1"
-      And I press "Edit"
-      And I press "Create folder"
+      And I click on "Edit" "button"
+      And I click on "Create folder" "button"
       And I set the field "New folder name" to "Test subfolder 2"
       And I click on "button.fp-dlg-butcreate" "css_element" in the "div.fp-mkdir-dlg" "css_element"
-      And I press "Save changes"
+      And I click on "Save changes" "button"
       When I follow "Course 1"
       Then I should not see "Test subfolder 2"
       And I follow "Test folder"
@@ -46,12 +46,12 @@ Feature: View subfolders in a course in-line
 
     @javascript
     Scenario: Make the subfolders viewable inline on the course page
-      Given I press "Edit"
+      Given I click on "Edit" "button"
       And I click on "div.fp-filename" "css_element" in the "div.fp-filename-field" "css_element"
-      And I press "Create folder"
+      And I click on "Create folder" "button"
       And I set the field "New folder name" to "Test sub subfolder"
       And I click on "button.fp-dlg-butcreate" "css_element" in the "div.fp-mkdir-dlg" "css_element"
-      And I press "Save changes"
+      And I click on "Save changes" "button"
       And I should see "Test sub subfolder"
       And I navigate to "Edit settings" node in "Folder administration"
       And I set the field "Display folder contents" to "Inline on a course page"
