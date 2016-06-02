@@ -344,8 +344,15 @@ class behat_general extends behat_base {
         $this->ensure_node_is_visible($node);
 
         // Ensure element is focused before taking it off.
-        $node->focus();
-        $node->blur();
+        try {
+            $node->focus();
+            $node->blur();
+        } catch (\Exception $e) {
+            // If element is not present because of JS, then don't fail.
+            // This can happen in case where parallel runs are happening
+            // and focus is changed from windows. Also, it has been checked
+            // above that element was visible.
+        }
     }
 
     /**

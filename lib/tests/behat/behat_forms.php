@@ -54,7 +54,18 @@ class behat_forms extends behat_base {
 
         // Ensures the button is present.
         $buttonnode = $this->find_button($button);
-        $buttonnode->press();
+
+        if ($this->running_javascript()) {
+            $dialoguexpath = "//div[contains(concat(' ', normalize-space(@class), ' '), ' moodle-dialogue ')]";
+            // Click on body to trigger change/blur event.
+            if ($this->getSession()->getDriver()->find($dialoguexpath)) {
+                $buttonnode->press();
+            } else {
+                $this->getSession()->getDriver()->moodle_move_to_and_click_on_element($buttonnode->getXpath());
+            }
+        } else {
+            $buttonnode->press();
+        }
     }
 
     /**

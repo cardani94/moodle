@@ -53,6 +53,10 @@ class behat_form_select extends behat_form_field {
         $multiple = $this->field->hasAttribute('multiple');
         $singleselect = ($this->field->hasClass('singleselect') || $this->field->hasClass('urlselect'));
 
+        if ($this->running_javascript()) {
+            $currentelementid = $this->get_internal_field_id();
+        }
+
         // Here we select the option(s).
         if ($multiple) {
             // Split and decode values. Comma separated list of values allowed. With valuable commas escaped with backslash.
@@ -64,17 +68,40 @@ class behat_form_select extends behat_form_field {
                 $afterfirstoption = true;
             }
         } else {
-           // By default, assume the passed value is a non-multiple option.
+            // By default, assume the passed value is a non-multiple option.
             $this->field->selectOption(trim($value));
-       }
+        }
 
         // Wait for all the possible AJAX requests that have been
         // already triggered by selectOption() to be finished.
         if ($this->running_javascript()) {
+            // Ensure element still exists, before we go ahead with this.
+            $selectxpath = $this->field->getXpath();
+            if (!$this->session->getDriver()->find($selectxpath)) {
+                return;
+            }
+            if ($currentelementid != $this->get_internal_field_id()) {
+                return;
+            }
+
             // Trigger change event as this is needed by some drivers (Phantomjs). Don't do it for
             // Singleselect as this will cause multiple event fire and lead to race-around condition.
+            if (!$singleselect && !$multiple) {
+                // Click on option again, as it might fail on some browsers.
+                $optionxpath = $this->get_option_xpath($value, $selectxpath);
+                if ($this->session->getDriver()->find($optionxpath)) {
+                    try {
+                        $this->session->getDriver()->moodle_click_on_element($optionxpath);
+
+                    } catch (\Exception $e) {
+                        return;
+                    }
+                }
+            }
+
+            // Specific to Phantomjs.
             $browser = \Moodle\BehatExtension\Driver\MoodleSelenium2Driver::getBrowser();
-            if (!$singleselect && ($browser == 'phantomjs')) {
+            if ($multiple && ($browser == 'phantomjs')) {
                 $script = "Syn.trigger('change', {}, {{ELEMENT}})";
                 try {
                     $this->session->getDriver()->triggerSynScript($this->field->getXpath(), $script);
@@ -158,7 +185,7 @@ class behat_form_select extends behat_form_field {
             'trim',
             preg_replace('/\\\,/', ',',
                 preg_split('/(?<!\\\),/', $value)
-           )
+            )
         );
 
         // Sort by value (keeping the keys is irrelevant).

@@ -45,6 +45,28 @@ class behat_form_text extends behat_form_field {
      */
     public function set_value($value) {
         $this->field->setValue($value);
+
+        if ($this->running_javascript()) {
+            // If value is set in dialogue then just trigger chnage event, as move will move the screen and dialogue
+            // will be wrongly positioned.
+            $dialoguexpath = "//div[contains(concat(' ', normalize-space(@class), ' '), ' moodle-dialogue ')]";
+            if ($this->session->getDriver()->find($dialoguexpath)) {
+                $script = "Syn.trigger('change', {}, {{ELEMENT}})";
+                try {
+                    $this->session->getDriver()->triggerSynScript($this->field->getXpath(), $script);
+                } catch (Exception $e) {
+                    // No need to do anything if element has been removed by JS.
+                    // This is possible when inline editing element is used.
+                }
+            } else {
+                try {
+                    $this->session->getDriver()->moodle_move_to_and_click_on_element($this->field->getXpath());
+                } catch (\Exception $e) {
+                    return;
+                }
+            }
+        }
+
     }
 
     /**
