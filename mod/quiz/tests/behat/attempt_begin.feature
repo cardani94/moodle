@@ -88,7 +88,7 @@ Feature: The various checks that may happen when an attept is started
     And I should see "The quiz has a time limit of 1 hour. Time will "
     And I should see "The password entered was incorrect"
     And I set the field "Quiz password" to "Frog"
-    And I press "Start attempt"
+    And I move to and click on "Start attempt" "button"
     And I should see "Text of the first question"
 
   @javascript
@@ -110,6 +110,6 @@ Feature: The various checks that may happen when an attept is started
     And I should see "The quiz has a time limit of 1 hour. Time will "
     And I should see "The password entered was incorrect"
     And I set the field "Quiz password" to "Frog"
-    And I press "Cancel"
+    And I move to and click on "Cancel" "button"
     Then I should see "Quiz 1 description"
     And "Attempt quiz now" "button" should be visible

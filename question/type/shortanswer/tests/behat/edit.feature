@@ -33,7 +33,7 @@ Feature: Test editing a Short answer question
     Then I should see "You must supply a value here."
     When I set the following fields to these values:
       | Question name | Edited shortanswer-001 name |
-    And I press "id_submitbutton"
+    And I move to and click on "id_submitbutton" "button"
     Then I should see "Edited shortanswer-001 name"
     When I click on "Edit" "link" in the "Edited shortanswer-001 name" "table_row"
     And I set the following fields to these values:

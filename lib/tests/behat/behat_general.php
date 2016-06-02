@@ -329,6 +329,26 @@ class behat_general extends behat_base {
     }
 
     /**
+     * Move to and click on the element of the specified type.
+     *
+     * @When /^I move to and click on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)"$/
+     * @param string $element Element we look for
+     * @param string $selectortype The type of what we look for
+     */
+    public function i_move_to_and_click_on($element, $selectortype) {
+
+        // Gets the node based on the requested selector type and locator.
+        $node = $this->get_selected_node($selectortype, $element);
+        $this->ensure_node_is_visible($node);
+
+        if ($this->running_javascript()) {
+            $this->getSession()->getDriver()->moodle_move_to_and_click_on_element($node->getXpath());
+        } else {
+            $node->click();
+        }
+    }
+
+    /**
      * Sets the focus and takes away the focus from an element, generating blur JS event.
      *
      * @When /^I take focus off "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)"$/
