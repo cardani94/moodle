@@ -273,4 +273,36 @@ class behat_form_field {
             }
         }
     }
+
+    /**
+     * Move to element and click on it. This is noramlly needed to ensure change event is triggered.
+     *
+     * @param string $xpath
+     * @param bool $dialougeclick click on element or fire change event when showing dialouge.
+     */
+    protected function click_on_field_or_fire_change_event($xpath, $dialougeclick) {
+        if ($this->session->getDriver()->find($xpath.'/preceding-sibling::label[1]')) {
+            $xpath = $xpath.'/preceding-sibling::label[1]';
+        } else if ($this->session->getDriver()->find($xpath.'/preceding::label[1]')) {
+            $xpath = $xpath.'/preceding::label[1]';
+        } else {
+            $xpath = $xpath.'/preceding::div[1]';
+        }
+        // If it's not dialogue then move to element, else just click on it.
+        $dialoguexpath = "//div[contains(concat(' ', normalize-space(@class), ' '), ' moodle-dialogue ')]";
+        if (!$this->session->getDriver()->find($dialoguexpath)) {
+            try {
+                $this->session->getDriver()->moodle_move_to_and_click_on_element($xpath);
+            } catch (\Exception $e) {
+                return;
+            }
+        } else {
+            // Trigger on change event.
+            if ($dialougeclick) {
+                $this->session->getDriver()->moodle_click_on_element($xpath);
+            } else {
+                $this->trigger_on_change();
+            }
+        }
+    }
 }

@@ -44,25 +44,14 @@ class behat_form_text extends behat_form_field {
      * @return void
      */
     public function set_value($value) {
+        $this->field->setValue("");
         $this->field->setValue($value);
 
         if ($this->running_javascript()) {
             // If value is set in dialogue then just trigger chnage event, as move will move the screen and dialogue
             // will be wrongly positioned.
-            $dialoguexpath = "//div[contains(concat(' ', normalize-space(@class), ' '), ' moodle-dialogue ')]";
-            if (!$this->session->getDriver()->find($dialoguexpath)) {
-                try {
-                    $this->session->getDriver()->moodle_move_to_and_click_on_element($this->field->getXpath());
-                } catch (\Exception $e) {
-                    return;
-                }
-            } else {
-                // Trigger on change event.
-                $this->trigger_on_change();
-            }
-
+            $this->click_on_field_or_fire_change_event($this->field->getXpath(), false);
         }
-
     }
 
     /**

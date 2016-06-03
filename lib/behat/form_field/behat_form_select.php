@@ -90,12 +90,7 @@ class behat_form_select extends behat_form_field {
                 // Click on option again, as it might fail on some browsers.
                 $optionxpath = $this->get_option_xpath($value, $selectxpath);
                 if ($this->session->getDriver()->find($optionxpath)) {
-                    try {
-                        $this->session->getDriver()->moodle_click_on_element($optionxpath);
-
-                    } catch (\Exception $e) {
-                        return;
-                    }
+                    $this->click_on_field_or_fire_change_event($selectxpath, true);
                 }
             }
 
