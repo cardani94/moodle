@@ -63,6 +63,12 @@ editor.set("value", "' . $value . '");
         } else {
             parent::set_value($value);
         }
+
+        // Specific to Phantomjs.
+        $browser = \Moodle\BehatExtension\Driver\MoodleSelenium2Driver::getBrowser();
+        if ($browser == 'phantomjs') {
+            $this->trigger_on_change();
+        }
     }
 
     /**

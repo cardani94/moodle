@@ -257,4 +257,20 @@ class behat_form_field {
 
         return $this->fieldlocator;
     }
+
+    /**
+     * Trigger on change event.
+     */
+    protected function trigger_on_change() {
+        if ($this->running_javascript()) {
+            try {
+                $this->session->getDriver()->triggerSynScript(
+                    $this->field->getXPath(),
+                    "Syn.trigger('change', {}, {{ELEMENT}})"
+                );
+            } catch (\Exception $e) {
+                // No need to fire exception if it fails, as element might be removed by JS.
+            }
+        }
+    }
 }

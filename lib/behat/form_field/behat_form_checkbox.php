@@ -103,14 +103,4 @@ class behat_form_checkbox extends behat_form_field {
 
         return false;
     }
-
-    /**
-     * Trigger on change event.
-     */
-    protected function trigger_on_change() {
-        $this->session->getDriver()->triggerSynScript(
-            $this->field->getXPath(),
-            "Syn.trigger('change', {}, {{ELEMENT}})"
-        );
-    }
 }

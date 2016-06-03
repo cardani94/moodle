@@ -102,13 +102,7 @@ class behat_form_select extends behat_form_field {
             // Specific to Phantomjs.
             $browser = \Moodle\BehatExtension\Driver\MoodleSelenium2Driver::getBrowser();
             if ($multiple && ($browser == 'phantomjs')) {
-                $script = "Syn.trigger('change', {}, {{ELEMENT}})";
-                try {
-                    $this->session->getDriver()->triggerSynScript($this->field->getXpath(), $script);
-                } catch (Exception $e) {
-                    // No need to do anything if element has been removed by JS.
-                    // This is possible when inline editing element is used.
-                }
+                $this->trigger_on_change();
             }
             $this->session->wait(behat_base::TIMEOUT * 1000, behat_base::PAGE_READY_JS);
         }
