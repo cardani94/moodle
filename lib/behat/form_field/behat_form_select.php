@@ -74,6 +74,22 @@ class behat_form_select extends behat_form_field {
             // Trigger change event as this is needed by some drivers (Phantomjs, Mac-FF). Don't do it for
             // Singleselect as this will cause multiple event fire and lead to race-around condition.
             if (!$singleselect) {
+                $dialoguexpath = "//div[contains(concat(' ', normalize-space(@class), ' '), ' moodle-dialogue-focused ')]";
+                if (!$node = $this->session->getDriver()->find($dialoguexpath)) {
+                    try {
+                        if (!$node = $this->session->getDriver()->find('//body')) {
+                            $node->click();
+                        }
+                    } catch (\Exception $e) {
+                        return;
+                    }
+                } else {
+                    try {
+                       $node->click();
+                    } catch (\Exception $e) {
+                        return;
+                    }
+                }
                 $script = "Syn.trigger('change', {}, {{ELEMENT}})";
                 try {
                     $this->session->getDriver()->triggerSynScript($this->field->getXpath(), $script);
