@@ -51,7 +51,8 @@ abstract class UnitTestCase extends PHPUnit_Framework_TestCase {
         if (!$expected) {
             return;
         }
-        $this->setExpectedException('moodle_exception', $message);
+        $this->expectException('moodle_exception');
+        $this->expectExceptionMessage($message);
     }
 
     /**
@@ -65,7 +66,8 @@ abstract class UnitTestCase extends PHPUnit_Framework_TestCase {
         if (!$expected) {
             return;
         }
-        $this->setExpectedException('PHPUnit_Framework_Error', $message);
+        $this->expectException('PHPUnit_Framework_Error');
+        $this->expectExceptionMessage($message);
     }
 
     /**
