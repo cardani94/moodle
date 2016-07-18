@@ -329,6 +329,22 @@ class behat_general extends behat_base {
     }
 
     /**
+     * Sets the focus on specificed element.
+     *
+     * @When /^I set focus on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)"$/
+     * @param string $element Element we look for
+     * @param string $selectortype The type of what we look for
+     */
+    public function i_set_focus_on($element, $selectortype) {
+
+        // Gets the node based on the requested selector type and locator.
+        $node = $this->get_selected_node($selectortype, $element);
+        $this->ensure_node_is_visible($node);
+        $node->mouseOver();
+        $node->focus();
+    }
+
+    /**
      * Sets the focus and takes away the focus from an element, generating blur JS event.
      *
      * @When /^I take focus off "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)"$/

@@ -54,6 +54,8 @@ Feature: Marking guides can be created and edited
     When I go to "Test assignment 1 name" advanced grading definition page
     And I click on "Delete criterion" "button" in the "Guide criterion B" "table_row"
     And I press "Yes"
+    # Set focus on save button so it gets in viewport.
+    And I set focus on "Save" "button"
     And I press "Save"
     Then I should see "Guide criterion A"
     And I should see "Guide criterion C"
