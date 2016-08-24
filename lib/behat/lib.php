@@ -177,12 +177,7 @@ function behat_shutdown_function() {
     if ($error = error_get_last()) {
         // Ignore E_WARNING, as they might come via ( @ )suppression and might lead to false failure.
         if (isset($error['type']) && !($error['type'] & E_WARNING)) {
-            $errors = behat_get_shutdown_process_errors();
-
-            $errors[] = $error;
-            $errorstosave = json_encode($errors);
-
-            set_config('process_errors', $errorstosave, 'tool_behat');
+            $DB->insert_record('behat_errors_temp', $error);
         }
     }
 }
@@ -193,13 +188,10 @@ function behat_shutdown_function() {
  * @return array
  */
 function behat_get_shutdown_process_errors() {
-    $phperrors = get_config('tool_behat', 'process_errors');
+    global $DB;
 
-    if (!empty($phperrors)) {
-        return json_decode($phperrors, true);
-    } else {
-        return array();
-    }
+    $phperrors = $DB->get_records('behat_errors_temp');
+    return $phperrors;
 }
 
 /**

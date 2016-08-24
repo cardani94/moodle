@@ -768,6 +768,7 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
                 $phperrors = behat_get_shutdown_process_errors();
                 if (!empty($phperrors)) {
                     foreach ($phperrors as $error) {
+                        $error = (array)$error;
                         $errnostring = behat_get_error_string($error['type']);
                         $msgs[] = $errnostring . ": " .$error['message'] . " at " . $error['file'] . ": " . $error['line'];
                     }

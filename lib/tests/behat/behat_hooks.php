@@ -365,6 +365,9 @@ class behat_hooks extends behat_base {
 
         // Run all test with medium (1024x768) screen size, to avoid responsive problems.
         $this->resize_window('medium');
+
+        // Create behat_error_temp table for storing php errors.
+        self::create_behat_error_temp_table();
     }
 
     /**
@@ -597,6 +600,24 @@ class behat_hooks extends behat_base {
      */
     protected static function is_first_scenario() {
         return !(self::$initprocessesfinished);
+    }
+
+    /**
+     * Create behat error temp table to store php errors.
+     */
+    protected static function create_behat_error_temp_table() {
+        global $DB;
+        $dbman = $DB->get_manager();
+        if (!$dbman->table_exists('behat_errors_temp')) {
+            $table = new xmldb_table('behat_errors_temp');
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $table->add_field('type', XMLDB_TYPE_INTEGER, '2', null, null, null);
+            $table->add_field('message', XMLDB_TYPE_TEXT, null, null, null, null, null);
+            $table->add_field('file', XMLDB_TYPE_TEXT, null, null, null, null, null);
+            $table->add_field('line', XMLDB_TYPE_INTEGER, '10', null, null, null);
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+            $dbman->create_table($table);
+        }
     }
 }
 
