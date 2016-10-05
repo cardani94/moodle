@@ -42,9 +42,14 @@ Feature: Chat reset
     When I navigate to "Reset" node in "Course administration"
     And I set the following fields to these values:
       | reset_start_date[enabled] | 1  |
-      | reset_start_date[day]       | 1 |
-      | reset_start_date[month]     | January |
-      | reset_start_date[year]      | 2030 |
+      | reset_start_date[day]     | 1 |
+      | reset_start_date[month]   | January |
+      | reset_start_date[year]    | 2030 |
+    And I set the following fields to these values:
+      | reset_end_date[enabled] | 1  |
+      | reset_end_date[day]     | 2 |
+      | reset_end_date[month]   | January |
+      | reset_end_date[year]    | 2030 |
     And I press "Reset course"
     And I should see "Date changed" in the "Chats" "table_row"
     And I press "Continue"
