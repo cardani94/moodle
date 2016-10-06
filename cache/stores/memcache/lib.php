@@ -582,24 +582,12 @@ class cachestore_memcache extends cache_store implements cache_is_configurable {
     }
 
     /**
-     * Creates a test instance for unit tests if possible.
-     * @param cache_definition $definition
-     * @return bool|cachestore_memcache
+     * Generates the appropriate configuration required for unit testing.
+     *
+     * @return array Array of unit test configuration data to be used by initialise().
      */
-    public static function initialise_unit_test_instance(cache_definition $definition) {
-        if (!self::are_requirements_met()) {
-            return false;
-        }
-        if (!defined('TEST_CACHESTORE_MEMCACHE_TESTSERVERS')) {
-            return false;
-        }
-        $configuration = array();
-        $configuration['servers'] = explode("\n", TEST_CACHESTORE_MEMCACHE_TESTSERVERS);
-
-        $store = new cachestore_memcache('Test memcache', $configuration);
-        $store->initialise($definition);
-
-        return $store;
+    public static function unit_test_configuration() {
+        return ['servers' => explode("\n", TEST_CACHESTORE_MEMCACHE_TESTSERVERS)];
     }
 
     /**
