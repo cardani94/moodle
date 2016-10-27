@@ -163,7 +163,7 @@ class portfolio_plugin_googledocs extends portfolio_plugin_push_base {
         return array('clientid', 'secret');
     }
 
-    public static function admin_config_form(&$mform) {
+    public static function admin_config_form($mform) {
         $a = new stdClass;
         $a->docsurl = get_docs_url('Google_OAuth_2.0_setup');
         $a->callbackurl = (new moodle_url(self::REDIRECTURL))->out(false);

@@ -347,7 +347,7 @@ abstract class portfolio_plugin_base {
      *
      * @param moodleform $mform passed by reference, add elements to it.
      */
-    public static function admin_config_form(&$mform) {}
+    public static function admin_config_form($mform) {}
 
     /**
      * Just like the moodle form validation function,
