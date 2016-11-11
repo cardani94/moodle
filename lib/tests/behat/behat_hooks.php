@@ -382,6 +382,32 @@ class behat_hooks extends behat_base {
     }
 
     /**
+     * Executed after scenario.
+     * Logout to ensure the state of browser don't change.
+     * This will ensure session and cookie gets cleared and there is no pending ajax called.
+     *
+     * @param AfterScenarioScope $scope scope passed by event fired after scenario.
+     * @AfterScenario
+     */
+    public function after_scenario(AfterScenarioScope $scope) {
+        if ($this->running_javascript()) {
+            // Go to home page and logout user, if user is logged in.
+            try {
+                $this->wait_for_pending_js();
+                $logoutxpath = '//footer//a[text() = \''.get_string('logout').'\']';
+                if ($logoutnode = $this->find('xpath_element', $logoutxpath, false, false, 0)) {
+                    if ($logoutnode && $logoutnode->isVisible()) {
+                        $logoutnode->click();
+                        $this->wait_for_pending_js();
+                    }
+                }
+            } catch (\Behat\Mink\Exception\ElementNotFoundException $e) {
+                // If Log out link doesn't exist then no need to do anything.
+            }
+        }
+    }
+
+    /**
      * Wait for JS to complete before beginning interacting with the DOM.
      *
      * Executed only when running against a real browser. We wrap it
