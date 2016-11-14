@@ -115,6 +115,7 @@ Feature: Automatic updating of groups and groupings
     And I follow "Groups"
     And I set the field "groups" to "Group (with ID)"
     And I press "Edit group settings"
+    And I wait until the page is ready
     And I set the following fields to these values:
       | Enrolment key | badpasswd |
     When I press "Save changes"

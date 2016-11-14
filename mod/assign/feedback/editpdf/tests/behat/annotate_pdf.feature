@@ -25,9 +25,11 @@ Feature: In an assignment, teacher can annotate PDF files during grading
     When I press "Save changes"
     Then I should see "Changes saved"
     And I follow "Test ghostscript path"
+    And I wait until the page is ready
     And I should see "The ghostscript path appears to be OK"
     And I press "Continue"
     And I log out
+    And I wait until the page is ready
     And I log in as "teacher1"
     And I follow "Course 1"
     And I turn editing mode on
@@ -65,6 +67,9 @@ Feature: In an assignment, teacher can annotate PDF files during grading
     And I press "Save changes"
     And I wait until the page is ready
     And I should see "The changes to the grade and feedback were saved"
+    And I press "Ok"
+    And I follow "Course 1"
+    And I log out
 
   @javascript
   Scenario: Submit a PDF file as a student in a team and annotate the PDF as a teacher
@@ -134,6 +139,7 @@ Feature: In an assignment, teacher can annotate PDF files during grading
     And I click on ".linebutton" "css_element"
     And I draw on the pdf
     And I press "Save changes"
+    And I wait until the page is ready
     And I should see "The changes to the grade and feedback were saved"
     And I press "Ok"
     And I click on "Edit settings" "link"

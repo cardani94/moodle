@@ -43,6 +43,8 @@ Feature: Edited wiki pages may be previewed before saving
   Scenario: Page contents preview before saving with Javascript enabled
     Then the field "HTML format" matches value "Student page contents to be previewed"
     And I press "Cancel"
+    And I wait until the page is ready
+    And I log out
 
   Scenario: Page contents preview before saving with Javascript disabled
     Then the field "HTML format" matches value "Student page contents to be previewed"

@@ -43,8 +43,9 @@ Feature: Edited wiki pages handle tags correctly
     Then I should see "Page" in the ".form-autocomplete-selection" "css_element"
     Then I should see "Cool" in the ".form-autocomplete-selection" "css_element"
     And I press "Cancel"
+    And I wait until the page is ready
+    And I log out
 
-  @javascript
   Scenario: Wiki page edition of standard tags works as expected
     Given I log in as "admin"
     And I expand "Site administration" node
@@ -75,3 +76,5 @@ Feature: Edited wiki pages handle tags correctly
     And I should see "OT3" in the ".form-autocomplete-selection" "css_element"
     And I should not see "OT2" in the ".form-autocomplete-selection" "css_element"
     And I press "Cancel"
+    And I wait until the page is ready
+    And I log out

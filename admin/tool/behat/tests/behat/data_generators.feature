@@ -98,6 +98,8 @@ Feature: Set up contextual data for tests
     And I set the field "Advanced role override" to "Teacher (1)"
     And "mod/forum:replynews" capability has "Prevent" permission
     And I press "Cancel"
+    And I wait until the page is ready
+    And I log out
 
   Scenario: Add course enrolments
     Given the following "users" exist:

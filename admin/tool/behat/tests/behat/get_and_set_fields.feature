@@ -163,3 +163,5 @@ Feature: Verify that all form fields values can be get and set
     And the "available[day]" "field" should be enabled
     And the field "deadline[enabled]" matches value "1"
     And I press "Cancel"
+    And I wait until the page is ready
+    And I log out

@@ -122,7 +122,9 @@ Feature: Atto tables
     And I press "Save changes"
     And I follow "Edit"
     And I click on "Show more buttons" "button"
+    And I wait until the page is ready
     And I click on "HTML" "button"
+    And I wait until the page is ready
     Then I should see "background-color:rgb(255,255,255);"
     And I should see "width:100%;"
 

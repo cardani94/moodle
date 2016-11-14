@@ -47,6 +47,7 @@ Feature: In a lesson activity, a teacher can duplicate a lesson page
     And I click on "Select this file" "button"
     And I set the field "Describe this image for someone who cannot see it" to "It's the logo"
     And I click on "Save image" "button"
+    And I wait until the page is ready
     And I press "Save page"
     And I follow "Duplicate page: First page name"
     And I should see "Inserted page: First page name"

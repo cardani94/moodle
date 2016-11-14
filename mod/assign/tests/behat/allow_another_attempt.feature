@@ -57,7 +57,10 @@ Feature: In an assignment, students start a new attempt based on their previous 
     And I follow "Test assignment name"
     And I click on "View all submissions" "link" in the "Administration" "block"
     And I click on "Grade" "link" in the "Student 1" "table_row"
+    And I wait until the page is ready
     And I should see "I'm the student first submission"
+    And I follow "Course 1"
+    And I log out
 
   @javascript @_alert
   Scenario: Allow new attempt does not display incorrect error message on group submission
@@ -127,6 +130,7 @@ Feature: In an assignment, students start a new attempt based on their previous 
     And I set the following fields to these values:
       | operation | Allow another attempt |
     And I click on "Go" "button" confirming the dialogue
+    And I wait until the page is ready
     And I should not see "The grades were not saved because someone has modified one or more records more recently than when you loaded the page."
 # Behat tests for the group submission, should be uncommented once the MDL-48216 is fixed.
 #    And I log out
