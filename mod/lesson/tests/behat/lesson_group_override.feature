@@ -1,8 +1,8 @@
 @mod @mod_lesson
-Feature: Lesson user override
-  In order to grant a student special access to a lesson
+Feature: Lesson group override
+  In order to grant students in a group special access to a lesson
   As a teacher
-  I need to create an override for that user.
+  I need to create an override for group.
 
   Background:
     Given the following "users" exist:
