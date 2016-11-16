@@ -60,5 +60,10 @@ JS;
         }
 
         $this->field->setValue($value);
+
+        // If running JS, then press enter after setting the key, so editing turn off don't create any problem with next step.
+        if ($this->running_javascript()) {
+            $this->session->getDriver()->post_key(\WebDriver\Key::RETURN_KEY, $this->field->getXpath());
+        }
     }
 }
