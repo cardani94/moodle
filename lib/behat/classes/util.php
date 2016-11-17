@@ -58,6 +58,11 @@ class behat_util extends testing_util {
     protected static $datarootskipondrop = array('.', '..', 'lock');
 
     /**
+     * @var int Counter used to track how many times reset_dataroot has been tried.
+     */
+    protected static $tryresetcount = 0;
+
+    /**
      * Installs a site using $CFG->dataroot and $CFG->prefix
      * @throws coding_exception
      * @return void
@@ -327,8 +332,18 @@ class behat_util extends testing_util {
      * Reset contents of all database tables to initial values, reset caches, etc.
      */
     public static function reset_all_data() {
+
         // Reset database.
         self::reset_database();
+
+        // Because of ajax or pending apache calls, data reset might fail. So try again.
+        set_error_handler(function() {
+            if (self::$tryresetcount < behat_base::EXTENDED_TIMEOUT) {
+                usleep(500000);
+                behat_util::reset_all_data();
+            }
+            self::$tryresetcount++;
+        });
 
         // Purge dataroot directory.
         self::reset_dataroot();
@@ -353,5 +368,11 @@ class behat_util extends testing_util {
         // Initialise $CFG with default values. This is needed for behat cli process, so we don't have modified
         // $CFG values from the old run. @see set_config.
         initialise_cfg();
+
+        // Restore error handler.
+        restore_error_handler();
+
+        // Reset the counter, so it is ready for next try.
+        self::$tryresetcount = 0;
     }
 }
