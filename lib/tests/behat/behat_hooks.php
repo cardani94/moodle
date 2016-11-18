@@ -266,12 +266,28 @@ class behat_hooks extends behat_base {
      * @BeforeScenario
      */
     public function before_scenario_hook(BeforeScenarioScope $scope) {
+       // Set custom hadler to ignore any notice or warning. Also,
+       // Trigger an error which will be handeled by shutdown hook
+       // and not registed as the failure.
+       set_error_handler(
+            function() {
+                return true;
+            }, E_NOTICE | E_WARNING | E_USER_WARNING);
+
         try {
             $this->before_scenario($scope);
         } catch (behat_stop_exception $e) {
             echo $e->getMessage() . PHP_EOL;
             exit(1);
         }
+
+        // Trigger an error which will be ignored by behat_shutdown_function.
+        if (function_exists('error_clear_last')) {
+            error_clear_last();
+        } else {
+            trigger_error(NULL, E_USER_WARNING);
+        }
+        restore_error_handler();
     }
 
     /**

@@ -175,6 +175,12 @@ function behat_shutdown_function() {
     if ($error = error_get_last()) {
         // Ignore E_WARNING, as they might come via ( @ )suppression and might lead to false failure.
         if (isset($error['type']) && !($error['type'] & E_WARNING)) {
+            // Ignore empty E_USER_WARANING. This is intentional to clear
+            // Last error.
+            if (($error['type'] & E_USER_WARNING) && empty($error['message'])) {
+                return;
+            }
+
             $errors = behat_get_shutdown_process_errors();
 
             $errors[] = $error;
