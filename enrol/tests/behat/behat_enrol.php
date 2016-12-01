@@ -104,7 +104,9 @@ class behat_enrol extends behat_base {
             $this->execute('behat_general::i_click_on_in_the',
                 array(get_string('enrol', 'enrol'), "button", $userrowxpath, "xpath_element")
             );
+            $this->resize_window('large');
             $this->execute("behat_forms::press_button", get_string('finishenrollingusers', 'enrol'));
+            $this->resize_window('medium');
 
         } else {
             $this->execute('behat_forms::i_set_the_field_to', array(get_string('assignrole', 'role'), $rolename));
