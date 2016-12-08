@@ -229,6 +229,9 @@ class behat_theme_boost_behat_navigation extends behat_navigation {
      * @param string $menuxpath (optional) xpath to the page administration menu if already known
      */
     protected function toggle_page_administration_menu($menuxpath = null) {
+        // Ensure page is ready, before opening the menu.
+        //$this->execute('behat_general::wait_until_the_page_is_ready');
+
         if (!$menuxpath) {
             $menuxpath = $this->find_header_administration_menu() ?: $this->find_page_administration_menu();
         }
