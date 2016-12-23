@@ -35,4 +35,3 @@ Feature: Atto superscript button
     And I press "Save changes"
     And I follow "Edit profile"
     Then I should see "<sup>Helicopter</sup>"
-

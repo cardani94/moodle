@@ -35,4 +35,3 @@ Feature: In a lesson activity, teacher can import embedded images in questions a
     And I should see "What language is being spoken?"
     And "//*[contains(@class, 'answeroption')]//img[contains(@src, 'pluginfile.php')]" "xpath_element" should exist
     And "//*[contains(@class, 'answeroption')]//img[contains(@src, 'flag-france.jpg')]" "xpath_element" should exist
-

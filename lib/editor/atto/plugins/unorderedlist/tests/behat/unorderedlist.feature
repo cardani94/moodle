@@ -17,4 +17,3 @@ Feature: Atto unordered list button
     And I press "Save changes"
     And I follow "Edit profile"
     Then I should see "<ul><li>Things, dogs, clogs"
-

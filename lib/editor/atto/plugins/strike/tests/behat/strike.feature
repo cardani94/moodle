@@ -18,4 +18,3 @@ Feature: Atto strike button
     And I press "Save changes"
     And I follow "Edit profile"
     Then I should see "<strike>MUA</strike>"
-

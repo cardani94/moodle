@@ -16,7 +16,6 @@ Feature: Role assignments can be made at the category level
       | manager | manager       | Category     | CAT1      |
     And I log in as "admin"
 
-
   @javascript
   Scenario: A user with a category role can assign roles
     Given I define the allowed role assignments for the "Manager" role as:

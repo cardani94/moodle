@@ -53,4 +53,3 @@ Feature: Atto align text
     And I press "Save changes"
     And I follow "Edit profile"
     Then I should see "style=\"text-align:center;\""
-

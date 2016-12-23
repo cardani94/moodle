@@ -20,4 +20,3 @@ Feature: Atto clear button
     And I press "Save changes"
     And I follow "Edit profile"
     Then I should not see "<i>Pisa"
-

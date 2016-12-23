@@ -24,4 +24,3 @@ Feature: Add links to Atto
     And I press "Save changes"
     And I follow "Edit profile"
     Then I should see "Super cool</a>"
-

@@ -23,4 +23,3 @@ Feature: Add media to Atto
     And I click on "Insert media" "button"
     And I click on "Save changes" "button"
     Then "video" "css_element" should be visible
-

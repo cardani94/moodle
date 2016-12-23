@@ -18,4 +18,3 @@ Feature: Atto title
     And I press "Save changes"
     And I follow "Edit profile"
     Then I should see "<h3>How The Rock"
-

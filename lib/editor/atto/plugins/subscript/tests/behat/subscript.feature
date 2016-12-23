@@ -35,4 +35,3 @@ Feature: Atto subscript button
     And I press "Save changes"
     And I follow "Edit profile"
     Then I should see "<sub>Submarine</sub>"
-
