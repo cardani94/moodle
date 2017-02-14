@@ -2466,7 +2466,7 @@ EOD;
 
         debugging('core_renderer::update_module_button() has been deprecated and should not be used anymore. Activity modules ' .
             'should not add the edit module button, the link is already available in the Administration block. Themes can choose ' .
-            'to display the link in the buttons row consistently for all module types.', DEBUG_DEVELOPER);
+            'to display the link in the buttons row consistently for all module types.', E_USER_DEPRECATED);
 
         if (has_capability('moodle/course:manageactivities', context_module::instance($cmid))) {
             $modulename = get_string('modulename', $modulename);
@@ -2700,7 +2700,7 @@ EOD;
     public function notify_problem($message) {
         debugging(__FUNCTION__ . ' is deprecated.' .
             'Please use \core\notification::add, or \core\output\notification as required',
-            DEBUG_DEVELOPER);
+            E_USER_DEPRECATED);
         $n = new \core\output\notification($message, \core\output\notification::NOTIFY_ERROR);
         return $this->render($n);
     }
@@ -2717,7 +2717,7 @@ EOD;
     public function notify_success($message) {
         debugging(__FUNCTION__ . ' is deprecated.' .
             'Please use \core\notification::add, or \core\output\notification as required',
-            DEBUG_DEVELOPER);
+            E_USER_DEPRECATED);
         $n = new \core\output\notification($message, \core\output\notification::NOTIFY_SUCCESS);
         return $this->render($n);
     }
@@ -2734,7 +2734,7 @@ EOD;
     public function notify_message($message) {
         debugging(__FUNCTION__ . ' is deprecated.' .
             'Please use \core\notification::add, or \core\output\notification as required',
-            DEBUG_DEVELOPER);
+            E_USER_DEPRECATED);
         $n = new \core\output\notification($message, \core\output\notification::NOTIFY_INFO);
         return $this->render($n);
     }
@@ -2751,7 +2751,7 @@ EOD;
     public function notify_redirect($message) {
         debugging(__FUNCTION__ . ' is deprecated.' .
             'Please use \core\notification::add, or \core\output\notification as required',
-            DEBUG_DEVELOPER);
+            E_USER_DEPRECATED);
         $n = new \core\output\notification($message, \core\output\notification::NOTIFY_INFO);
         return $this->render($n);
     }
@@ -4504,7 +4504,7 @@ class core_media_renderer extends plugin_renderer_base {
      * before you call renderer functions.
      */
     public function __construct() {
-        debugging('Class core_media_renderer is deprecated, please use core_media_manager::instance()', DEBUG_DEVELOPER);
+        debugging('Class core_media_renderer is deprecated, please use core_media_manager::instance()', E_USER_DEPRECATED);
     }
 
     /**

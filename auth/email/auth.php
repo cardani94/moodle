@@ -45,7 +45,7 @@ class auth_plugin_email extends auth_plugin_base {
      * @deprecated since Moodle 3.1
      */
     public function auth_plugin_email() {
-        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
+        debugging('Use of class name as constructor is deprecated', E_USER_DEPRECATED);
         self::__construct();
     }
 

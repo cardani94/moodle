@@ -1647,7 +1647,8 @@ function calendar_preferences_button(stdClass $course) {
     if (!isloggedin() || isguestuser()) {
         return '';
     }
-    debugging('This should no longer be used, the calendar preferences are now linked to the user preferences page');
+    debugging('This should no longer be used, the calendar preferences are now linked to the user preferences page',
+        E_USER_DEPRECATED);
 
     return $OUTPUT->single_button(new moodle_url('/user/calendar.php'), get_string("preferences", "calendar"));
 }

@@ -68,7 +68,7 @@ class object extends stdClass {
      * Constructor.
      */
     public function __construct() {
-        debugging("'object' class has been deprecated, please use stdClass instead.", DEBUG_DEVELOPER);
+        debugging("'object' class has been deprecated, please use stdClass instead.", E_USER_DEPRECATED);
     }
 };
 

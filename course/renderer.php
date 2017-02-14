@@ -69,7 +69,7 @@ class core_course_renderer extends plugin_renderer_base {
      * @deprecated since 3.2
      */
     protected function add_modchoosertoggle() {
-        debugging('core_course_renderer::add_modchoosertoggle() is deprecated.', DEBUG_DEVELOPER);
+        debugging('core_course_renderer::add_modchoosertoggle() is deprecated.', E_USER_DEPRECATED);
 
         global $CFG;
 
@@ -146,7 +146,8 @@ class core_course_renderer extends plugin_renderer_base {
      * @return string
      */
     public final function course_category_tree(array $ignored) {
-        debugging('Function core_course_renderer::course_category_tree() is deprecated, please use frontpage_combo_list()', DEBUG_DEVELOPER);
+        debugging('Function core_course_renderer::course_category_tree() is deprecated, please use frontpage_combo_list()',
+            E_USER_DEPRECATED);
         return $this->frontpage_combo_list();
     }
 
@@ -162,7 +163,7 @@ class core_course_renderer extends plugin_renderer_base {
      * @return string
      */
     protected final function course_category_tree_category(stdClass $category, $depth=1) {
-        debugging('Function core_course_renderer::course_category_tree_category() is deprecated', DEBUG_DEVELOPER);
+        debugging('Function core_course_renderer::course_category_tree_category() is deprecated', E_USER_DEPRECATED);
         return '';
     }
 

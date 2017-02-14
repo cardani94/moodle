@@ -1131,7 +1131,7 @@ class grade_plugin_return {
      * @deprecated since Moodle 3.1
      */
     public function grade_plugin_return($params = null) {
-        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
+        debugging('Use of class name as constructor is deprecated', E_USER_DEPRECATED);
         self::__construct($params);
     }
 
@@ -2099,7 +2099,7 @@ class grade_seq extends grade_structure {
      * @deprecated since Moodle 3.1
      */
     public function grade_seq($courseid, $category_grade_last=false, $nooutcomes=false) {
-        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
+        debugging('Use of class name as constructor is deprecated', E_USER_DEPRECATED);
         self::__construct($courseid, $category_grade_last, $nooutcomes);
     }
 
@@ -2290,7 +2290,7 @@ class grade_tree extends grade_structure {
      */
     public function grade_tree($courseid, $fillers=true, $category_grade_last=false,
                                $collapsed=null, $nooutcomes=false) {
-        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
+        debugging('Use of class name as constructor is deprecated', E_USER_DEPRECATED);
         self::__construct($courseid, $fillers, $category_grade_last, $collapsed, $nooutcomes);
     }
 

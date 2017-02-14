@@ -101,7 +101,7 @@ abstract class moodleform_mod extends moodleform {
      * @deprecated since Moodle 3.1
      */
     public function moodleform_mod($current, $section, $cm, $course) {
-        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
+        debugging('Use of class name as constructor is deprecated', E_USER_DEPRECATED);
         self::__construct($current, $section, $cm, $course);
     }
 
@@ -876,7 +876,7 @@ abstract class moodleform_mod extends moodleform {
      */
     protected function add_intro_editor($required=null, $customlabel=null) {
         $str = "Function moodleform_mod::add_intro_editor() is deprecated, use moodleform_mod::standard_intro_elements() instead.";
-        debugging($str, DEBUG_DEVELOPER);
+        debugging($str, E_USER_DEPRECATED);
 
         $this->standard_intro_elements($customlabel);
     }

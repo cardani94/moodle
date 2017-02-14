@@ -565,7 +565,7 @@ abstract class grade_report {
         // the aggregated grade does not make sense without the updated min and max information.
 
         debugging('grade_report::blank_hidden_total() is deprecated.
-                   Call grade_report::blank_hidden_total_and_adjust_bounds instead.', DEBUG_DEVELOPER);
+                   Call grade_report::blank_hidden_total_and_adjust_bounds instead.', E_USER_DEPRECATED);
         $result = $this->blank_hidden_total_and_adjust_bounds($courseid, $course_item, $finalgrade);
         return $result['grade'];
     }

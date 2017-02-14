@@ -62,7 +62,7 @@ class search_token {
    * @deprecated since Moodle 3.1
    */
   public function search_token($type, $value) {
-    debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
+    debugging('Use of class name as constructor is deprecated', E_USER_DEPRECATED);
     self::__construct($type, $value);
   }
 
@@ -210,7 +210,7 @@ class search_lexer extends Lexer{
    * @deprecated since Moodle 3.1
    */
   public function search_lexer(&$parser) {
-    debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
+    debugging('Use of class name as constructor is deprecated', E_USER_DEPRECATED);
     self::__construct($parser);
   }
 
@@ -372,7 +372,7 @@ class search_parser {
  */
 function search_generate_text_SQL($parsetree, $datafield, $metafield, $mainidfield, $useridfield,
                              $userfirstnamefield, $userlastnamefield, $timefield, $instancefield) {
-    debugging('search_generate_text_SQL() is deprecated, please use search_generate_SQL() instead.', DEBUG_DEVELOPER);
+    debugging('search_generate_text_SQL() is deprecated, please use search_generate_SQL() instead.', E_USER_DEPRECATED);
 
     return search_generate_SQL($parsetree, $datafield, $metafield, $mainidfield, $useridfield,
                                $userfirstnamefield, $userlastnamefield, $timefield, $instancefield);

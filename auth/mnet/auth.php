@@ -47,7 +47,7 @@ class auth_plugin_mnet extends auth_plugin_base {
      * @deprecated since Moodle 3.1
      */
     public function auth_plugin_mnet() {
-        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
+        debugging('Use of class name as constructor is deprecated', E_USER_DEPRECATED);
         self::__construct();
     }
 
@@ -783,7 +783,7 @@ class auth_plugin_mnet extends auth_plugin_base {
      * @return  string              "All ok" or an error message
      */
     function refresh_log($array) {
-        debugging('refresh_log() is deprecated, The transfer of logs through mnet are no longer recorded.', DEBUG_DEVELOPER);
+        debugging('refresh_log() is deprecated, The transfer of logs through mnet are no longer recorded.', E_USER_DEPRECATED);
         return array('code' => 0, 'message' => 'All ok');
     }
 

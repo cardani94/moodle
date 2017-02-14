@@ -212,7 +212,7 @@ class component_installer {
      * @deprecated since Moodle 3.1
      */
     public function component_installer($sourcebase, $zippath, $zipfilename, $md5filename='', $destpath='') {
-        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
+        debugging('Use of class name as constructor is deprecated', E_USER_DEPRECATED);
         self::__construct($sourcebase, $zippath, $zipfilename, $md5filename, $destpath);
     }
 

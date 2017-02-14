@@ -1651,7 +1651,7 @@ class table_default_export_format_parent {
      * @deprecated since Moodle 3.1
      */
     public function table_default_export_format_parent(&$table) {
-        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
+        debugging('Use of class name as constructor is deprecated', E_USER_DEPRECATED);
         self::__construct($table);
     }
 

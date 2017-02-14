@@ -29,7 +29,7 @@ namespace core\event;
 defined('MOODLE_INTERNAL') || die();
 
 debugging('core\event\content_viewed has been deprecated. Please extend base event or other relevant abstract class.',
-        DEBUG_DEVELOPER);
+    E_USER_DEPRECATED);
 
 /**
  * Class content_viewed.

@@ -268,7 +268,7 @@ class behat_field_manager {
      */
     public static function get_field(NodeElement $fieldnode, $locator, Session $session) {
         debugging('Function behat_field_manager::get_field() is deprecated, ' .
-            'please use function behat_field_manager::get_form_field() instead', DEBUG_DEVELOPER);
+            'please use function behat_field_manager::get_form_field() instead', E_USER_DEPRECATED);
 
         return self::get_form_field($fieldnode, $session);
     }
@@ -289,7 +289,7 @@ class behat_field_manager {
      */
     protected static function get_node_type(NodeElement $fieldnode, $locator, Session $session) {
         debugging('Function behat_field_manager::get_node_type() is deprecated, ' .
-            'please use function behat_field_manager::get_field_node_type() instead', DEBUG_DEVELOPER);
+            'please use function behat_field_manager::get_field_node_type() instead', E_USER_DEPRECATED);
 
         return self::get_field_node_type($fieldnode, $session);
     }

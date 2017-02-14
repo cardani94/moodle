@@ -248,7 +248,8 @@ abstract class moodle_database {
      * @return string
      */
     public function get_configuration_hints() {
-        debugging('$DB->get_configuration_hints() method is deprecated, use $DB->get_configuration_help() instead');
+        debugging('$DB->get_configuration_hints() method is deprecated, use $DB->get_configuration_help() instead',
+            E_USER_DEPRECATED);
         return $this->get_configuration_help();
     }
 
@@ -2235,7 +2236,7 @@ abstract class moodle_database {
      * @return string An empty string.
      */
     function sql_empty() {
-        debugging("sql_empty() is deprecated, please use empty string '' as sql parameter value instead", DEBUG_DEVELOPER);
+        debugging("sql_empty() is deprecated, please use empty string '' as sql parameter value instead", E_USER_DEPRECATED);
         return '';
     }
 

@@ -45,7 +45,7 @@ class auth_plugin_nologin extends auth_plugin_base {
      * @deprecated since Moodle 3.1
      */
     public function auth_plugin_nologin() {
-        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
+        debugging('Use of class name as constructor is deprecated', E_USER_DEPRECATED);
         self::__construct();
     }
 

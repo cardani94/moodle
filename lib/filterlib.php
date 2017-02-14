@@ -241,7 +241,7 @@ class filter_manager {
     public function text_filtering_hash($context) {
         debugging('filter_manager::text_filtering_hash() is deprecated. ' .
                 'It was an internal part of the old format_text caching, ' .
-                'and should not have been called from other code.', DEBUG_DEVELOPER);
+                'and should not have been called from other code.', E_USER_DEPRECATED);
         $filters = $this->get_text_filters($context);
         $hashes = array();
         foreach ($filters as $filter) {
@@ -423,7 +423,7 @@ abstract class moodle_text_filter {
     public function hash() {
         debugging('moodle_text_filter::hash() is deprecated. ' .
                 'It was an internal part of the old format_text caching, ' .
-                'and should not have been called from other code.', DEBUG_DEVELOPER);
+                'and should not have been called from other code.', E_USER_DEPRECATED);
         return __CLASS__;
     }
 

@@ -43,6 +43,7 @@ class core_adhoc_task_testcase extends advanced_testcase {
     public function test_get_next_adhoc_task_now() {
         $this->resetAfterTest(true);
 
+        prevent_form_autofill_password();
         // Create an adhoc task.
         $task = new \core\task\adhoc_test_task();
 

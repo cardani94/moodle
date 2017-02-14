@@ -263,6 +263,6 @@ class boxnet_client extends oauth2_client {
 class boxclient {
     public function __construct() {
         throw new coding_exception(__CLASS__ . ' has been removed. Please update your code to use boxnet_client.',
-            DEBUG_DEVELOPER);
+            E_USER_DEPRECATED);
     }
 }

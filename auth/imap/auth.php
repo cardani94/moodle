@@ -46,7 +46,7 @@ class auth_plugin_imap extends auth_plugin_base {
      * @deprecated since Moodle 3.1
      */
     public function auth_plugin_imap() {
-        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
+        debugging('Use of class name as constructor is deprecated', E_USER_DEPRECATED);
         self::__construct();
     }
 

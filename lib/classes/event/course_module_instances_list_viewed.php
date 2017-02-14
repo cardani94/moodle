@@ -28,7 +28,7 @@ namespace core\event;
 defined('MOODLE_INTERNAL') || die();
 
 debugging('core\\event\\course_module_instances_list_viewed has been deperecated. Please use
-        core\\event\\course_module_instance_list_viewed instead', DEBUG_DEVELOPER);
+        core\\event\\course_module_instance_list_viewed instead', E_USER_DEPRECATED);
 
 /**
  * This class has been deprecated, please use \core\event\course_module_instance_list_viewed.

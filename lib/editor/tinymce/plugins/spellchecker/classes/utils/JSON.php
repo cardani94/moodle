@@ -4,7 +4,7 @@
  *
  * @package MCManager.utils
  * @author Moxiecode
- * @copyright Copyright © 2007, Moxiecode Systems AB, All rights reserved.
+ * @copyright Copyright ï¿½ 2007, Moxiecode Systems AB, All rights reserved.
  */
 
 define('JSON_BOOL', 1);
@@ -44,7 +44,7 @@ class Moxiecode_JSONReader {
      * @deprecated since Moodle 3.1
      */
     public function Moxiecode_JSONReader($data) {
-        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
+        debugging('Use of class name as constructor is deprecated', E_USER_DEPRECATED);
         self::__construct($data);
     }
 
@@ -379,7 +379,7 @@ class Moxiecode_JSON {
      * @deprecated since Moodle 3.1
      */
     public function Moxiecode_JSON() {
-        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
+        debugging('Use of class name as constructor is deprecated', E_USER_DEPRECATED);
         self::__construct();
     }
 

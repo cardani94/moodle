@@ -78,7 +78,7 @@ class profile_field_menu extends profile_field_base {
      * @deprecated since Moodle 3.1
      */
     public function profile_field_menu($fieldid=0, $userid=0) {
-        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
+        debugging('Use of class name as constructor is deprecated', E_USER_DEPRECATED);
         self::__construct($fieldid, $userid);
     }
 

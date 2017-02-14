@@ -4106,7 +4106,7 @@ class action_menu implements renderable, templatable {
      * @deprecated since Moodle 3.2
      */
     public function do_not_enhance() {
-        debugging('The method action_menu::do_not_enhance() is deprecated, use a list of action_icon instead.', DEBUG_DEVELOPER);
+        debugging('The method action_menu::do_not_enhance() is deprecated, use a list of action_icon instead.', E_USER_DEPRECATED);
     }
 
     /**

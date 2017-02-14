@@ -3055,7 +3055,8 @@ class admin_setting_configselect extends admin_setting {
      * @deprecated since Moodle 3.2
      */
     public function output_select_html($data, $current, $default, $extraname = '') {
-        debugging('The method admin_setting_configselect::output_select_html is depreacted, do not use any more.', DEBUG_DEVELOPER);
+        debugging('The method admin_setting_configselect::output_select_html is depreacted, do not use any more.',
+            E_USER_DEPRECATED);
     }
 
     /**
@@ -5209,7 +5210,7 @@ class admin_setting_special_gradelimiting extends admin_setting_configcheckbox {
      * @deprecated since Moodle 3.1
      */
     public function admin_setting_special_gradelimiting() {
-        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
+        debugging('Use of class name as constructor is deprecated', E_USER_DEPRECATED);
         self::__construct();
     }
 

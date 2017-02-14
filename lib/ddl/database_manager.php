@@ -478,7 +478,7 @@ class database_manager {
      * @return void
      */
     public function drop_temp_table(xmldb_table $xmldb_table) {
-        debugging('database_manager::drop_temp_table() is deprecated, use database_manager::drop_table() instead');
+        debugging('database_manager::drop_temp_table() is deprecated, use database_manager::drop_table() instead', E_USER_DEPRECATED);
         $this->drop_table($xmldb_table);
     }
 
@@ -616,7 +616,7 @@ class database_manager {
      * @return void
      */
     public function change_field_unsigned(xmldb_table $xmldb_table, xmldb_field $xmldb_field) {
-        debugging('All unsigned numbers are converted to signed automatically during Moodle upgrade.');
+        debugging('All unsigned numbers are converted to signed automatically during Moodle upgrade.', E_USER_DEPRECATED);
         $this->change_field_type($xmldb_table, $xmldb_field);
     }
 

@@ -131,7 +131,7 @@ class EvalMath {
      * @deprecated since Moodle 3.1
      */
     public function EvalMath($allowconstants = false, $allowimplicitmultiplication = false) {
-        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
+        debugging('Use of class name as constructor is deprecated', E_USER_DEPRECATED);
         self::__construct($allowconstants, $allowimplicitmultiplication);
     }
 

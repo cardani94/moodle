@@ -224,7 +224,7 @@ abstract class moodleform {
      * @deprecated since Moodle 3.1
      */
     public function moodleform($action=null, $customdata=null, $method='post', $target='', $attributes=null, $editable=true) {
-        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
+        debugging('Use of class name as constructor is deprecated', E_USER_DEPRECATED);
         self::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }
 
@@ -667,7 +667,7 @@ abstract class moodleform {
      * @return bool Always false
      */
     function save_files($destination) {
-        debugging('Not used anymore, please fix code! Use save_stored_file() or save_file() instead');
+        debugging('Not used anymore, please fix code! Use save_stored_file() or save_file() instead', E_USER_DEPRECATED);
         return false;
     }
 
@@ -1268,7 +1268,7 @@ abstract class moodleform {
      */
     function init_javascript_enhancement($element, $enhancement, array $options=array(), array $strings=null) {
         debugging('$mform->init_javascript_enhancement() is deprecated and no longer does anything. '.
-            'smartselect uses should be converted to the searchableselector form element.', DEBUG_DEVELOPER);
+            'smartselect uses should be converted to the searchableselector form element.', E_USER_DEPRECATED);
     }
 
     /**
@@ -1497,7 +1497,7 @@ class MoodleQuickForm extends HTML_QuickForm_DHTMLRulesTableless {
      * @deprecated since Moodle 3.1
      */
     public function MoodleQuickForm($formName, $method, $action, $target='', $attributes=null) {
-        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
+        debugging('Use of class name as constructor is deprecated', E_USER_DEPRECATED);
         self::__construct($formName, $method, $action, $target, $attributes);
     }
 
@@ -1588,7 +1588,8 @@ class MoodleQuickForm extends HTML_QuickForm_DHTMLRulesTableless {
      * @param bool $showadvancedNow if true will show advanced elements.
       */
     function setShowAdvanced($showadvancedNow = null){
-        debugging('Call to deprecated function setShowAdvanced. See "Show more.../Show less..." in shortforms yui module.');
+        debugging('Call to deprecated function setShowAdvanced. See "Show more.../Show less..." in shortforms yui module.',
+            E_USER_DEPRECATED);
     }
 
     /**
@@ -1599,7 +1600,8 @@ class MoodleQuickForm extends HTML_QuickForm_DHTMLRulesTableless {
      * @return bool (Always false)
       */
     function getShowAdvanced(){
-        debugging('Call to deprecated function setShowAdvanced. See "Show more.../Show less..." in shortforms yui module.');
+        debugging('Call to deprecated function setShowAdvanced. See "Show more.../Show less..." in shortforms yui module.',
+            E_USER_DEPRECATED);
         return false;
     }
 
@@ -2731,7 +2733,7 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
      * @deprecated since Moodle 3.1
      */
     public function MoodleQuickForm_Renderer() {
-        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
+        debugging('Use of class name as constructor is deprecated', E_USER_DEPRECATED);
         self::__construct();
     }
 
