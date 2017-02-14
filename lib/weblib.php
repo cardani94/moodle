@@ -3060,6 +3060,11 @@ function debugging($message = '', $level = DEBUG_NORMAL, $backtrace = null) {
         return false;
     }
 
+    // If DEBUG_DISABLE_DEPRECATED defined then skip debugging of deprecated messages.
+    if (defined('DEBUG_DISABLE_DEPRECATED') && DEBUG_DISABLE_DEPRECATED && ($level === E_USER_DEPRECATED)) {
+        return false;
+    }
+
     if (!isset($CFG->debugdisplay)) {
         $CFG->debugdisplay = ini_get_bool('display_errors');
     }
@@ -3092,7 +3097,11 @@ function debugging($message = '', $level = DEBUG_NORMAL, $backtrace = null) {
             }
 
         } else {
-            trigger_error($message . $from, E_USER_NOTICE);
+            if ($level === E_USER_DEPRECATED) {
+                trigger_error($message . $from, E_USER_DEPRECATED);
+            } else {
+                trigger_error($message . $from, E_USER_NOTICE);
+            }
         }
     }
     return true;

@@ -47,7 +47,7 @@ defined('MOODLE_INTERNAL') || die();
  * @return void
  */
 function add_to_log($courseid, $module, $action, $url='', $info='', $cm=0, $user=0) {
-    debugging('add_to_log() has been deprecated, please rewrite your code to the new events API', DEBUG_DEVELOPER);
+    debugging('add_to_log() has been deprecated, please rewrite your code to the new events API', E_USER_DEPRECATED);
 
     // This is a nasty hack that allows us to put all the legacy stuff into legacy storage,
     // this way we may move all the legacy settings there too.
@@ -67,7 +67,7 @@ function add_to_log($courseid, $module, $action, $url='', $info='', $cm=0, $user
  * @return int number of failed events
  */
 function events_trigger($eventname, $eventdata) {
-    debugging('events_trigger() is deprecated, please use new events instead', DEBUG_DEVELOPER);
+    debugging('events_trigger() is deprecated, please use new events instead', E_USER_DEPRECATED);
     return events_trigger_legacy($eventname, $eventdata);
 }
 
@@ -99,7 +99,7 @@ function get_core_subsystems($fullpaths = false) {
         return $subsystems;
     }
 
-    debugging('Short paths are deprecated when using get_core_subsystems(), please fix the code to use fullpaths instead.', DEBUG_DEVELOPER);
+    debugging('Short paths are deprecated when using get_core_subsystems(), please fix the code to use fullpaths instead.', E_USER_DEPRECATED);
 
     $dlength = strlen($CFG->dirroot);
 
@@ -132,7 +132,7 @@ function get_plugin_types($fullpaths = true) {
         return $types;
     }
 
-    debugging('Short paths are deprecated when using get_plugin_types(), please fix the code to use fullpaths instead.', DEBUG_DEVELOPER);
+    debugging('Short paths are deprecated when using get_plugin_types(), please fix the code to use fullpaths instead.', E_USER_DEPRECATED);
 
     $dlength = strlen($CFG->dirroot);
 
@@ -253,7 +253,7 @@ function get_component_directory($component) {
  */
 function get_context_instance($contextlevel, $instance = 0, $strictness = IGNORE_MISSING) {
 
-    debugging('get_context_instance() is deprecated, please use context_xxxx::instance() instead.', DEBUG_DEVELOPER);
+    debugging('get_context_instance() is deprecated, please use context_xxxx::instance() instead.', E_USER_DEPRECATED);
 
     $instances = (array)$instance;
     $contexts = array();
@@ -520,7 +520,7 @@ function httpsrequired() {
  * @return string URL to file
  */
 function get_file_url($path, $options=null, $type='coursefile') {
-    debugging('Function get_file_url() is deprecated, please use moodle_url factory methods instead.', DEBUG_DEVELOPER);
+    debugging('Function get_file_url() is deprecated, please use moodle_url factory methods instead.', E_USER_DEPRECATED);
     global $CFG;
 
     $path = str_replace('//', '/', $path);
@@ -612,7 +612,7 @@ function detect_munged_arguments($string, $allowdots=1) {
  */
 function unzip_file($zipfile, $destination = '', $showstatus_ignored = true) {
     debugging(__FUNCTION__ . '() is deprecated. '
-            . 'Please use the application/zip file_packer implementation instead.', DEBUG_DEVELOPER);
+            . 'Please use the application/zip file_packer implementation instead.', E_USER_DEPRECATED);
 
     // Extract everything from zipfile.
     $path_parts = pathinfo(cleardoubleslashes($zipfile));
@@ -681,7 +681,7 @@ function unzip_file($zipfile, $destination = '', $showstatus_ignored = true) {
  */
 function zip_files($originalfiles, $destination) {
     debugging(__FUNCTION__ . '() is deprecated. '
-            . 'Please use the application/zip file_packer implementation instead.', DEBUG_DEVELOPER);
+            . 'Please use the application/zip file_packer implementation instead.', E_USER_DEPRECATED);
 
     // Extract everything from destination.
     $path_parts = pathinfo(cleardoubleslashes($destination));
@@ -766,7 +766,7 @@ function mygroupid($courseid) {
  */
 function groupmode($course, $cm=null) {
 
-    debugging('groupmode() is deprecated, please use groups_get_* instead', DEBUG_DEVELOPER);
+    debugging('groupmode() is deprecated, please use groups_get_* instead', E_USER_DEPRECATED);
     if (isset($cm->groupmode) && empty($course->groupmodeforce)) {
         return $cm->groupmode;
     }
@@ -792,7 +792,7 @@ function groupmode($course, $cm=null) {
 function set_current_group($courseid, $groupid) {
     global $SESSION;
 
-    debugging('set_current_group() is deprecated, please use $SESSION->currentgroup[$courseid] instead', DEBUG_DEVELOPER);
+    debugging('set_current_group() is deprecated, please use $SESSION->currentgroup[$courseid] instead', E_USER_DEPRECATED);
     return $SESSION->currentgroup[$courseid] = $groupid;
 }
 
@@ -812,7 +812,7 @@ function set_current_group($courseid, $groupid) {
 function get_current_group($courseid, $full = false) {
     global $SESSION;
 
-    debugging('get_current_group() is deprecated, please use groups_get_* instead', DEBUG_DEVELOPER);
+    debugging('get_current_group() is deprecated, please use groups_get_* instead', E_USER_DEPRECATED);
     if (isset($SESSION->currentgroup[$courseid])) {
         if ($full) {
             return groups_get_group($SESSION->currentgroup[$courseid]);
@@ -854,7 +854,7 @@ function groups_filter_users_by_course_module_visible($cm, $users) {
  */
 function groups_course_module_visible($cm, $userid=null) {
     throw new coding_exception('groups_course_module_visible() is removed, use $cm->uservisible to decide whether the current
-        user can ' . 'access an activity.', DEBUG_DEVELOPER);
+        user can ' . 'access an activity.', E_USER_DEPRECATED);
 }
 
 /**
@@ -922,10 +922,10 @@ function print_container_end($return=false) {
 function notify($message, $classes = 'error', $align = 'center', $return = false) {
     global $OUTPUT;
 
-    debugging('notify() is deprecated, please use $OUTPUT->notification() instead', DEBUG_DEVELOPER);
+    debugging('notify() is deprecated, please use $OUTPUT->notification() instead', E_USER_DEPRECATED);
 
     if ($classes == 'green') {
-        debugging('Use of deprecated class name "green" in notify. Please change to "success".', DEBUG_DEVELOPER);
+        debugging('Use of deprecated class name "green" in notify. Please change to "success".', E_USER_DEPRECATED);
         $classes = 'success'; // Backward compatible with old color system.
     }
 
@@ -1048,7 +1048,7 @@ function print_textarea($unused, $rows, $cols, $width, $height, $name, $value=''
 function print_arrow($direction='up', $strsort=null, $return=false) {
     global $OUTPUT;
 
-    debugging('print_arrow() is deprecated. Please use $OUTPUT->arrow() instead.', DEBUG_DEVELOPER);
+    debugging('print_arrow() is deprecated. Please use $OUTPUT->arrow() instead.', E_USER_DEPRECATED);
 
     if (!in_array($direction, array('up', 'down', 'right', 'left', 'move'))) {
         return null;
@@ -1126,7 +1126,7 @@ function update_module_button($cmid, $ignored, $string) {
 
     debugging('update_module_button() has been deprecated and should not be used anymore. Activity modules should not add the ' .
         'edit module button, the link is already available in the Administration block. Themes can choose to display the link ' .
-        'in the buttons row consistently for all module types.', DEBUG_DEVELOPER);
+        'in the buttons row consistently for all module types.', E_USER_DEPRECATED);
 
     if (has_capability('moodle/course:manageactivities', context_module::instance($cmid))) {
         $string = get_string('updatethis', '', $string);
@@ -1698,7 +1698,7 @@ function get_category_courses_array($categoryid = 0) {
  * @deprecated since 2.5
  */
 function get_category_courses_array_recursively(array &$flattened, $category) {
-    throw new coding_exception('Function get_category_courses_array_recursively() is removed, please use methods of coursecat class', DEBUG_DEVELOPER);
+    throw new coding_exception('Function get_category_courses_array_recursively() is removed, please use methods of coursecat class', E_USER_DEPRECATED);
 }
 
 /**
@@ -1762,7 +1762,7 @@ function get_context_instance_by_id($id, $strictness = IGNORE_MISSING) {
  * @return context system context (null if context table not created yet)
  */
 function get_system_context($cache = true) {
-    debugging('get_system_context() is deprecated, please use context_system::instance() instead.', DEBUG_DEVELOPER);
+    debugging('get_system_context() is deprecated, please use context_system::instance() instead.', E_USER_DEPRECATED);
     return context_system::instance(0, IGNORE_MISSING, $cache);
 }
 
@@ -2227,7 +2227,7 @@ function get_timezone_record($timezonename) {
  * @return string The resulting referer or empty string.
  */
 function get_referer($stripquery = true) {
-    debugging('get_referer() is deprecated. Please use get_local_referer() instead.', DEBUG_DEVELOPER);
+    debugging('get_referer() is deprecated. Please use get_local_referer() instead.', E_USER_DEPRECATED);
     if (isset($_SERVER['HTTP_REFERER'])) {
         if ($stripquery) {
             return strip_querystring($_SERVER['HTTP_REFERER']);
@@ -2253,7 +2253,7 @@ function get_referer($stripquery = true) {
  * @deprecated since Moodle 3.0 use \core_useragent::is_web_crawler instead.
  */
 function is_web_crawler() {
-    debugging('is_web_crawler() has been deprecated, please use core_useragent::is_web_crawler() instead.', DEBUG_DEVELOPER);
+    debugging('is_web_crawler() has been deprecated, please use core_useragent::is_web_crawler() instead.', E_USER_DEPRECATED);
     return core_useragent::is_web_crawler();
 }
 
@@ -2270,7 +2270,7 @@ function completion_cron() {
     global $CFG;
     require_once($CFG->dirroot.'/completion/cron.php');
 
-    debugging('completion_cron() is deprecated. Functionality has been moved to scheduled tasks.', DEBUG_DEVELOPER);
+    debugging('completion_cron() is deprecated. Functionality has been moved to scheduled tasks.', E_USER_DEPRECATED);
     completion_cron_mark_started();
 
     completion_cron_criteria();
@@ -2294,7 +2294,7 @@ function completion_cron() {
  * @return   array
  */
 function coursetag_get_tags($courseid, $userid=0, $tagtype='', $numtags=0, $unused = '') {
-    debugging('Function coursetag_get_tags() is deprecated. Userid is no longer used for tagging courses.', DEBUG_DEVELOPER);
+    debugging('Function coursetag_get_tags() is deprecated. Userid is no longer used for tagging courses.', E_USER_DEPRECATED);
 
     global $CFG, $DB;
 
@@ -2372,7 +2372,7 @@ function coursetag_get_tags($courseid, $userid=0, $tagtype='', $numtags=0, $unus
  * @return   array
  */
 function coursetag_get_all_tags($unused='', $numtags=0) {
-    debugging('Function coursetag_get_all_tag() is deprecated. Userid is no longer used for tagging courses.', DEBUG_DEVELOPER);
+    debugging('Function coursetag_get_all_tag() is deprecated. Userid is no longer used for tagging courses.', E_USER_DEPRECATED);
 
     global $CFG, $DB;
 
@@ -2413,7 +2413,7 @@ function coursetag_get_all_tags($unused='', $numtags=0) {
  * @return   null
  */
 function coursetag_get_jscript() {
-    debugging('Function coursetag_get_jscript() is deprecated and obsolete.', DEBUG_DEVELOPER);
+    debugging('Function coursetag_get_jscript() is deprecated and obsolete.', E_USER_DEPRECATED);
     return '';
 }
 
@@ -2428,7 +2428,7 @@ function coursetag_get_jscript() {
  * @return   string   always returns a blank string
  */
 function coursetag_get_jscript_links($elementid, $coursetagslinks) {
-    debugging('Function coursetag_get_jscript_links() is deprecated and obsolete.', DEBUG_DEVELOPER);
+    debugging('Function coursetag_get_jscript_links() is deprecated and obsolete.', E_USER_DEPRECATED);
     return '';
 }
 
@@ -2442,7 +2442,7 @@ function coursetag_get_jscript_links($elementid, $coursetagslinks) {
  * @param    int      $userid   return tags which were created by this user
  */
 function coursetag_get_records($courseid, $userid) {
-    debugging('Function coursetag_get_records() is deprecated. Userid is no longer used for tagging courses.', DEBUG_DEVELOPER);
+    debugging('Function coursetag_get_records() is deprecated. Userid is no longer used for tagging courses.', E_USER_DEPRECATED);
 
     global $CFG, $DB;
 
@@ -2469,7 +2469,7 @@ function coursetag_get_records($courseid, $userid) {
  * @param    string $myurl    (optional) for logging creation of course tags
  */
 function coursetag_store_keywords($tags, $courseid, $userid=0, $tagtype='official', $myurl='') {
-    debugging('Function coursetag_store_keywords() is deprecated. Userid is no longer used for tagging courses.', DEBUG_DEVELOPER);
+    debugging('Function coursetag_store_keywords() is deprecated. Userid is no longer used for tagging courses.', E_USER_DEPRECATED);
 
     global $CFG;
 
@@ -2500,7 +2500,7 @@ function coursetag_store_keywords($tags, $courseid, $userid=0, $tagtype='officia
  * @param    int      $courseid the course that the tag is associated with
  */
 function coursetag_delete_keyword($tagid, $userid, $courseid) {
-    debugging('Function coursetag_delete_keyword() is deprecated. Userid is no longer used for tagging courses.', DEBUG_DEVELOPER);
+    debugging('Function coursetag_delete_keyword() is deprecated. Userid is no longer used for tagging courses.', E_USER_DEPRECATED);
 
     $tag = core_tag_tag::get($tagid);
     core_tag_tag::remove_item_tag('core', 'course', $courseid, $tag->rawname, $userid);
@@ -2516,7 +2516,7 @@ function coursetag_delete_keyword($tagid, $userid, $courseid) {
  * @return array of course objects
  */
 function coursetag_get_tagged_courses($tagid) {
-    debugging('Function coursetag_get_tagged_courses() is deprecated. Userid is no longer used for tagging courses.', DEBUG_DEVELOPER);
+    debugging('Function coursetag_get_tagged_courses() is deprecated. Userid is no longer used for tagging courses.', E_USER_DEPRECATED);
 
     global $DB;
 
@@ -2552,7 +2552,7 @@ function coursetag_get_tagged_courses($tagid) {
  * @param   bool     $showfeedback if we should output a notification of the delete to the end user
  */
 function coursetag_delete_course_tags($courseid, $showfeedback=false) {
-    debugging('Function coursetag_delete_course_tags() is deprecated. Use core_tag_tag::remove_all_item_tags().', DEBUG_DEVELOPER);
+    debugging('Function coursetag_delete_course_tags() is deprecated. Use core_tag_tag::remove_all_item_tags().', E_USER_DEPRECATED);
 
     global $OUTPUT;
     core_tag_tag::remove_all_item_tags('core', 'course', $courseid);
@@ -2573,7 +2573,7 @@ function coursetag_delete_course_tags($courseid, $showfeedback=false) {
  * @return   bool     true on success, false otherwise
  */
 function tag_type_set($tagid, $type) {
-    debugging('Function tag_type_set() is deprecated and can be replaced with use core_tag_tag::get($tagid)->update().', DEBUG_DEVELOPER);
+    debugging('Function tag_type_set() is deprecated and can be replaced with use core_tag_tag::get($tagid)->update().', E_USER_DEPRECATED);
     if ($tag = core_tag_tag::get($tagid, '*')) {
         return $tag->update(array('isstandard' => ($type === 'official') ? 1 : 0));
     }
@@ -2592,7 +2592,7 @@ function tag_type_set($tagid, $type) {
  * @return   bool     true on success, false otherwise
  */
 function tag_description_set($tagid, $description, $descriptionformat) {
-    debugging('Function tag_type_set() is deprecated and can be replaced with core_tag_tag::get($tagid)->update().', DEBUG_DEVELOPER);
+    debugging('Function tag_type_set() is deprecated and can be replaced with core_tag_tag::get($tagid)->update().', E_USER_DEPRECATED);
     if ($tag = core_tag_tag::get($tagid, '*')) {
         return $tag->update(array('description' => $description, 'descriptionformat' => $descriptionformat));
     }
@@ -2612,7 +2612,7 @@ function tag_description_set($tagid, $description, $descriptionformat) {
  */
 function tag_get_tags($record_type, $record_id, $type=null, $userid=0) {
     debugging('Method tag_get_tags() is deprecated and replaced with core_tag_tag::get_item_tags(). ' .
-        'Component is now required when retrieving tag instances.', DEBUG_DEVELOPER);
+        'Component is now required when retrieving tag instances.', E_USER_DEPRECATED);
     $standardonly = ($type === 'official' ? core_tag_tag::STANDARD_ONLY :
         (!empty($type) ? core_tag_tag::NOT_STANDARD_ONLY : core_tag_tag::BOTH_STANDARD_AND_NOT));
     $tags = core_tag_tag::get_item_tags(null, $record_type, $record_id, $standardonly, $userid);
@@ -2635,7 +2635,7 @@ function tag_get_tags($record_type, $record_id, $type=null, $userid=0) {
  */
 function tag_get_tags_array($record_type, $record_id, $type=null) {
     debugging('Method tag_get_tags_array() is deprecated and replaced with core_tag_tag::get_item_tags_array(). ' .
-        'Component is now required when retrieving tag instances.', DEBUG_DEVELOPER);
+        'Component is now required when retrieving tag instances.', E_USER_DEPRECATED);
     $standardonly = ($type === 'official' ? core_tag_tag::STANDARD_ONLY :
         (!empty($type) ? core_tag_tag::NOT_STANDARD_ONLY : core_tag_tag::BOTH_STANDARD_AND_NOT));
     return core_tag_tag::get_item_tags_array('', $record_type, $record_id, $standardonly);
@@ -2658,7 +2658,7 @@ function tag_get_tags_csv($record_type, $record_id, $html=null, $type=null) {
     global $CFG, $OUTPUT;
     debugging('Method tag_get_tags_csv() is deprecated. Instead you should use either ' .
             'core_tag_tag::get_item_tags_array() or $OUTPUT->tag_list(core_tag_tag::get_item_tags()). ' .
-        'Component is now required when retrieving tag instances.', DEBUG_DEVELOPER);
+        'Component is now required when retrieving tag instances.', E_USER_DEPRECATED);
     $standardonly = ($type === 'official' ? core_tag_tag::STANDARD_ONLY :
         (!empty($type) ? core_tag_tag::NOT_STANDARD_ONLY : core_tag_tag::BOTH_STANDARD_AND_NOT));
     if ($html != TAG_RETURN_TEXT) {
@@ -2678,7 +2678,7 @@ function tag_get_tags_csv($record_type, $record_id, $html=null, $type=null) {
  * @return   array     tag ids, indexed and sorted by 'ordering'
  */
 function tag_get_tags_ids($record_type, $record_id) {
-    debugging('Method tag_get_tags_ids() is deprecated. Please consider using core_tag_tag::get_item_tags() or similar methods.', DEBUG_DEVELOPER);
+    debugging('Method tag_get_tags_ids() is deprecated. Please consider using core_tag_tag::get_item_tags() or similar methods.', E_USER_DEPRECATED);
     $tag_ids = array();
     $tagobjects = core_tag_tag::get_item_tags(null, $record_type, $record_id);
     foreach ($tagobjects as $tagobject) {
@@ -2705,7 +2705,7 @@ function tag_get_tags_ids($record_type, $record_id) {
 function tag_get_id($tags, $return_value = null) {
     global $CFG, $DB;
     debugging('Method tag_get_id() is deprecated and can be replaced with core_tag_tag::get_by_name() or core_tag_tag::get_by_name_bulk(). ' .
-        'You need to specify tag collection when retrieving tag by name', DEBUG_DEVELOPER);
+        'You need to specify tag collection when retrieving tag by name', E_USER_DEPRECATED);
 
     if (!is_array($tags)) {
         if(is_null($return_value) || $return_value == TAG_RETURN_OBJECT) {
@@ -2740,7 +2740,7 @@ function tag_get_id($tags, $return_value = null) {
  * @return   bool     true on success, false otherwise
  */
 function tag_rename($tagid, $newrawname) {
-    debugging('Function tag_rename() is deprecated and may be replaced with core_tag_tag::get($tagid)->update().', DEBUG_DEVELOPER);
+    debugging('Function tag_rename() is deprecated and may be replaced with core_tag_tag::get($tagid)->update().', E_USER_DEPRECATED);
     if ($tag = core_tag_tag::get($tagid, '*')) {
         return $tag->update(array('rawname' => $newrawname));
     }
@@ -2760,7 +2760,7 @@ function tag_rename($tagid, $newrawname) {
  */
 function tag_delete_instance($record_type, $record_id, $tagid, $userid = null) {
     debugging('Function tag_delete_instance() is deprecated and replaced with core_tag_tag::remove_item_tag() instead. ' .
-        'Component is required for retrieving instances', DEBUG_DEVELOPER);
+        'Component is required for retrieving instances', E_USER_DEPRECATED);
     $tag = core_tag_tag::get($tagid);
     core_tag_tag::remove_item_tag('', $record_type, $record_id, $tag->rawname, $userid);
 }
@@ -2779,7 +2779,7 @@ function tag_delete_instance($record_type, $record_id, $tagid, $userid = null) {
  */
 function tag_find_records($tag, $type, $limitfrom='', $limitnum='') {
     debugging('Function tag_find_records() is deprecated and replaced with core_tag_tag::get_by_name()->get_tagged_items(). '.
-        'You need to specify tag collection when retrieving tag by name', DEBUG_DEVELOPER);
+        'You need to specify tag collection when retrieving tag by name', E_USER_DEPRECATED);
 
     if (!$tag || !$type) {
         return array();
@@ -2803,7 +2803,7 @@ function tag_find_records($tag, $type, $limitfrom='', $limitnum='') {
  */
 function tag_add($tags, $type="default") {
     debugging('Function tag_add() is deprecated. You can use core_tag_tag::create_if_missing(), however it should not be necessary ' .
-        'since tags are created automatically when assigned to items', DEBUG_DEVELOPER);
+        'since tags are created automatically when assigned to items', E_USER_DEPRECATED);
     if (!is_array($tags)) {
         $tags = array($tags);
     }
@@ -2843,7 +2843,7 @@ function tag_assign($record_type, $record_id, $tagid, $ordering, $userid = 0, $c
     if ($component === null || $contextid === null) {
         $message .= '. You should specify the component and contextid of the item being tagged in your call to tag_assign.';
     }
-    debugging($message, DEBUG_DEVELOPER);
+    debugging($message, E_USER_DEPRECATED);
 
     if ($contextid) {
         $context = context::instance_by_id($contextid);
@@ -2878,7 +2878,7 @@ function tag_assign($record_type, $record_id, $tagid, $ordering, $userid = 0, $c
  */
 function tag_record_count($record_type, $tagid) {
     debugging('Method tag_record_count() is deprecated and replaced with core_tag_tag::get($tagid)->count_tagged_items(). '.
-        'Component is now required when retrieving tag instances.', DEBUG_DEVELOPER);
+        'Component is now required when retrieving tag instances.', E_USER_DEPRECATED);
     return core_tag_tag::get($tagid)->count_tagged_items('', $record_type);
 }
 
@@ -2894,7 +2894,7 @@ function tag_record_count($record_type, $tagid) {
  */
 function tag_record_tagged_with($record_type, $record_id, $tag) {
     debugging('Method tag_record_tagged_with() is deprecated and replaced with core_tag_tag::get($tagid)->is_item_tagged_with(). '.
-        'Component is now required when retrieving tag instances.', DEBUG_DEVELOPER);
+        'Component is now required when retrieving tag instances.', E_USER_DEPRECATED);
     return core_tag_tag::is_item_tagged_with('', $record_type, $record_id, $tag);
 }
 
@@ -2905,7 +2905,7 @@ function tag_record_tagged_with($record_type, $record_id, $tag) {
  * @param int|array $tagids a single tagid, or an array of tagids
  */
 function tag_set_flag($tagids) {
-    debugging('Function tag_set_flag() is deprecated and replaced with core_tag_tag::get($tagid)->flag().', DEBUG_DEVELOPER);
+    debugging('Function tag_set_flag() is deprecated and replaced with core_tag_tag::get($tagid)->flag().', E_USER_DEPRECATED);
     $tagids = (array) $tagids;
     foreach ($tagids as $tagid) {
         if ($tag = core_tag_tag::get($tagid, '*')) {
@@ -2921,7 +2921,7 @@ function tag_set_flag($tagids) {
  * @param int|array $tagids a single tagid, or an array of tagids
  */
 function tag_unset_flag($tagids) {
-    debugging('Function tag_unset_flag() is deprecated and replaced with core_tag_tag::get($tagid)->reset_flag().', DEBUG_DEVELOPER);
+    debugging('Function tag_unset_flag() is deprecated and replaced with core_tag_tag::get($tagid)->reset_flag().', E_USER_DEPRECATED);
     $tagids = (array) $tagids;
     foreach ($tagids as $tagid) {
         if ($tag = core_tag_tag::get($tagid, '*')) {
@@ -2945,7 +2945,7 @@ function tag_print_cloud($tagset=null, $nr_of_tags=150, $return=false, $sort='')
     global $OUTPUT;
 
     debugging('Function tag_print_cloud() is deprecated and replaced with function core_tag_collection::get_tag_cloud(), '
-            . 'templateable core_tag\output\tagcloud and template core_tag/tagcloud.', DEBUG_DEVELOPER);
+            . 'templateable core_tag\output\tagcloud and template core_tag/tagcloud.', E_USER_DEPRECATED);
 
     // Set up sort global - used to pass sort type into core_tag_collection::cloud_sort through usort() avoiding multiple sort functions.
     if ($sort == 'popularity') {
@@ -2993,7 +2993,7 @@ function tag_print_cloud($tagset=null, $nr_of_tags=150, $return=false, $sort='')
  */
 function tag_autocomplete($text) {
     debugging('Function tag_autocomplete() is deprecated without replacement. ' .
-            'New form element "tags" does proper autocomplete.', DEBUG_DEVELOPER);
+            'New form element "tags" does proper autocomplete.', E_USER_DEPRECATED);
     global $DB;
     return $DB->get_records_sql("SELECT tg.id, tg.name, tg.rawname
                                    FROM {tag} tg
@@ -3015,7 +3015,7 @@ function tag_print_description_box($tag_object, $return=false) {
     require_once($CFG->libdir.'/filelib.php');
 
     debugging('Function tag_print_description_box() is deprecated without replacement. ' .
-            'See core_tag_renderer for similar code.', DEBUG_DEVELOPER);
+            'See core_tag_renderer for similar code.', E_USER_DEPRECATED);
 
     $relatedtags = array();
     if ($tag = core_tag_tag::get($tag_object->id)) {
@@ -3064,7 +3064,7 @@ function tag_print_management_box($tag_object, $return=false) {
     global $USER, $CFG, $OUTPUT;
 
     debugging('Function tag_print_description_box() is deprecated without replacement. ' .
-            'See core_tag_renderer for similar code.', DEBUG_DEVELOPER);
+            'See core_tag_renderer for similar code.', E_USER_DEPRECATED);
 
     $tagname  = core_tag_tag::make_display_name($tag_object);
     $output = '';
@@ -3123,7 +3123,7 @@ function tag_print_search_box($return=false) {
     global $CFG, $OUTPUT;
 
     debugging('Function tag_print_search_box() is deprecated without replacement. ' .
-            'See core_tag_renderer for similar code.', DEBUG_DEVELOPER);
+            'See core_tag_renderer for similar code.', E_USER_DEPRECATED);
 
     $query = optional_param('query', '', PARAM_RAW);
 
@@ -3159,7 +3159,7 @@ function tag_print_search_results($query,  $page, $perpage, $return=false) {
     global $CFG, $USER, $OUTPUT;
 
     debugging('Function tag_print_search_results() is deprecated without replacement. ' .
-            'In /tag/search.php the search results are printed using the core_tag/tagcloud template.', DEBUG_DEVELOPER);
+            'In /tag/search.php the search results are printed using the core_tag/tagcloud template.', E_USER_DEPRECATED);
 
     $query = clean_param($query, PARAM_TAG);
 
@@ -3236,7 +3236,7 @@ function tag_print_search_results($query,  $page, $perpage, $return=false) {
 function tag_print_tagged_users_table($tagobject, $limitfrom='', $limitnum='', $return=false) {
 
     debugging('Function tag_print_tagged_users_table() is deprecated without replacement. ' .
-            'See core_user_renderer for similar code.', DEBUG_DEVELOPER);
+            'See core_user_renderer for similar code.', E_USER_DEPRECATED);
 
     //List of users with this tag
     $tagobject = core_tag_tag::get($tagobject->id);
@@ -3264,7 +3264,7 @@ function tag_print_user_box($user, $return=false) {
     global $CFG, $OUTPUT;
 
     debugging('Function tag_print_user_box() is deprecated without replacement. ' .
-            'See core_user_renderer for similar code.', DEBUG_DEVELOPER);
+            'See core_user_renderer for similar code.', E_USER_DEPRECATED);
 
     $usercontext = context_user::instance($user->id);
     $profilelink = '';
@@ -3316,7 +3316,7 @@ function tag_print_user_box($user, $return=false) {
 function tag_print_user_list($userlist, $return=false) {
 
     debugging('Function tag_print_user_list() is deprecated without replacement. ' .
-            'See core_user_renderer for similar code.', DEBUG_DEVELOPER);
+            'See core_user_renderer for similar code.', E_USER_DEPRECATED);
 
     $output = '<div><ul class="inline-list">';
 
@@ -3344,7 +3344,7 @@ function tag_print_user_list($userlist, $return=false) {
  * @return   string
  */
 function tag_display_name($tagobject, $html=TAG_RETURN_HTML) {
-    debugging('Function tag_display_name() is deprecated. Use core_tag_tag::make_display_name().', DEBUG_DEVELOPER);
+    debugging('Function tag_display_name() is deprecated. Use core_tag_tag::make_display_name().', E_USER_DEPRECATED);
     if (!isset($tagobject->name)) {
         return '';
     }
@@ -3362,7 +3362,7 @@ function tag_display_name($tagobject, $html=TAG_RETURN_HTML) {
  *                       (Eg: 'Banana' => 'banana').
  */
 function tag_normalize($rawtags, $case = TAG_CASE_LOWER) {
-    debugging('Function tag_normalize() is deprecated. Use core_tag_tag::normalize().', DEBUG_DEVELOPER);
+    debugging('Function tag_normalize() is deprecated. Use core_tag_tag::normalize().', E_USER_DEPRECATED);
 
     if ( !is_array($rawtags) ) {
         $rawtags = array($rawtags);
@@ -3384,7 +3384,7 @@ function tag_get_related_tags_csv($related_tags, $html=TAG_RETURN_HTML) {
     global $OUTPUT;
     debugging('Method tag_get_related_tags_csv() is deprecated. Consider '
             . 'looping through array or using $OUTPUT->tag_list(core_tag_tag::get_item_tags())',
-        DEBUG_DEVELOPER);
+        E_USER_DEPRECATED);
     if ($html != TAG_RETURN_TEXT) {
         return $OUTPUT->tag_list($related_tags, '');
     }
@@ -3475,7 +3475,7 @@ define('TAG_RELATED_CORRELATED', 2);
  */
 function tag_set($itemtype, $itemid, $tags, $component = null, $contextid = null) {
     debugging('Function tag_set() is deprecated. Use ' .
-        ' core_tag_tag::set_item_tags() instead', DEBUG_DEVELOPER);
+        ' core_tag_tag::set_item_tags() instead', E_USER_DEPRECATED);
 
     if ($itemtype === 'tag') {
         return core_tag_tag::get($itemid, '*', MUST_EXIST)->set_related_tags($tags);
@@ -3502,7 +3502,7 @@ function tag_set($itemtype, $itemid, $tags, $component = null, $contextid = null
  */
 function tag_set_add($itemtype, $itemid, $tag, $component = null, $contextid = null) {
     debugging('Function tag_set_add() is deprecated. Use ' .
-        ' core_tag_tag::add_item_tag() instead', DEBUG_DEVELOPER);
+        ' core_tag_tag::add_item_tag() instead', E_USER_DEPRECATED);
 
     if ($itemtype === 'tag') {
         return core_tag_tag::get($itemid, '*', MUST_EXIST)->add_related_tags(array($tag));
@@ -3529,7 +3529,7 @@ function tag_set_add($itemtype, $itemid, $tag, $component = null, $contextid = n
  */
 function tag_set_delete($itemtype, $itemid, $tag, $component = null, $contextid = null) {
     debugging('Function tag_set_delete() is deprecated. Use ' .
-        ' core_tag_tag::remove_item_tag() instead', DEBUG_DEVELOPER);
+        ' core_tag_tag::remove_item_tag() instead', E_USER_DEPRECATED);
     return core_tag_tag::remove_item_tag($component, $itemtype, $itemid, $tag);
 }
 
@@ -3550,7 +3550,7 @@ function tag_get($field, $value, $returnfields='id, name, rawname, tagcollid') {
     global $DB;
     debugging('Function tag_get() is deprecated. Use ' .
         ' core_tag_tag::get() or core_tag_tag::get_by_name()',
-        DEBUG_DEVELOPER);
+        E_USER_DEPRECATED);
     if ($field === 'id') {
         $tag = core_tag_tag::get((int)$value, $returnfields);
     } else if ($field === 'name') {
@@ -3583,7 +3583,7 @@ function tag_get($field, $value, $returnfields='id, name, rawname, tagcollid') {
 function tag_get_related_tags($tagid, $type=TAG_RELATED_ALL, $limitnum=10) {
     debugging('Method tag_get_related_tags() is deprecated, '
         . 'use core_tag_tag::get_correlated_tags(), core_tag_tag::get_related_tags() or '
-        . 'core_tag_tag::get_manual_related_tags()', DEBUG_DEVELOPER);
+        . 'core_tag_tag::get_manual_related_tags()', E_USER_DEPRECATED);
     $result = array();
     if ($tag = core_tag_tag::get($tagid)) {
         if ($type == TAG_RELATED_CORRELATED) {
@@ -3611,7 +3611,7 @@ function tag_get_related_tags($tagid, $type=TAG_RELATED_ALL, $limitnum=10) {
  */
 function tag_delete($tagids) {
     debugging('Method tag_delete() is deprecated, use core_tag_tag::delete_tags()',
-        DEBUG_DEVELOPER);
+        E_USER_DEPRECATED);
     return core_tag_tag::delete_tags($tagids);
 }
 
@@ -3624,7 +3624,7 @@ function tag_delete($tagids) {
  */
 function tag_delete_instances($component, $contextid = null) {
     debugging('Method tag_delete() is deprecated, use core_tag_tag::delete_instances()',
-        DEBUG_DEVELOPER);
+        E_USER_DEPRECATED);
     core_tag_tag::delete_instances($component, null, $contextid);
 }
 
@@ -3640,7 +3640,7 @@ function tag_delete_instances($component, $contextid = null) {
  */
 function tag_cleanup() {
     debugging('Method tag_cleanup() is deprecated, use \core\task\tag_cron_task::cleanup()',
-        DEBUG_DEVELOPER);
+        E_USER_DEPRECATED);
 
     $task = new \core\task\tag_cron_task();
     return $task->cleanup();
@@ -3657,7 +3657,7 @@ function tag_cleanup() {
 function tag_bulk_delete_instances($instances) {
     debugging('Method tag_bulk_delete_instances() is deprecated, '
         . 'use \core\task\tag_cron_task::bulk_delete_instances()',
-        DEBUG_DEVELOPER);
+        E_USER_DEPRECATED);
 
     $task = new \core\task\tag_cron_task();
     return $task->bulk_delete_instances($instances);
@@ -3678,7 +3678,7 @@ function tag_bulk_delete_instances($instances) {
 function tag_compute_correlations($mincorrelation = 2) {
     debugging('Method tag_compute_correlations() is deprecated, '
         . 'use \core\task\tag_cron_task::compute_correlations()',
-        DEBUG_DEVELOPER);
+        E_USER_DEPRECATED);
 
     $task = new \core\task\tag_cron_task();
     return $task->compute_correlations($mincorrelation);
@@ -3697,7 +3697,7 @@ function tag_compute_correlations($mincorrelation = 2) {
 function tag_process_computed_correlation(stdClass $tagcorrelation) {
     debugging('Method tag_process_computed_correlation() is deprecated, '
         . 'use \core\task\tag_cron_task::process_computed_correlation()',
-        DEBUG_DEVELOPER);
+        E_USER_DEPRECATED);
 
     $task = new \core\task\tag_cron_task();
     return $task->process_computed_correlation($tagcorrelation);
@@ -3711,7 +3711,7 @@ function tag_process_computed_correlation(stdClass $tagcorrelation) {
  */
 function tag_cron() {
     debugging('Method tag_cron() is deprecated, use \core\task\tag_cron_task::execute()',
-        DEBUG_DEVELOPER);
+        E_USER_DEPRECATED);
 
     $task = new \core\task\tag_cron_task();
     $task->execute();
@@ -3730,7 +3730,7 @@ function tag_cron() {
  * @return  array/boolean an array of objects, or false if no records were found or an error occured.
  */
 function tag_find_tags($text, $ordered=true, $limitfrom='', $limitnum='', $tagcollid = null) {
-    debugging('Method tag_find_tags() is deprecated without replacement', DEBUG_DEVELOPER);
+    debugging('Method tag_find_tags() is deprecated without replacement', E_USER_DEPRECATED);
     global $DB;
 
     $text = core_text::strtolower(clean_param($text, PARAM_TAG));
@@ -3762,7 +3762,7 @@ function tag_find_tags($text, $ordered=true, $limitfrom='', $limitnum='', $tagco
  * @return  mixed    string name of one tag, or id-indexed array of strings
  */
 function tag_get_name($tagids) {
-    debugging('Method tag_get_name() is deprecated without replacement', DEBUG_DEVELOPER);
+    debugging('Method tag_get_name() is deprecated without replacement', E_USER_DEPRECATED);
     global $DB;
 
     if (!is_array($tagids)) {
@@ -3794,7 +3794,7 @@ function tag_get_name($tagids) {
  */
 function tag_get_correlated($tagid, $notused = null) {
     debugging('Method tag_get_correlated() is deprecated, '
-        . 'use core_tag_tag::get_correlated_tags()', DEBUG_DEVELOPER);
+        . 'use core_tag_tag::get_correlated_tags()', E_USER_DEPRECATED);
     $result = array();
     if ($tag = core_tag_tag::get($tagid)) {
         $tags = $tag->get_correlated_tags(true);
@@ -3817,7 +3817,7 @@ function tag_get_correlated($tagid, $notused = null) {
  * @return  int    The result of the comparison/validation 1, 0 or -1
  */
 function tag_cloud_sort($a, $b) {
-    debugging('Method tag_cloud_sort() is deprecated, similar method can be found in core_tag_collection::cloud_sort()', DEBUG_DEVELOPER);
+    debugging('Method tag_cloud_sort() is deprecated, similar method can be found in core_tag_collection::cloud_sort()', E_USER_DEPRECATED);
     global $CFG;
 
     if (empty($CFG->tagsort)) {
@@ -3943,7 +3943,7 @@ function events_queue_handler($handler, $event, $errormessage) {
 function events_dispatch($handler, $eventdata, &$errormessage) {
     global $CFG;
 
-    debugging('Events API using $handlers array has been deprecated in favour of Events 2 API, please use it instead.', DEBUG_DEVELOPER);
+    debugging('Events API using $handlers array has been deprecated in favour of Events 2 API, please use it instead.', E_USER_DEPRECATED);
 
     $function = unserialize($handler->handlerfunction);
 
@@ -4055,7 +4055,7 @@ function events_update_definition($component='moodle') {
     $filehandlers = events_load_def($component);
 
     if ($filehandlers) {
-        debugging('Events API using $handlers array has been deprecated in favour of Events 2 API, please use it instead.', DEBUG_DEVELOPER);
+        debugging('Events API using $handlers array has been deprecated in favour of Events 2 API, please use it instead.', E_USER_DEPRECATED);
     }
 
     // load event definitions from db tables
@@ -4144,7 +4144,7 @@ function events_cron($eventname='') {
 
     $rs = $DB->get_recordset_sql($sql, $params);
     if ($rs->valid()) {
-        debugging('Events API using $handlers array has been deprecated in favour of Events 2 API, please use it instead.', DEBUG_DEVELOPER);
+        debugging('Events API using $handlers array has been deprecated in favour of Events 2 API, please use it instead.', E_USER_DEPRECATED);
     }
 
     foreach ($rs as $qhandler) {
@@ -4302,7 +4302,7 @@ function events_is_registered($eventname, $component) {
     global $DB;
 
     debugging('events_is_registered() has been deprecated along with all Events 1 API in favour of Events 2 API,' .
-        ' please use it instead.', DEBUG_DEVELOPER);
+        ' please use it instead.', E_USER_DEPRECATED);
 
     return $DB->record_exists('events_handlers', array('component'=>$component, 'eventname'=>$eventname));
 }
@@ -4319,7 +4319,7 @@ function events_pending_count($eventname) {
     global $DB;
 
     debugging('events_pending_count() has been deprecated along with all Events 1 API in favour of Events 2 API,' .
-        ' please use it instead.', DEBUG_DEVELOPER);
+        ' please use it instead.', E_USER_DEPRECATED);
 
     $sql = "SELECT COUNT('x')
               FROM {events_queue_handlers} qh
@@ -4337,7 +4337,7 @@ function events_pending_count($eventname) {
  * @return void
  */
 function clam_message_admins($notice) {
-    debugging('clam_message_admins() is deprecated, please use message_admins() method of \antivirus_clamav\scanner class.', DEBUG_DEVELOPER);
+    debugging('clam_message_admins() is deprecated, please use message_admins() method of \antivirus_clamav\scanner class.', E_USER_DEPRECATED);
 
     $antivirus = \core\antivirus\manager::get_antivirus('clamav');
     $antivirus->message_admins($notice);
@@ -4351,7 +4351,7 @@ function clam_message_admins($notice) {
  * @return string The definition of the error code
  */
 function get_clam_error_code($returncode) {
-    debugging('get_clam_error_code() is deprecated, please use get_clam_error_code() method of \antivirus_clamav\scanner class.', DEBUG_DEVELOPER);
+    debugging('get_clam_error_code() is deprecated, please use get_clam_error_code() method of \antivirus_clamav\scanner class.', E_USER_DEPRECATED);
 
     $antivirus = \core\antivirus\manager::get_antivirus('clamav');
     return $antivirus->get_clam_error_code($returncode);
@@ -4372,7 +4372,7 @@ function course_get_cm_rename_action(cm_info $mod, $sr = null) {
     static $baseurl;
 
     debugging('Function course_get_cm_rename_action() is deprecated. Please use inplace_editable ' .
-        'https://docs.moodle.org/dev/Inplace_editable', DEBUG_DEVELOPER);
+        'https://docs.moodle.org/dev/Inplace_editable', E_USER_DEPRECATED);
 
     $modcontext = context_module::instance($mod->id);
     $hasmanageactivities = has_capability('moodle/course:manageactivities', $modcontext);
@@ -4420,7 +4420,7 @@ function course_scale_used($courseid, $scaleid) {
     global $CFG, $DB;
 
     debugging('course_scale_used() is deprecated and never used, plugins can implement <modname>_scale_used_anywhere, '.
-        'all implementations of <modname>_scale_used are now ignored', DEBUG_DEVELOPER);
+        'all implementations of <modname>_scale_used are now ignored', E_USER_DEPRECATED);
 
     $return = 0;
 
@@ -4466,7 +4466,7 @@ function site_scale_used($scaleid, &$courses) {
     $return = 0;
 
     debugging('site_scale_used() is deprecated and never used, plugins can implement <modname>_scale_used_anywhere, '.
-        'all implementations of <modname>_scale_used are now ignored', DEBUG_DEVELOPER);
+        'all implementations of <modname>_scale_used are now ignored', E_USER_DEPRECATED);
 
     if (!is_array($courses) || count($courses) == 0) {
         $courses = get_courses("all", false, "c.id, c.shortname");
@@ -4494,7 +4494,7 @@ function site_scale_used($scaleid, &$courses) {
  */
 function external_function_info($function, $strictness=MUST_EXIST) {
     debugging('external_function_info() is deprecated. Please use external_api::external_function_info() instead.',
-              DEBUG_DEVELOPER);
+              E_USER_DEPRECATED);
     return external_api::external_function_info($function, $strictness);
 }
 
@@ -4649,7 +4649,7 @@ function put_records_csv($file, $records, $table = NULL) {
  */
 function css_is_colour($value) {
     debugging('css_is_colour() is deprecated without a replacement. Please copy the implementation '.
-        'into your plugin if you need this functionality.', DEBUG_DEVELOPER);
+        'into your plugin if you need this functionality.', E_USER_DEPRECATED);
 
     $value = trim($value);
 
@@ -4694,7 +4694,7 @@ function css_is_colour($value) {
  */
 function css_is_width($value) {
     debugging('css_is_width() is deprecated without a replacement. Please copy the implementation '.
-        'into your plugin if you need this functionality.', DEBUG_DEVELOPER);
+        'into your plugin if you need this functionality.', E_USER_DEPRECATED);
 
     $value = trim($value);
     if (in_array(strtolower($value), array('auto', 'inherit'))) {
@@ -4717,7 +4717,7 @@ function css_is_width($value) {
  */
 function css_sort_by_count(array $a, array $b) {
     debugging('css_sort_by_count() is deprecated without a replacement. Please copy the implementation '.
-        'into your plugin if you need this functionality.', DEBUG_DEVELOPER);
+        'into your plugin if you need this functionality.', E_USER_DEPRECATED);
 
     $a = count($a);
     $b = count($b);
@@ -4905,7 +4905,7 @@ class css_optimiser {
      */
     public function process($css) {
         debugging('class css_optimiser is deprecated and no longer does anything, '.
-            'please consider using stylelint to optimise your css.', DEBUG_DEVELOPER);
+            'please consider using stylelint to optimise your css.', E_USER_DEPRECATED);
 
         return $css;
     }
@@ -4919,7 +4919,7 @@ class css_optimiser {
  * @return array of course contexts
  */
 function message_get_course_contexts($courses) {
-    debugging('message_get_course_contexts() is deprecated and is no longer used.', DEBUG_DEVELOPER);
+    debugging('message_get_course_contexts() is deprecated and is no longer used.', E_USER_DEPRECATED);
 
     $coursecontexts = array();
 
@@ -4938,7 +4938,7 @@ function message_get_course_contexts($courses) {
  * @return string the URL minus parameters that perform actions (like adding/removing/blocking a contact).
  */
 function message_remove_url_params($moodleurl) {
-    debugging('message_remove_url_params() is deprecated and is no longer used.', DEBUG_DEVELOPER);
+    debugging('message_remove_url_params() is deprecated and is no longer used.', E_USER_DEPRECATED);
 
     $newurl = new moodle_url($moodleurl);
     $newurl->remove_params('addcontact','removecontact','blockcontact','unblockcontact');
@@ -4956,7 +4956,7 @@ function message_remove_url_params($moodleurl) {
  * @param string $value the value to test the field against
  */
 function message_count_messages($messagearray, $field='', $value='') {
-    debugging('message_count_messages() is deprecated and is no longer used.', DEBUG_DEVELOPER);
+    debugging('message_count_messages() is deprecated and is no longer used.', E_USER_DEPRECATED);
 
     if (!is_array($messagearray)) return 0;
     if ($field == '' or empty($messagearray)) return count($messagearray);
@@ -4977,7 +4977,7 @@ function message_count_messages($messagearray, $field='', $value='') {
  */
 function message_count_blocked_users($user1=null) {
     debugging('message_count_blocked_users() is deprecated, please use \core_message\api::count_blocked_users() instead.',
-        DEBUG_DEVELOPER);
+        E_USER_DEPRECATED);
 
     return \core_message\api::count_blocked_users($user1);
 }
@@ -4995,7 +4995,7 @@ function message_count_blocked_users($user1=null) {
  * @return string  if $return is true otherwise bool
  */
 function message_contact_link($userid, $linktype='add', $return=false, $script=null, $text=false, $icon=true) {
-    debugging('message_contact_link() is deprecated and is no longer used.', DEBUG_DEVELOPER);
+    debugging('message_contact_link() is deprecated and is no longer used.', E_USER_DEPRECATED);
 
     global $OUTPUT, $PAGE;
 
@@ -5070,7 +5070,7 @@ function message_contact_link($userid, $linktype='add', $return=false, $script=n
  * @return array
  */
 function message_get_recent_notifications($user, $limitfrom=0, $limitto=100) {
-    debugging('message_get_recent_notifications() is deprecated and is no longer used.', DEBUG_DEVELOPER);
+    debugging('message_get_recent_notifications() is deprecated and is no longer used.', E_USER_DEPRECATED);
 
     global $DB;
 
@@ -5099,7 +5099,7 @@ function message_get_recent_notifications($user, $limitfrom=0, $limitto=100) {
  * @return string|bool. Returns a string if $return is true. Otherwise returns a boolean.
  */
 function message_history_link($userid1, $userid2, $return=false, $keywords='', $position='', $linktext='') {
-    debugging('message_history_link() is deprecated and is no longer used.', DEBUG_DEVELOPER);
+    debugging('message_history_link() is deprecated and is no longer used.', E_USER_DEPRECATED);
 
     global $OUTPUT, $PAGE;
     static $strmessagehistory;
@@ -5167,7 +5167,7 @@ function message_history_link($userid1, $userid2, $return=false, $keywords='', $
  * @return mixed An array of messages or false if no matching messages were found
  */
 function message_search($searchterms, $fromme=true, $tome=true, $courseid='none', $userid=0) {
-    debugging('message_search() is deprecated and is no longer used.', DEBUG_DEVELOPER);
+    debugging('message_search() is deprecated and is no longer used.', E_USER_DEPRECATED);
 
     global $CFG, $USER, $DB;
 
@@ -5322,7 +5322,7 @@ function message_search($searchterms, $fromme=true, $tome=true, $courseid='none'
  * @return string the shortened message
  */
 function message_shorten_message($message, $minlength = 0) {
-    debugging('message_shorten_message() is deprecated and is no longer used.', DEBUG_DEVELOPER);
+    debugging('message_shorten_message() is deprecated and is no longer used.', E_USER_DEPRECATED);
 
     $i = 0;
     $tag = false;
@@ -5379,7 +5379,7 @@ function message_shorten_message($message, $minlength = 0) {
  * @param array $keywords array of keywords to find
  */
 function message_get_fragment($message, $keywords) {
-    debugging('message_get_fragment() is deprecated and is no longer used.', DEBUG_DEVELOPER);
+    debugging('message_get_fragment() is deprecated and is no longer used.', E_USER_DEPRECATED);
 
     $fullsize = 160;
     $halfsize = (int)($fullsize/2);
@@ -5431,7 +5431,7 @@ function message_get_fragment($message, $keywords) {
  * @param bool $viewingnewmessages are we currently viewing new messages?
  */
 function message_get_history($user1, $user2, $limitnum=0, $viewingnewmessages=false) {
-    debugging('message_get_history() is deprecated and is no longer used.', DEBUG_DEVELOPER);
+    debugging('message_get_history() is deprecated and is no longer used.', E_USER_DEPRECATED);
 
     global $DB, $CFG;
 
@@ -5494,7 +5494,7 @@ function message_get_history($user1, $user2, $limitnum=0, $viewingnewmessages=fa
  * @return string
  */
 function message_get_contact_add_remove_link($incontactlist, $isblocked, $contact, $script=null, $text=false, $icon=true) {
-    debugging('message_get_contact_add_remove_link() is deprecated and is no longer used.', DEBUG_DEVELOPER);
+    debugging('message_get_contact_add_remove_link() is deprecated and is no longer used.', E_USER_DEPRECATED);
 
     $strcontact = '';
 
@@ -5522,7 +5522,7 @@ function message_get_contact_add_remove_link($incontactlist, $isblocked, $contac
  * @return string
  */
 function message_get_contact_block_link($incontactlist, $isblocked, $contact, $script=null, $text=false, $icon=true) {
-    debugging('message_get_contact_block_link() is deprecated and is no longer used.', DEBUG_DEVELOPER);
+    debugging('message_get_contact_block_link() is deprecated and is no longer used.', E_USER_DEPRECATED);
 
     $strblock   = '';
 
@@ -5549,7 +5549,7 @@ function message_get_contact_block_link($incontactlist, $isblocked, $contact, $s
  */
 function message_mark_messages_read($touserid, $fromuserid) {
     debugging('message_mark_messages_read() is deprecated and is no longer used, please use
-        \core_message\api::mark_all_read_for_user() instead.', DEBUG_DEVELOPER);
+        \core_message\api::mark_all_read_for_user() instead.', E_USER_DEPRECATED);
 
     \core_message\api::mark_all_read_for_user($touserid, $fromuserid);
 }
@@ -5563,7 +5563,7 @@ function message_mark_messages_read($touserid, $fromuserid) {
  * @param stdClass $currentcontext Current context of block
  */
 function message_page_type_list($pagetype, $parentcontext, $currentcontext) {
-    debugging('message_page_type_list() is deprecated and is no longer used.', DEBUG_DEVELOPER);
+    debugging('message_page_type_list() is deprecated and is no longer used.', E_USER_DEPRECATED);
 
     return array('messages-*'=>get_string('page-message-x', 'message'));
 }
@@ -5579,7 +5579,7 @@ function message_page_type_list($pagetype, $parentcontext, $currentcontext) {
  */
 function message_can_post_message($recipient, $sender = null) {
     debugging('message_can_post_message() is deprecated and is no longer used, please use
-        \core_message\api::can_post_message() instead.', DEBUG_DEVELOPER);
+        \core_message\api::can_post_message() instead.', E_USER_DEPRECATED);
 
     return \core_message\api::can_post_message($recipient, $sender);
 }
@@ -5596,7 +5596,7 @@ function message_can_post_message($recipient, $sender = null) {
  */
 function message_is_user_non_contact_blocked($recipient, $sender = null) {
     debugging('message_is_user_non_contact_blocked() is deprecated and is no longer used, please use
-        \core_message\api::is_user_non_contact_blocked() instead.', DEBUG_DEVELOPER);
+        \core_message\api::is_user_non_contact_blocked() instead.', E_USER_DEPRECATED);
 
     return \core_message\api::is_user_non_contact_blocked($recipient, $sender);
 }
@@ -5614,7 +5614,7 @@ function message_is_user_non_contact_blocked($recipient, $sender = null) {
  */
 function message_is_user_blocked($recipient, $sender = null) {
     debugging('message_is_user_blocked() is deprecated and is no longer used, please use
-        \core_message\api::is_user_blocked() instead.', DEBUG_DEVELOPER);
+        \core_message\api::is_user_blocked() instead.', E_USER_DEPRECATED);
 
     $senderid = null;
     if ($sender !== null && isset($sender->id)) {
@@ -5630,7 +5630,7 @@ function message_is_user_blocked($recipient, $sender = null) {
  */
 function print_log($course, $user=0, $date=0, $order="l.time ASC", $page=0, $perpage=100,
                    $url="", $modname="", $modid=0, $modaction="", $groupid=0) {
-    debugging(__FUNCTION__ . '() is deprecated. Please use the report_log framework instead.', DEBUG_DEVELOPER);
+    debugging(__FUNCTION__ . '() is deprecated. Please use the report_log framework instead.', E_USER_DEPRECATED);
 
     global $CFG, $DB, $OUTPUT;
 
@@ -5749,7 +5749,7 @@ function print_log($course, $user=0, $date=0, $order="l.time ASC", $page=0, $per
  */
 function print_mnet_log($hostid, $course, $user=0, $date=0, $order="l.time ASC", $page=0, $perpage=100,
                    $url="", $modname="", $modid=0, $modaction="", $groupid=0) {
-    debugging(__FUNCTION__ . '() is deprecated. Please use the report_log framework instead.', DEBUG_DEVELOPER);
+    debugging(__FUNCTION__ . '() is deprecated. Please use the report_log framework instead.', E_USER_DEPRECATED);
 
     global $CFG, $DB, $OUTPUT;
 
@@ -5856,7 +5856,7 @@ function print_mnet_log($hostid, $course, $user=0, $date=0, $order="l.time ASC",
  */
 function print_log_csv($course, $user, $date, $order='l.time DESC', $modname,
                         $modid, $modaction, $groupid) {
-    debugging(__FUNCTION__ . '() is deprecated. Please use the report_log framework instead.', DEBUG_DEVELOPER);
+    debugging(__FUNCTION__ . '() is deprecated. Please use the report_log framework instead.', E_USER_DEPRECATED);
 
     global $DB, $CFG;
 
@@ -5944,7 +5944,7 @@ function print_log_csv($course, $user, $date, $order='l.time DESC', $modname,
  */
 function print_log_xls($course, $user, $date, $order='l.time DESC', $modname,
                         $modid, $modaction, $groupid) {
-    debugging(__FUNCTION__ . '() is deprecated. Please use the report_log framework instead.', DEBUG_DEVELOPER);
+    debugging(__FUNCTION__ . '() is deprecated. Please use the report_log framework instead.', E_USER_DEPRECATED);
 
     global $CFG, $DB;
 
@@ -6064,7 +6064,7 @@ function print_log_xls($course, $user, $date, $order='l.time DESC', $modname,
  */
 function print_log_ods($course, $user, $date, $order='l.time DESC', $modname,
                         $modid, $modaction, $groupid) {
-    debugging(__FUNCTION__ . '() is deprecated. Please use the report_log framework instead.', DEBUG_DEVELOPER);
+    debugging(__FUNCTION__ . '() is deprecated. Please use the report_log framework instead.', E_USER_DEPRECATED);
 
     global $CFG, $DB;
 
@@ -6183,7 +6183,7 @@ function build_logs_array($course, $user=0, $date=0, $order="l.time ASC", $limit
                    $modname="", $modid=0, $modaction="", $groupid=0) {
     global $DB, $SESSION, $USER;
 
-    debugging(__FUNCTION__ . '() is deprecated. Please use the report_log framework instead.', DEBUG_DEVELOPER);
+    debugging(__FUNCTION__ . '() is deprecated. Please use the report_log framework instead.', E_USER_DEPRECATED);
     // It is assumed that $date is the GMT time of midnight for that day,
     // and so the next 86400 seconds worth of logs are printed.
 
@@ -6283,7 +6283,7 @@ function build_logs_array($course, $user=0, $date=0, $order="l.time ASC", $limit
 function get_logs_usercourse($userid, $courseid, $coursestart) {
     global $DB;
 
-    debugging(__FUNCTION__ . '() is deprecated. Please use the report_log framework instead.', DEBUG_DEVELOPER);
+    debugging(__FUNCTION__ . '() is deprecated. Please use the report_log framework instead.', E_USER_DEPRECATED);
 
     $params = array();
 
@@ -6317,7 +6317,7 @@ function get_logs_usercourse($userid, $courseid, $coursestart) {
 function get_logs_userday($userid, $courseid, $daystart) {
     global $DB;
 
-    debugging(__FUNCTION__ . '() is deprecated. Please use the report_log framework instead.', DEBUG_DEVELOPER);
+    debugging(__FUNCTION__ . '() is deprecated. Please use the report_log framework instead.', E_USER_DEPRECATED);
 
     $params = array('userid'=>$userid);
 
@@ -6351,7 +6351,7 @@ function get_logs_userday($userid, $courseid, $daystart) {
 function get_logs($select, array $params=null, $order='l.time DESC', $limitfrom='', $limitnum='', &$totalcount) {
     global $DB;
 
-    debugging(__FUNCTION__ . '() is deprecated. Please use the report_log framework instead.', DEBUG_DEVELOPER);
+    debugging(__FUNCTION__ . '() is deprecated. Please use the report_log framework instead.', E_USER_DEPRECATED);
 
     if ($order) {
         $order = "ORDER BY $order";
@@ -6382,6 +6382,6 @@ function get_logs($select, array $params=null, $order='l.time DESC', $limitfrom=
  * @deprecated since Moodle 3.2 MDL-53048
  */
 function prevent_form_autofill_password() {
-    debugging('prevent_form_autofill_password has been deprecated and is no longer in use.', DEBUG_DEVELOPER);
+    debugging('prevent_form_autofill_password has been deprecated and is no longer in use.', E_USER_DEPRECATED);
     return '';
 }
