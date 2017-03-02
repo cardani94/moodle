@@ -227,9 +227,10 @@ class mysqli_native_moodle_database extends moodle_database {
      *
      * This is an ugly workaround for MySQL default collation problems.
      *
+     * @param bool $cachedbcollation cache dbcollation
      * @return string or null MySQL collation name
      */
-    public function get_dbcollation() {
+    public function get_dbcollation($cachedbcollation = true) {
         if (isset($this->dboptions['dbcollation'])) {
             return $this->dboptions['dbcollation'];
         }
@@ -285,7 +286,9 @@ class mysqli_native_moodle_database extends moodle_database {
         }
 
         // Cache the result to improve performance.
-        $this->dboptions['dbcollation'] = $collation;
+        if ($cachedbcollation) {
+            $this->dboptions['dbcollation'] = $collation;
+        }
         return $collation;
     }
 
@@ -521,9 +524,8 @@ class mysqli_native_moodle_database extends moodle_database {
 
         if (isset($dboptions['dbcollation'])) {
             $collationinfo = explode('_', $dboptions['dbcollation']);
-            $this->dboptions['dbcollation'] = $dboptions['dbcollation'];
         } else {
-            $collationinfo = explode('_', $this->get_dbcollation());
+            $collationinfo = explode('_', $this->get_dbcollation(false));
         }
         $charset = reset($collationinfo);
 
